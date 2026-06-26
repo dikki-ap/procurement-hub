@@ -64,6 +64,9 @@ try
 
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+    if (builder.Environment.IsDevelopment())
+        builder.Services.AddHostedService<ViteDevServerService>();
+
     builder.Services.AddSignalR();
     builder.Services.AddApplicationHangfire(builder.Configuration);
 
