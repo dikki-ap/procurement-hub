@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Packages">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" />
     <PackageReference Include="FluentValidation" />
