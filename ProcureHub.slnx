@@ -1,0 +1,32 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ProcureHub.API/ProcureHub.API.csproj" />
+    <Project Path="src/ProcureHub.SharedKernel/ProcureHub.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Analytics/">
+    <Project Path="src/Modules/Analytics/ProcureHub.Modules.Analytics.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/ApprovalEngine/">
+    <Project Path="src/Modules/ApprovalEngine/ProcureHub.Modules.ApprovalEngine.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/DocumentManagement/">
+    <Project Path="src/Modules/DocumentManagement/ProcureHub.Modules.DocumentManagement.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/MasterData/">
+    <Project Path="src/Modules/MasterData/ProcureHub.Modules.MasterData.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notifications/">
+    <Project Path="src/Modules/Notifications/ProcureHub.Modules.Notifications.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Procurement/">
+    <Project Path="src/Modules/Procurement/ProcureHub.Modules.Procurement.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/VendorManagement/">
+    <Project Path="src/Modules/VendorManagement/ProcureHub.Modules.VendorManagement.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ProcureHub.IntegrationTests/ProcureHub.IntegrationTests.csproj" />
+    <Project Path="tests/ProcureHub.UnitTests/ProcureHub.UnitTests.csproj" />
+  </Folder>
+</Solution>

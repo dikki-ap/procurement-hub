@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup Label="Packages">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\..\src\ProcureHub.SharedKernel\ProcureHub.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\src\Modules\MasterData\ProcureHub.Modules.MasterData.csproj" />
+    <ProjectReference Include="..\..\src\Modules\VendorManagement\ProcureHub.Modules.VendorManagement.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Procurement\ProcureHub.Modules.Procurement.csproj" />
+    <ProjectReference Include="..\..\src\Modules\ApprovalEngine\ProcureHub.Modules.ApprovalEngine.csproj" />
+    <ProjectReference Include="..\..\src\Modules\DocumentManagement\ProcureHub.Modules.DocumentManagement.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Notifications\ProcureHub.Modules.Notifications.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Analytics\ProcureHub.Modules.Analytics.csproj" />
+  </ItemGroup>
+
+</Project>
