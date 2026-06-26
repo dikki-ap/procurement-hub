@@ -118,3 +118,26 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+button:not(:disabled) {
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
