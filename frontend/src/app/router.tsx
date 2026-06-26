@@ -52,6 +52,13 @@ export const router = createBrowserRouter([
               })),
           },
           {
+            path: 'vendors/new',
+            lazy: () =>
+              import('@/features/vendors/pages/VendorFormPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
             path: 'vendors/:id',
             lazy: () =>
               import('@/features/vendors/pages/VendorDetailPage').then((m) => ({

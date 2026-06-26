@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Eye, CheckCircle, PauseCircle, Ban, RotateCcw } from 'lucide-react';
+import { Eye, CheckCircle, PauseCircle, Ban, RotateCcw, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { vendorApi, type VendorDto, type VendorStatus } from '../api/vendorApi';
-import { useAuthStore } from '@/stores/authStore';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001'; // TODO: from auth context
 
@@ -90,6 +89,9 @@ export default function VendorListPage() {
           <h1 className="text-xl font-semibold text-slate-900">Vendors</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage vendor registrations and approvals</p>
         </div>
+        <Button onClick={() => navigate('new')} className="gap-2">
+          <Plus className="h-4 w-4" /> Add Vendor
+        </Button>
       </div>
 
       <DataTable
