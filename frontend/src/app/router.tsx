@@ -45,6 +45,20 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: 'vendors',
+            lazy: () =>
+              import('@/features/vendors/pages/VendorListPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'vendors/:id',
+            lazy: () =>
+              import('@/features/vendors/pages/VendorDetailPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
             path: 'master-data',
             element: <ProtectedRoute requiredRoles={['super_admin']} />,
             children: [
@@ -175,6 +189,38 @@ export const router = createBrowserRouter([
                   ).then((m) => ({ Component: m.default })),
               },
             ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/vendor-registration',
+    lazy: () =>
+      import('@/features/vendor-registration/pages/VendorRegistrationPage').then((m) => ({
+        Component: m.default,
+      })),
+  },
+  {
+    path: '/app/vendor-portal/:vendorId',
+    element: <ProtectedRoute requiredRoles={['vendor_admin', 'vendor_staff']} />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          {
+            path: 'profile',
+            lazy: () =>
+              import('@/features/vendor-portal/pages/VendorPortalProfilePage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'documents',
+            lazy: () =>
+              import('@/features/vendor-portal/pages/VendorPortalDocumentsPage').then((m) => ({
+                Component: m.default,
+              })),
           },
         ],
       },
