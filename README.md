@@ -18,7 +18,7 @@ PR → RFQ → Bidding → Evaluation → Approval → PO → GRN → Invoice
 | Frontend | React 19, TypeScript, Vite, TailwindCSS, shadcn/ui |
 | Database | MariaDB 11.4 (primary), PostgreSQL 16 |
 | Auth | Keycloak 26.4.7 (JWT + RBAC) |
-| Storage | SeaweedFS 4.10 (S3-compatible) |
+| Storage | SeaweedFS 3.93 (S3-compatible) |
 | Background Jobs | Hangfire |
 | Real-time | SignalR |
 | Email | MailKit + Mailpit (dev) |
@@ -82,9 +82,11 @@ Services:
 |---|---|
 | API | http://localhost:8080 |
 | Swagger | http://localhost:8080/swagger |
-| Keycloak | http://localhost:9090 |
+| Keycloak Admin | http://localhost:9090 |
 | Mailpit | http://localhost:8025 |
 | Hangfire | http://localhost:8080/hangfire |
+| SeaweedFS S3 | http://localhost:8333 |
+| SeaweedFS Master | http://localhost:9333 |
 
 ### Run Locally (Development)
 
