@@ -1,0 +1,256 @@
+# ============================================================
+# Visual Studio / .NET
+# ============================================================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+TestResults/
+*.VisualState.xml
+*.pidb
+*.orig
+*.ncrunchproject
+.ncrunch*/
+_NCrunch_*/
+nCrunchTemp_*
+.sonarqube/
+.ionide/
+*.cache
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
+orleans.codegen.cs
+PublishScripts/
+packages/
+!.nuget/NuGet.Config
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+_Chutzpah*
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.e2e
+$tf/
+*.gpState
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+_TeamCity*
+*.dotCover
+.axoCover/*
+!.axoCover/settings.json
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+*.mm.*
+AutoTest.Net/
+.sass-cache/
+[Ee]xpress/
+DocProject/buildhelp/
+DocProject/Help/*.HxT
+DocProject/Help/*.HxC
+DocProject/Help/*.hhc
+DocProject/Help/*.hhk
+DocProject/Help/*.hhp
+DocProject/Help/Html2/
+DocProject/Help/html/
+publish/
+*.[Pp]ublish.xml
+*.azurePubxml
+*.pubxml
+!*. pubxml
+*.publishproj
+WebPIConfig.xml
+*.jmconfig
+*.btp.cs
+*.btm.cs
+*.odx.cs
+*.xsd.cs
+FakesAssemblies/
+Generated_Code/
+*.GhostDoc.xml
+.ntvs_analysis.dat
+node_modules/
+StyleCopReport.xml
+![Ll]ib/[Uu]nmanaged/[Aa]rchitectures
+BenchmarkDotNet.Artifacts/
+.fake/
+.fantomas/
+.paket/
+paket-files/
+.fake
+/tools/
+GeneratedFiles/
+_Pvt_Extensions
+.localhistory/
+.history/
+*.suo
+*.user
+.vs/
+generated_code/
+[Bb]uild[Ll]og.*
+*.rpt
+CMakeSettings.json
+cmake_install.cmake
+CMakeCache.txt
+CMakeFiles
+!CMakeLists.txt
+install_manifest.txt
+
+# EF Core Migrations scratch (keep Migrations/ folder itself)
+*.mdf
+*.ldf
+*.ndf
+
+# ============================================================
+# JetBrains (Rider / ReSharper)
+# ============================================================
+.idea/
+*.sln.iml
+*.iws
+out/
+.idea_modules/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+.idea/caches/build_file_checksums.ser
+
+# ============================================================
+# Node / Frontend
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+dist/
+dist-ssr/
+*.local
+.parcel-cache/
+.next/
+.nuxt/
+.cache/
+.output/
+.vite/
+frontend/dist/
+frontend/node_modules/
+
+# ============================================================
+# Environment & Secrets
+# ============================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.json
+appsettings.Local.json
+
+# ============================================================
+# Docker
+# ============================================================
+docker-compose.override.local.yml
+
+# ============================================================
+# Claude Code & Project Docs
+# ============================================================
+.claude/
+projects/
+
+# ============================================================
+# OS / Editor
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# ============================================================
+# Test / Coverage output
+# ============================================================
+TestResults/
+coverage/
+*.trx
+*.coveragexml
+lcov.info
