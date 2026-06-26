@@ -17,9 +17,17 @@ export const ProtectedRoute = ({ requiredRoles }: Props) => {
     );
   }
 
-  if (!keycloak.authenticated || !user) {
-    keycloak.login();
+  if (!keycloak.authenticated) {
+    keycloak.login({ redirectUri: `${window.location.origin}/app/dashboard` });
     return null;
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
   }
 
   if (requiredRoles?.length && !requiredRoles.some((r) => user.roles.includes(r))) {

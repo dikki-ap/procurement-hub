@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
 import { keycloak } from './shared/lib/keycloak';
-import { apiClient } from './shared/lib/axios';
 import { useAuthStore } from './stores/authStore';
 
 async function bootstrap() {
@@ -14,13 +13,24 @@ async function bootstrap() {
       pkceMethod: 'S256',
     });
 
-    if (authenticated) {
-      try {
-        const res = await apiClient.get('/auth/profile');
-        useAuthStore.getState().setUser(res.data.data);
-      } catch {
-        useAuthStore.getState().clearUser();
-      }
+    if (authenticated && keycloak.tokenParsed) {
+      const t = keycloak.tokenParsed as Record<string, unknown> & {
+        sub?: string;
+        email?: string;
+        name?: string;
+        preferred_username?: string;
+        realm_access?: { roles: string[] };
+        company_id?: string;
+      };
+      const roles: string[] = t.realm_access?.roles ?? [];
+      useAuthStore.getState().setUser({
+        id:        t.sub             ?? '',
+        email:     t.email           ?? '',
+        fullName:  t.name            ?? t.preferred_username ?? '',
+        role:      roles[0]          ?? '',
+        companyId: t.company_id      ?? '',
+        roles,
+      });
     } else {
       useAuthStore.getState().clearUser();
     }
