@@ -33,6 +33,6 @@ export const useAuthStore = create<AuthState>()(
         return roles.some((r) => u.roles.includes(r));
       },
     }),
-    { name: 'auth-storage' }
+    { name: 'auth-storage', partialize: (s) => ({ user: s.user }) }
   )
 );
