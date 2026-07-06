@@ -65,6 +65,25 @@ export const router = createBrowserRouter([
                 Component: m.default,
               })),
           },
+          // ── Approval Engine ──────────────────────────────────────────────
+          {
+            path: 'approval',
+            element: <ProtectedRoute requiredRoles={['super_admin', 'approver', 'requester', 'purchasing', 'finance', 'management']} />,
+            children: [
+              {
+                path: 'inbox',
+                lazy: () => import('@/features/approval/pages/ApprovalInboxPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: ':id',
+                lazy: () => import('@/features/approval/pages/ApprovalDetailPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'policies',
+                lazy: () => import('@/features/approval/pages/ApprovalPoliciesPage').then(m => ({ Component: m.default })),
+              },
+            ],
+          },
           // ── Procurement ──────────────────────────────────────────────────
           {
             path: 'procurement',

@@ -63,6 +63,7 @@ try
     builder.Services.AddMasterDataServices();
     builder.Services.AddVendorManagementServices();
     builder.Services.AddProcurementServices();
+    builder.Services.AddApprovalEngineServices();
 
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 

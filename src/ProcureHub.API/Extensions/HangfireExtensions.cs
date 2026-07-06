@@ -2,6 +2,7 @@ using System.Transactions;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.MySql;
+using ProcureHub.Modules.ApprovalEngine.Infrastructure.Jobs;
 using ProcureHub.Modules.Procurement.Infrastructure.Jobs;
 using ProcureHub.Modules.VendorManagement.Infrastructure.Jobs;
 
@@ -52,10 +53,11 @@ public static class HangfireExtensions
             Cron.Hourly(),
             new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
 
-        // RecurringJob.AddOrUpdate<ApprovalEscalationJob>(
-        //     "approval-escalation",
-        //     job => job.ExecuteAsync(CancellationToken.None),
-        //     "0 */2 * * *");
+        RecurringJob.AddOrUpdate<ApprovalEscalationJob>(
+            "approval-escalation",
+            job => job.ExecuteAsync(CancellationToken.None),
+            "0 */2 * * *",
+            new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
     }
 }
 

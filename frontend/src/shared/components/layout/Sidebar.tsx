@@ -12,6 +12,8 @@ import {
   Users,
   ClipboardList,
   FileText,
+  Inbox,
+  Shield,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -121,6 +123,31 @@ export const Sidebar = () => {
           </NavLink>
         </div>
 
+        {/* Approval Inbox — visible to approvers */}
+        <div className="pt-3">
+          <NavLink
+            to="/app/approval/inbox"
+            title="Approval Inbox"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
+                sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
+              } ${
+                isActive
+                  ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
+                  : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
+              }`
+            }
+          >
+            <Inbox className="h-4 w-4 flex-shrink-0" />
+            <span
+              className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+              style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+            >
+              Approval Inbox
+            </span>
+          </NavLink>
+        </div>
+
         {/* Vendors — visible to all internal users */}
         <div className="pt-3">
           <NavLink
@@ -148,9 +175,32 @@ export const Sidebar = () => {
 
         {isSuperAdmin && (
           <div className="pt-3">
+            {/* Approval Policies — super admin only */}
+            <NavLink
+              to="/app/approval/policies"
+              title="Approval Policies"
+              className={({ isActive }) =>
+                `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
+                  sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
+                } ${
+                  isActive
+                    ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
+                    : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
+                }`
+              }
+            >
+              <Shield className="h-4 w-4 flex-shrink-0" />
+              <span
+                className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+                style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+              >
+                Approval Policies
+              </span>
+            </NavLink>
+
             {/* Group label */}
             <div
-              className="overflow-hidden transition-[max-height,opacity] duration-300"
+              className="overflow-hidden transition-[max-height,opacity] duration-300 mt-3"
               style={{ maxHeight: sidebarCollapsed ? 0 : '40px', opacity: sidebarCollapsed ? 0 : 1 }}
             >
               <p className="px-5 pb-1 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
