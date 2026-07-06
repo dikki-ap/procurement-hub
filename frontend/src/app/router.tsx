@@ -37,12 +37,10 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: (
-              <div className="p-8">
-                <h1 className="text-2xl font-bold">Dashboard</h1>
-                <p className="text-muted-foreground mt-2">Coming soon...</p>
-              </div>
-            ),
+            lazy: () =>
+              import('@/features/analytics/pages/AnalyticsDashboardPage').then((m) => ({
+                Component: m.default,
+              })),
           },
           {
             path: 'vendors',
