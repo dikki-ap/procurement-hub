@@ -19,7 +19,8 @@ public class ApprovalWorkflow : AggregateRoot
     public int            MaxLevel         { get; set; } = 1;
     public WorkflowStatus Status           { get; set; } = WorkflowStatus.Pending;
     public int            Iteration        { get; set; } = 1;
-    public DateTime?      CompletedAt      { get; set; }
+    public DateTime?      CompletedAt           { get; set; }
+    public DateTime?      LastEscalationSentAt  { get; set; }
 
     // Navigation
     public ICollection<ApprovalHistory>      History     { get; set; } = [];

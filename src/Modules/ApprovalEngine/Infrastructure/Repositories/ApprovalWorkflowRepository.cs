@@ -44,7 +44,9 @@ public class ApprovalWorkflowRepository : IApprovalWorkflowRepository
                     .Include(w => w.History)
                     .Include(w => w.Assignments)
                     .Where(w => w.Status == WorkflowStatus.Pending
-                             && w.CreatedAt < cutoffTime)
+                             && w.CreatedAt < cutoffTime
+                             && (w.LastEscalationSentAt == null
+                              || w.LastEscalationSentAt < cutoffTime))
                     .ToListAsync(ct);
 
     public void Add(ApprovalWorkflow workflow)    => _db.Set<ApprovalWorkflow>().Add(workflow);

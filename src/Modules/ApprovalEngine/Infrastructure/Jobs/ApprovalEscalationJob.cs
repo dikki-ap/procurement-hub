@@ -68,6 +68,10 @@ public class ApprovalEscalationJob
                     link: $"/app/approvals/{workflow.Id}",
                     ct: ct);
             }
+
+            workflow.LastEscalationSentAt = DateTime.UtcNow;
+            _workflowRepo.Update(workflow);
+            await _workflowRepo.SaveChangesAsync(ct);
         }
 
         _logger.LogInformation(
