@@ -12,6 +12,13 @@
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="PdfSharp" />
+  </ItemGroup>
+
+  <ItemGroup Label="Fonts">
+    <None Update="Assets\Fonts\Roboto-Regular.ttf" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Assets\Fonts\Roboto-Bold.ttf"    CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Assets\Fonts\Roboto-Italic.ttf"  CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Label="Project References">

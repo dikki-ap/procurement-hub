@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   Package,
   DollarSign,
@@ -14,6 +14,8 @@ import {
   FileText,
   Inbox,
   Shield,
+  ShoppingCart,
+  Receipt,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -27,10 +29,27 @@ const masterDataLinks = [
   { to: '/app/master-data/material-categories', icon: FolderOpen, label: 'Material Categories' },
 ];
 
+const navLink = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>
+  `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
+    collapsed ? 'px-[18px] justify-center' : 'px-3'
+  } ${
+    isActive
+      ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
+      : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
+  }`;
+
 export const Sidebar = () => {
   const { sidebarCollapsed, toggleSidebarCollapse } = useUIStore();
   const { user } = useAuthStore();
-  const isSuperAdmin = user?.role === 'super_admin';
+  const location = useLocation();
+
+  const isSuperAdmin  = user?.roles?.includes('super_admin') ?? false;
+  const isPurchasing  = user?.roles?.some(r => ['purchasing', 'super_admin'].includes(r)) ?? false;
+  const isFinance     = user?.roles?.some(r => ['finance',    'super_admin'].includes(r)) ?? false;
+  const isVendor      = user?.roles?.some(r => ['vendor_admin', 'vendor_staff'].includes(r)) ?? false;
+
+  const vendorMatch   = location.pathname.match(/\/app\/vendor-portal\/([^/]+)/);
+  const vendorId      = vendorMatch?.[1];
 
   return (
     <aside
@@ -122,6 +141,80 @@ export const Sidebar = () => {
             </span>
           </NavLink>
         </div>
+
+        {/* Purchase Orders — purchasing + finance */}
+        {(isPurchasing || isFinance) && (
+          <div className="pt-1">
+            <NavLink
+              to="/app/fulfillment/purchase-orders"
+              title="Purchase Orders"
+              className={navLink(sidebarCollapsed)}
+            >
+              <ShoppingCart className="h-4 w-4 flex-shrink-0" />
+              <span
+                className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+                style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+              >
+                Purchase Orders
+              </span>
+            </NavLink>
+          </div>
+        )}
+
+        {/* Invoices — finance only */}
+        {isFinance && (
+          <div className="pt-1">
+            <NavLink
+              to="/app/fulfillment/invoices"
+              title="Invoices"
+              className={navLink(sidebarCollapsed)}
+            >
+              <Receipt className="h-4 w-4 flex-shrink-0" />
+              <span
+                className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+                style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+              >
+                Invoices
+              </span>
+            </NavLink>
+          </div>
+        )}
+
+        {/* Vendor portal links */}
+        {isVendor && vendorId && (
+          <>
+            <div className="pt-1">
+              <NavLink
+                to={`/app/vendor-portal/${vendorId}/orders`}
+                title="Purchase Orders"
+                className={navLink(sidebarCollapsed)}
+              >
+                <ShoppingCart className="h-4 w-4 flex-shrink-0" />
+                <span
+                  className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+                  style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+                >
+                  Purchase Orders
+                </span>
+              </NavLink>
+            </div>
+            <div className="pt-1">
+              <NavLink
+                to={`/app/vendor-portal/${vendorId}/invoices`}
+                title="My Invoices"
+                className={navLink(sidebarCollapsed)}
+              >
+                <Receipt className="h-4 w-4 flex-shrink-0" />
+                <span
+                  className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+                  style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+                >
+                  My Invoices
+                </span>
+              </NavLink>
+            </div>
+          </>
+        )}
 
         {/* Approval Inbox — visible to approvers */}
         <div className="pt-3">

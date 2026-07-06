@@ -119,6 +119,33 @@ export const router = createBrowserRouter([
               },
             ],
           },
+          // ── Fulfillment ──────────────────────────────────────────────────
+          {
+            path: 'fulfillment',
+            element: <ProtectedRoute requiredRoles={['super_admin', 'purchasing', 'finance']} />,
+            children: [
+              {
+                path: 'purchase-orders',
+                lazy: () => import('@/features/fulfillment/pages/POListPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'purchase-orders/new',
+                lazy: () => import('@/features/fulfillment/pages/NewPOPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'purchase-orders/:id',
+                lazy: () => import('@/features/fulfillment/pages/PODetailPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'purchase-orders/:poId/grns/new',
+                lazy: () => import('@/features/fulfillment/pages/GRNFormPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'invoices',
+                lazy: () => import('@/features/fulfillment/pages/InvoiceListPage').then(m => ({ Component: m.default })),
+              },
+            ],
+          },
           {
             path: 'master-data',
             element: <ProtectedRoute requiredRoles={['super_admin']} />,
@@ -294,6 +321,20 @@ export const router = createBrowserRouter([
             path: 'bids/:id',
             lazy: () =>
               import('@/features/vendor-portal/pages/VendorRFQDetailPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'orders',
+            lazy: () =>
+              import('@/features/fulfillment/pages/VendorOrdersPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'invoices',
+            lazy: () =>
+              import('@/features/fulfillment/pages/VendorInvoicesPage').then((m) => ({
                 Component: m.default,
               })),
           },

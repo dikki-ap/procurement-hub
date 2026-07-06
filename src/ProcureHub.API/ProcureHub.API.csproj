@@ -41,6 +41,12 @@
     <ProjectReference Include="..\Modules\Analytics\ProcureHub.Modules.Analytics.csproj" />
   </ItemGroup>
 
+  <ItemGroup Label="Fonts">
+    <None Update="Assets\Fonts\Roboto-Regular.ttf" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Assets\Fonts\Roboto-Bold.ttf"    CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Assets\Fonts\Roboto-Italic.ttf"  CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />

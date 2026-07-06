@@ -64,6 +64,7 @@ try
     builder.Services.AddVendorManagementServices();
     builder.Services.AddProcurementServices();
     builder.Services.AddApprovalEngineServices();
+    builder.Services.AddDocumentManagementServices();
 
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 

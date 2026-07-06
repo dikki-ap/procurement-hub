@@ -12,6 +12,7 @@ public static class VendorManagementModule
     {
         services.AddScoped<IVendorRepository,         VendorRepository>();
         services.AddScoped<IVendorDocumentRepository, VendorDocumentRepository>();
+        services.AddScoped<IVendorScoreRepository,    VendorScoreRepository>();
 
         services.AddScoped<IStorageService,           SeaweedFsStorageService>();
 

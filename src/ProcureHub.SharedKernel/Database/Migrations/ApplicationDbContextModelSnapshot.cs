@@ -880,6 +880,123 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.ToTable("bid_evaluations", (string)null);
                 });
 
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.Contract", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ContractNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("contract_number");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<Guid?>("CurrencyId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("currency_id");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("deleted_by_id");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("end_date");
+
+                    b.Property<string>("FileUrl")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("file_url");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<Guid?>("POId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("po_id");
+
+                    b.Property<Guid?>("PurchaseOrderId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("purchase_order_id");
+
+                    b.Property<DateTime?>("SignedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("signed_at");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("start_date");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("title");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.Property<decimal?>("Value")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("value");
+
+                    b.Property<Guid>("VendorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("vendor_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_contracts");
+
+                    b.HasIndex("ContractNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_contracts_contract_number");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_contracts_created_by_id");
+
+                    b.HasIndex("DeletedById")
+                        .HasDatabaseName("ix_contracts_deleted_by_id");
+
+                    b.HasIndex("PurchaseOrderId")
+                        .HasDatabaseName("ix_contracts_purchase_order_id");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_contracts_updated_by_id");
+
+                    b.HasIndex("VendorId")
+                        .HasDatabaseName("ix_contracts_vendor_id");
+
+                    b.ToTable("contracts", (string)null);
+                });
+
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.EvaluationScore", b =>
                 {
                     b.Property<Guid>("Id")
@@ -946,6 +1063,384 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasDatabaseName("ix_evaluation_scores_updated_by_id");
 
                     b.ToTable("evaluation_scores", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.GRNItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<Guid>("GRNId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("grn_id");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<Guid>("POItemId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("po_item_id");
+
+                    b.Property<string>("QualityStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("quality_status");
+
+                    b.Property<decimal>("ReceivedQty")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("received_qty");
+
+                    b.Property<string>("RejectReason")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("reject_reason");
+
+                    b.Property<decimal>("RejectedQty")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("rejected_qty");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_grn_items");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_grn_items_created_by_id");
+
+                    b.HasIndex("GRNId")
+                        .HasDatabaseName("ix_grn_items_grn_id");
+
+                    b.HasIndex("POItemId")
+                        .HasDatabaseName("ix_grn_items_po_item_id");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_grn_items_updated_by_id");
+
+                    b.ToTable("grn_items", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.GoodsReceipt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("deleted_by_id");
+
+                    b.Property<string>("DeliveryNoteNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("delivery_note_no");
+
+                    b.Property<string>("GRNNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("grn_number");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<Guid>("POId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("po_id");
+
+                    b.Property<Guid?>("PurchaseOrderId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("purchase_order_id");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("received_at");
+
+                    b.Property<Guid>("ReceivedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("received_by");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_goods_receipts");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_goods_receipts_created_by_id");
+
+                    b.HasIndex("DeletedById")
+                        .HasDatabaseName("ix_goods_receipts_deleted_by_id");
+
+                    b.HasIndex("GRNNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_goods_receipts_grn_number");
+
+                    b.HasIndex("POId")
+                        .HasDatabaseName("ix_goods_receipts_po_id");
+
+                    b.HasIndex("PurchaseOrderId")
+                        .HasDatabaseName("ix_goods_receipts_purchase_order_id");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_goods_receipts_updated_by_id");
+
+                    b.ToTable("goods_receipts", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.Invoice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<Guid?>("CurrencyId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("currency_id");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("deleted_by_id");
+
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("due_at");
+
+                    b.Property<string>("FileUrl")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("file_url");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("invoice_number");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<Guid>("POId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("po_id");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("paid_at");
+
+                    b.Property<string>("PaymentReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("payment_reference");
+
+                    b.Property<Guid?>("PurchaseOrderId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("purchase_order_id");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("rejection_reason");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("reviewed_at");
+
+                    b.Property<Guid?>("ReviewedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("reviewed_by");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("submitted_at");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("tax_amount");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("total_amount");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.Property<Guid>("VendorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("vendor_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_invoices");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_invoices_created_by_id");
+
+                    b.HasIndex("DeletedById")
+                        .HasDatabaseName("ix_invoices_deleted_by_id");
+
+                    b.HasIndex("InvoiceNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_invoices_invoice_number");
+
+                    b.HasIndex("POId")
+                        .HasDatabaseName("ix_invoices_po_id");
+
+                    b.HasIndex("PurchaseOrderId")
+                        .HasDatabaseName("ix_invoices_purchase_order_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_invoices_status");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_invoices_updated_by_id");
+
+                    b.HasIndex("VendorId")
+                        .HasDatabaseName("ix_invoices_vendor_id");
+
+                    b.ToTable("invoices", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.POItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("description");
+
+                    b.Property<Guid?>("MaterialId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("material_id");
+
+                    b.Property<Guid>("POId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("po_id");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("ReceivedQty")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("received_qty");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("total_price");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("unit_price");
+
+                    b.Property<Guid?>("UomId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("uom_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_po_items");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_po_items_created_by_id");
+
+                    b.HasIndex("POId")
+                        .HasDatabaseName("ix_po_items_po_id");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_po_items_updated_by_id");
+
+                    b.ToTable("po_items", (string)null);
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PRItem", b =>
@@ -1018,6 +1513,145 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasDatabaseName("ix_pr_items_updated_by_id");
 
                     b.ToTable("pr_items", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseOrder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime?>("AcknowledgedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("acknowledged_at");
+
+                    b.Property<DateTime?>("ActualDelivery")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("actual_delivery");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("cancelled_at");
+
+                    b.Property<string>("CancelledReason")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("cancelled_reason");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<Guid?>("CurrencyId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("currency_id");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("deleted_by_id");
+
+                    b.Property<Guid?>("DeliveryLocationId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("delivery_location_id");
+
+                    b.Property<DateTime?>("ExpectedDelivery")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("expected_delivery");
+
+                    b.Property<string>("FileUrl")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("file_url");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<DateTime?>("IssuedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("issued_at");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<string>("PONumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("po_number");
+
+                    b.Property<Guid?>("PaymentTermId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("payment_term_id");
+
+                    b.Property<Guid?>("RFQId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("rfq_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("TermsConditions")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("terms_conditions");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("DECIMAL(18,4)")
+                        .HasColumnName("total_amount");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.Property<Guid>("VendorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("vendor_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_purchase_orders");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_purchase_orders_created_by_id");
+
+                    b.HasIndex("DeletedById")
+                        .HasDatabaseName("ix_purchase_orders_deleted_by_id");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_purchase_orders_updated_by_id");
+
+                    b.HasIndex("VendorId")
+                        .HasDatabaseName("ix_purchase_orders_vendor_id");
+
+                    b.HasIndex("CompanyId", "PONumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_purchase_orders_company_id_po_number");
+
+                    b.HasIndex("CompanyId", "Status")
+                        .HasDatabaseName("ix_purchase_orders_company_id_status");
+
+                    b.ToTable("purchase_orders", (string)null);
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseRequisition", b =>
@@ -2531,6 +3165,40 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.Contract", b =>
+                {
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_contracts_users_created_by_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_contracts_users_deleted_by_id");
+
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderId")
+                        .HasConstraintName("fk_contracts_purchase_order_purchase_order_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_contracts_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.EvaluationScore", b =>
                 {
                     b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.BidEvaluation", "Evaluation")
@@ -2559,6 +3227,139 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.GRNItem", b =>
+                {
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_grn_items_users_created_by_id");
+
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.GoodsReceipt", "GoodsReceipt")
+                        .WithMany("Items")
+                        .HasForeignKey("GRNId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_grn_items_goods_receipts_grn_id");
+
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.POItem", "POItem")
+                        .WithMany()
+                        .HasForeignKey("POItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_grn_items_po_item_po_item_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_grn_items_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("GoodsReceipt");
+
+                    b.Navigation("POItem");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.GoodsReceipt", b =>
+                {
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_goods_receipts_users_created_by_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_goods_receipts_users_deleted_by_id");
+
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderId")
+                        .HasConstraintName("fk_goods_receipts_purchase_order_purchase_order_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_goods_receipts_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.Invoice", b =>
+                {
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_invoices_users_created_by_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_invoices_users_deleted_by_id");
+
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderId")
+                        .HasConstraintName("fk_invoices_purchase_order_purchase_order_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_invoices_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.POItem", b =>
+                {
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_po_items_users_created_by_id");
+
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("Items")
+                        .HasForeignKey("POId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_po_items_purchase_orders_po_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_po_items_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PRItem", b =>
                 {
                     b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
@@ -2583,6 +3384,33 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("PurchaseRequisition");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseOrder", b =>
+                {
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_purchase_orders_users_created_by_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_purchase_orders_users_deleted_by_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_purchase_orders_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
 
                     b.Navigation("UpdatedBy");
                 });
@@ -2983,6 +3811,16 @@ namespace ProcureHub.SharedKernel.Database.Migrations
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.BidEvaluation", b =>
                 {
                     b.Navigation("Scores");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.GoodsReceipt", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseOrder", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseRequisition", b =>
