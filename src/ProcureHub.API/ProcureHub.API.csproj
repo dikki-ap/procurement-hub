@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Packages">
+    <PackageReference Include="AspNetCore.HealthChecks.MySql" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" />
@@ -44,8 +45,8 @@
 
   <ItemGroup Label="Fonts">
     <None Update="Assets\Fonts\Roboto-Regular.ttf" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="Assets\Fonts\Roboto-Bold.ttf"    CopyToOutputDirectory="PreserveNewest" />
-    <None Update="Assets\Fonts\Roboto-Italic.ttf"  CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Assets\Fonts\Roboto-Bold.ttf" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Assets\Fonts\Roboto-Italic.ttf" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">

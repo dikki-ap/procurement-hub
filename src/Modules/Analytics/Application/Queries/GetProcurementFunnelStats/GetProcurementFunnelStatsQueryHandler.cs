@@ -18,34 +18,34 @@ public class GetProcurementFunnelStatsQueryHandler
     {
         var year = request.Year > 0 ? request.Year : DateTime.UtcNow.Year;
 
-        var prCount = await _db.Set<PurchaseRequisition>()
+        var prCount = await _db.Set<PurchaseRequisition>().AsNoTracking()
             .CountAsync(pr => pr.CompanyId == request.CompanyId && pr.CreatedAt.Year == year, ct);
 
-        var prValue = await _db.Set<PurchaseRequisition>()
+        var prValue = await _db.Set<PurchaseRequisition>().AsNoTracking()
             .Where(pr => pr.CompanyId == request.CompanyId && pr.CreatedAt.Year == year)
             .SumAsync(pr => (decimal?)pr.TotalEstimatedValue ?? 0, ct);
 
-        var rfqCount = await _db.Set<RFQ>()
+        var rfqCount = await _db.Set<RFQ>().AsNoTracking()
             .CountAsync(r => r.CompanyId == request.CompanyId && r.CreatedAt.Year == year, ct);
 
-        var poCount = await _db.Set<PurchaseOrder>()
+        var poCount = await _db.Set<PurchaseOrder>().AsNoTracking()
             .CountAsync(po => po.CompanyId == request.CompanyId
                            && po.CreatedAt.Year == year
                            && po.Status != POStatus.Cancelled, ct);
 
-        var poValue = await _db.Set<PurchaseOrder>()
+        var poValue = await _db.Set<PurchaseOrder>().AsNoTracking()
             .Where(po => po.CompanyId == request.CompanyId
                       && po.CreatedAt.Year == year
                       && po.Status != POStatus.Cancelled)
             .SumAsync(po => (decimal?)po.TotalAmount ?? 0, ct);
 
         // GRN has no CompanyId — count GRNs linked to POs of this company
-        var companyPoIds = await _db.Set<PurchaseOrder>()
+        var companyPoIds = await _db.Set<PurchaseOrder>().AsNoTracking()
             .Where(po => po.CompanyId == request.CompanyId && po.CreatedAt.Year == year)
             .Select(po => po.Id)
             .ToListAsync(ct);
 
-        var grnCount = await _db.Set<GoodsReceipt>()
+        var grnCount = await _db.Set<GoodsReceipt>().AsNoTracking()
             .CountAsync(g => companyPoIds.Contains(g.POId), ct);
 
         var stages = new List<FunnelStageDto>

@@ -4,6 +4,7 @@ using FluentValidation;
 using Hangfire;
 using MediatR;
 using ProcureHub.API.Extensions;
+using ProcureHub.API.Middleware;
 using ProcureHub.Modules.Notifications.Infrastructure.Hubs;
 using ProcureHub.API.Services;
 using ProcureHub.Modules.Analytics;
@@ -100,7 +101,7 @@ try
                   .AllowCredentials(); // Required for SignalR
         }));
 
-    builder.Services.AddHealthChecks();
+    builder.Services.AddApplicationHealthChecks(builder.Configuration);
 
     var app = builder.Build();
 
@@ -108,6 +109,7 @@ try
     app.UseCorrelationId();
     app.UseSerilogRequestLogging();
     app.UseExceptionHandling();
+    app.UseSecurityHeaders();
     app.UseHttpsRedirection();
     app.UseCors("FrontendPolicy");
     app.UseRateLimiter();
@@ -125,8 +127,7 @@ try
             Authorization = [new HangfireAuthorizationFilter()],
         });
 
-    app.MapHealthChecks("/health");
-    app.MapHealthChecks("/health/ready");
+    app.MapApplicationHealthChecks();
     app.MapControllers();
     app.MapHub<NotificationHub>("/hubs/notifications");
     app.MapFallbackToFile("index.html");

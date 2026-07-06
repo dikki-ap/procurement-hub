@@ -18,7 +18,7 @@ public class GetSpendSummaryQueryHandler : IRequestHandler<GetSpendSummaryQuery,
         var start = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc)
             .AddMonths(-(request.Months - 1));
 
-        var rows = await _db.Set<PurchaseOrder>()
+        var rows = await _db.Set<PurchaseOrder>().AsNoTracking()
             .Where(po => po.CompanyId == request.CompanyId
                       && po.IssuedAt >= start
                       && po.Status != POStatus.Cancelled

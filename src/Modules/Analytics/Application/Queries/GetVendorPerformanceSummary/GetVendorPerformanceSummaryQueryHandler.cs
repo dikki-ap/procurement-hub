@@ -18,7 +18,7 @@ public class GetVendorPerformanceSummaryQueryHandler
         GetVendorPerformanceSummaryQuery request, CancellationToken ct)
     {
         // Get vendors with their latest score in one query
-        var vendors = await _db.Set<Vendor>()
+        var vendors = await _db.Set<Vendor>().AsNoTracking()
             .Where(v => v.CompanyId == request.CompanyId)
             .Select(v => new
             {
@@ -37,7 +37,7 @@ public class GetVendorPerformanceSummaryQueryHandler
 
         // Get PO spend per vendor
         var vendorIds = vendors.Select(v => v.Id).ToList();
-        var spendByVendor = await _db.Set<PurchaseOrder>()
+        var spendByVendor = await _db.Set<PurchaseOrder>().AsNoTracking()
             .Where(po => po.CompanyId == request.CompanyId
                       && vendorIds.Contains(po.VendorId)
                       && po.Status != POStatus.Cancelled)
