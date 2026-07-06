@@ -15,6 +15,8 @@ public static class VendorManagementModule
 
         services.AddScoped<IStorageService,           SeaweedFsStorageService>();
 
+        services.AddHostedService<SeaweedFsBucketInitializer>();
+
         services.AddScoped<DocumentExpiryCheckJob>();
 
         return services;
