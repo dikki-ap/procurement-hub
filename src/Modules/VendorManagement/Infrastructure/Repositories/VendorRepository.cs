@@ -28,6 +28,11 @@ public class VendorRepository : IVendorRepository
               .Include(v => v.Capabilities)
               .FirstOrDefaultAsync(v => v.Id == id, ct);
 
+    public Task<List<Vendor>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        => _db.Set<Vendor>()
+              .Where(v => ids.Contains(v.Id))
+              .ToListAsync(ct);
+
     public Task<bool> ExistsByCodeAsync(Guid companyId, string vendorCode, Guid? excludeId = null, CancellationToken ct = default)
         => _db.Set<Vendor>()
               .AnyAsync(v => v.CompanyId == companyId

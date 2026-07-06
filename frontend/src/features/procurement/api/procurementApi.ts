@@ -1,8 +1,10 @@
 import { apiClient } from '@/shared/lib/axios';
 
-export type PRStatus       = 'Draft' | 'Submitted' | 'Approved' | 'Rejected' | 'Cancelled';
-export type RFQStatus      = 'Draft' | 'Open' | 'Closed' | 'Cancelled';
-export type RFQVendorStatus = 'Invited' | 'Declined' | 'Submitted';
+export type PRStatus         = 'Draft' | 'Submitted' | 'Approved' | 'Rejected' | 'Cancelled';
+export type RFQStatus        = 'Draft' | 'Open' | 'Closed' | 'Cancelled';
+export type RFQVendorStatus  = 'Invited' | 'Declined' | 'Submitted';
+export type QuotationStatus  = 'Draft' | 'Submitted' | 'Withdrawn' | 'Awarded' | 'Rejected';
+export type EvaluationStatus = 'Pending' | 'Awarded';
 
 export interface PRItemDto {
   id: string;
@@ -106,6 +108,111 @@ export interface CreateRFQItemRequest {
   unitLabel?: string;
 }
 
+// ── Quotation types ───────────────────────────────────────────────────────────
+
+export interface QuotationItemDto {
+  id: string;
+  rfqItemId: string;
+  itemDescription: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  notes: string | null;
+}
+
+export interface QuotationListDto {
+  id: string;
+  rfqId: string;
+  rfqNumber: string;
+  rfqTitle: string;
+  vendorId: string;
+  vendorName: string;
+  status: QuotationStatus;
+  totalPrice: number;
+  createdAt: string;
+}
+
+export interface BidComparisonItemDto {
+  rfqItemId: string;
+  itemDescription: string;
+  quantity: number;
+  unitLabel: string | null;
+}
+
+export interface BidComparisonPriceDto {
+  rfqItemId: string;
+  unitPrice: number;
+  lineTotal: number;
+  notes: string | null;
+}
+
+export interface BidComparisonRowDto {
+  vendorId: string;
+  vendorName: string;
+  quotationId: string;
+  status: string;
+  totalPrice: number;
+  itemPrices: BidComparisonPriceDto[];
+}
+
+export interface BidComparisonDto {
+  rfqId: string;
+  rfqNumber: string;
+  rfqTitle: string;
+  items: BidComparisonItemDto[];
+  vendors: BidComparisonRowDto[];
+}
+
+export interface EvaluationScoreDto {
+  quotationId: string;
+  vendorId: string;
+  vendorName: string;
+  priceScore: number;
+  qualityScore: number;
+  deliveryScore: number;
+  weightedTotal: number;
+}
+
+export interface BidEvaluationDto {
+  id: string;
+  rfqId: string;
+  priceWeight: number;
+  qualityWeight: number;
+  deliveryWeight: number;
+  status: EvaluationStatus;
+  awardedVendorId: string | null;
+  awardedQuotationId: string | null;
+  scores: EvaluationScoreDto[];
+}
+
+export interface SubmitQuotationItemRequest {
+  rfqItemId: string;
+  unitPrice: number;
+  notes?: string;
+}
+
+export interface SubmitQuotationRequest {
+  rfqId: string;
+  vendorId: string;
+  notes?: string;
+  items: SubmitQuotationItemRequest[];
+}
+
+export interface VendorScoreInput {
+  quotationId: string;
+  vendorId: string;
+  qualityScore: number;
+  deliveryScore: number;
+}
+
+export interface EvaluateBidsRequest {
+  rfqId: string;
+  priceWeight: number;
+  qualityWeight: number;
+  deliveryWeight: number;
+  scores: VendorScoreInput[];
+}
+
 export interface CreateRFQRequest {
   companyId: string;
   title: string;
@@ -154,4 +261,30 @@ export const procurementApi = {
 
   closeRFQ: (id: string) =>
     apiClient.post(`/rfqs/${id}/close`),
+
+  getRFQBids: (rfqId: string) =>
+    apiClient.get<QuotationListDto[]>(`/rfqs/${rfqId}/bids`),
+
+  getBidComparison: (rfqId: string) =>
+    apiClient.get<BidComparisonDto>(`/rfqs/${rfqId}/bids/comparison`),
+
+  evaluateBids: (rfqId: string, data: EvaluateBidsRequest) =>
+    apiClient.post<string>(`/rfqs/${rfqId}/evaluate`, data),
+
+  getBidEvaluationResult: (rfqId: string) =>
+    apiClient.get<BidEvaluationDto | null>(`/rfqs/${rfqId}/evaluation`),
+
+  awardVendor: (rfqId: string, quotationId: string, vendorId: string) =>
+    apiClient.post(`/rfqs/${rfqId}/award`, { rfqId, quotationId, vendorId }),
+
+  // ── Quotation (vendor portal) ─────────────────────────────────────────────
+
+  submitQuotation: (data: SubmitQuotationRequest) =>
+    apiClient.post<string>('/quotations', data),
+
+  withdrawQuotation: (quotationId: string) =>
+    apiClient.post(`/quotations/${quotationId}/withdraw`),
+
+  getMyQuotations: (vendorId: string) =>
+    apiClient.get<QuotationListDto[]>('/quotations', { params: { vendorId } }),
 };

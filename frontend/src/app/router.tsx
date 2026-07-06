@@ -94,6 +94,10 @@ export const router = createBrowserRouter([
                 path: 'rfqs/:id',
                 lazy: () => import('@/features/procurement/pages/RFQDetailPage').then(m => ({ Component: m.default })),
               },
+              {
+                path: 'rfqs/:id/evaluation',
+                lazy: () => import('@/features/procurement/pages/BidEvaluationPage').then(m => ({ Component: m.default })),
+              },
             ],
           },
           {

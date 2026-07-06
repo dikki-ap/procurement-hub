@@ -13,6 +13,8 @@ public static class ProcurementModule
     {
         services.AddScoped<IPurchaseRequisitionRepository, PurchaseRequisitionRepository>();
         services.AddScoped<IRFQRepository,                 RFQRepository>();
+        services.AddScoped<IVendorQuotationRepository,     VendorQuotationRepository>();
+        services.AddScoped<IBidEvaluationRepository,       BidEvaluationRepository>();
 
         services.AddScoped<IVendorChecker,                 VendorChecker>();
 

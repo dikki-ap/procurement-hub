@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Lock, Play } from 'lucide-react';
+import { ArrowLeft, Lock, Play, BarChart2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type RFQStatus, type RFQVendorStatus } from '../api/procurementApi';
@@ -77,6 +77,11 @@ export default function RFQDetailPage() {
           {rfq.status === 'Open' && (
             <Button variant="outline" onClick={() => closeMut.mutate()} disabled={closeMut.isPending}>
               <Lock className="h-4 w-4 mr-2" /> Close Bidding
+            </Button>
+          )}
+          {rfq.status === 'Closed' && (
+            <Button onClick={() => navigate(`/app/procurement/rfqs/${id}/evaluation`)}>
+              <BarChart2 className="h-4 w-4 mr-2" /> Evaluate Bids
             </Button>
           )}
         </div>
