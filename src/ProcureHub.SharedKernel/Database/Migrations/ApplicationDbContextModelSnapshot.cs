@@ -223,6 +223,10 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasColumnType("int")
                         .HasColumnName("iteration");
 
+                    b.Property<DateTime?>("LastEscalationSentAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_escalation_sent_at");
+
                     b.Property<int>("MaxLevel")
                         .HasColumnType("int")
                         .HasColumnName("max_level");

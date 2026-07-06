@@ -10,145 +10,76 @@ namespace ProcureHub.SharedKernel.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Using CREATE INDEX IF NOT EXISTS for idempotency — some indexes may already
+            // exist if a previous partial migration run created them before failing.
+
             // ── vendors ──────────────────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_vendors_status",
-                table:   "vendors",
-                column:  "status");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_vendors_is_deleted",
-                table:   "vendors",
-                column:  "is_deleted");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_vendors_created_at",
-                table:   "vendors",
-                column:  "created_at");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_vendors_status`     ON `vendors` (`status`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_vendors_is_deleted` ON `vendors` (`is_deleted`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_vendors_created_at` ON `vendors` (`created_at`)");
 
             // ── vendor_documents ─────────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_vendor_documents_is_deleted",
-                table:   "vendor_documents",
-                column:  "is_deleted");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_vendor_documents_is_deleted` ON `vendor_documents` (`is_deleted`)");
 
             // ── purchase_requisitions ────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_purchase_requisitions_status",
-                table:   "purchase_requisitions",
-                column:  "status");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_purchase_requisitions_is_deleted",
-                table:   "purchase_requisitions",
-                column:  "is_deleted");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_purchase_requisitions_created_at",
-                table:   "purchase_requisitions",
-                column:  "created_at");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_purchase_requisitions_status`     ON `purchase_requisitions` (`status`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_purchase_requisitions_is_deleted` ON `purchase_requisitions` (`is_deleted`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_purchase_requisitions_created_at` ON `purchase_requisitions` (`created_at`)");
 
             // ── rfqs ─────────────────────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_rfqs_status",
-                table:   "rfqs",
-                column:  "status");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_rfqs_is_deleted",
-                table:   "rfqs",
-                column:  "is_deleted");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_rfqs_created_at",
-                table:   "rfqs",
-                column:  "created_at");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_rfqs_status`     ON `rfqs` (`status`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_rfqs_is_deleted` ON `rfqs` (`is_deleted`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_rfqs_created_at` ON `rfqs` (`created_at`)");
 
             // ── purchase_orders ──────────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_purchase_orders_status",
-                table:   "purchase_orders",
-                column:  "status");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_purchase_orders_is_deleted",
-                table:   "purchase_orders",
-                column:  "is_deleted");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_purchase_orders_created_at",
-                table:   "purchase_orders",
-                column:  "created_at");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_purchase_orders_status`     ON `purchase_orders` (`status`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_purchase_orders_is_deleted` ON `purchase_orders` (`is_deleted`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_purchase_orders_created_at` ON `purchase_orders` (`created_at`)");
 
             // ── invoices ─────────────────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_invoices_status",
-                table:   "invoices",
-                column:  "status");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_invoices_is_deleted",
-                table:   "invoices",
-                column:  "is_deleted");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_invoices_created_at",
-                table:   "invoices",
-                column:  "created_at");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_invoices_status`     ON `invoices` (`status`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_invoices_is_deleted` ON `invoices` (`is_deleted`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_invoices_created_at` ON `invoices` (`created_at`)");
 
             // ── approval_workflows ───────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_approval_workflows_status",
-                table:   "approval_workflows",
-                column:  "status");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_approval_workflows_created_at",
-                table:   "approval_workflows",
-                column:  "created_at");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_approval_workflows_status`     ON `approval_workflows` (`status`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_approval_workflows_created_at` ON `approval_workflows` (`created_at`)");
 
             // ── in_app_notifications ─────────────────────────────────────────
-            migrationBuilder.CreateIndex(
-                name:    "ix_in_app_notifications_is_read",
-                table:   "in_app_notifications",
-                column:  "is_read");
-
-            migrationBuilder.CreateIndex(
-                name:    "ix_in_app_notifications_created_at",
-                table:   "in_app_notifications",
-                column:  "created_at");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_in_app_notifications_is_read`   ON `in_app_notifications` (`is_read`)");
+            migrationBuilder.Sql("CREATE INDEX IF NOT EXISTS `ix_in_app_notifications_created_at` ON `in_app_notifications` (`created_at`)");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(name: "ix_vendors_status",              table: "vendors");
-            migrationBuilder.DropIndex(name: "ix_vendors_is_deleted",          table: "vendors");
-            migrationBuilder.DropIndex(name: "ix_vendors_created_at",          table: "vendors");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_vendors_status`     ON `vendors`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_vendors_is_deleted` ON `vendors`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_vendors_created_at` ON `vendors`");
 
-            migrationBuilder.DropIndex(name: "ix_vendor_documents_is_deleted", table: "vendor_documents");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_vendor_documents_is_deleted` ON `vendor_documents`");
 
-            migrationBuilder.DropIndex(name: "ix_purchase_requisitions_status",     table: "purchase_requisitions");
-            migrationBuilder.DropIndex(name: "ix_purchase_requisitions_is_deleted", table: "purchase_requisitions");
-            migrationBuilder.DropIndex(name: "ix_purchase_requisitions_created_at", table: "purchase_requisitions");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_purchase_requisitions_status`     ON `purchase_requisitions`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_purchase_requisitions_is_deleted` ON `purchase_requisitions`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_purchase_requisitions_created_at` ON `purchase_requisitions`");
 
-            migrationBuilder.DropIndex(name: "ix_rfqs_status",     table: "rfqs");
-            migrationBuilder.DropIndex(name: "ix_rfqs_is_deleted", table: "rfqs");
-            migrationBuilder.DropIndex(name: "ix_rfqs_created_at", table: "rfqs");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_rfqs_status`     ON `rfqs`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_rfqs_is_deleted` ON `rfqs`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_rfqs_created_at` ON `rfqs`");
 
-            migrationBuilder.DropIndex(name: "ix_purchase_orders_status",     table: "purchase_orders");
-            migrationBuilder.DropIndex(name: "ix_purchase_orders_is_deleted", table: "purchase_orders");
-            migrationBuilder.DropIndex(name: "ix_purchase_orders_created_at", table: "purchase_orders");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_purchase_orders_status`     ON `purchase_orders`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_purchase_orders_is_deleted` ON `purchase_orders`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_purchase_orders_created_at` ON `purchase_orders`");
 
-            migrationBuilder.DropIndex(name: "ix_invoices_status",     table: "invoices");
-            migrationBuilder.DropIndex(name: "ix_invoices_is_deleted", table: "invoices");
-            migrationBuilder.DropIndex(name: "ix_invoices_created_at", table: "invoices");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_invoices_status`     ON `invoices`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_invoices_is_deleted` ON `invoices`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_invoices_created_at` ON `invoices`");
 
-            migrationBuilder.DropIndex(name: "ix_approval_workflows_status",     table: "approval_workflows");
-            migrationBuilder.DropIndex(name: "ix_approval_workflows_created_at", table: "approval_workflows");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_approval_workflows_status`     ON `approval_workflows`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_approval_workflows_created_at` ON `approval_workflows`");
 
-            migrationBuilder.DropIndex(name: "ix_in_app_notifications_is_read",   table: "in_app_notifications");
-            migrationBuilder.DropIndex(name: "ix_in_app_notifications_created_at", table: "in_app_notifications");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_in_app_notifications_is_read`    ON `in_app_notifications`");
+            migrationBuilder.Sql("DROP INDEX IF EXISTS `ix_in_app_notifications_created_at` ON `in_app_notifications`");
         }
     }
 }
