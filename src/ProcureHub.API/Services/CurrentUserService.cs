@@ -38,8 +38,11 @@ public class CurrentUserService : ICurrentUserService
     {
         get
         {
+            // Set by UserSyncMiddleware on every authenticated request
+            if (Context?.Items["LocalUserId"] is Guid id) return id;
+            // Fallback for test auth handler which injects the claim directly
             var claim = User?.FindFirstValue("procurehub_user_id");
-            return claim is not null && Guid.TryParse(claim, out var id) ? id : null;
+            return claim is not null && Guid.TryParse(claim, out var jwtId) ? jwtId : null;
         }
     }
 

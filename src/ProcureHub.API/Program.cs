@@ -114,6 +114,7 @@ try
     app.UseCors("FrontendPolicy");
     app.UseRateLimiter();
     app.UseAuthentication();
+    app.UseUserSync();
     app.UseAuthorization();
     app.UseDefaultFiles();
     app.UseStaticFiles();
