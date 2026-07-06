@@ -39,6 +39,7 @@
     <ProjectReference Include="..\Modules\DocumentManagement\ProcureHub.Modules.DocumentManagement.csproj" />
     <ProjectReference Include="..\Modules\Notifications\ProcureHub.Modules.Notifications.csproj" />
     <ProjectReference Include="..\Modules\Analytics\ProcureHub.Modules.Analytics.csproj" />
+    <ProjectReference Include="..\Modules\Audit\ProcureHub.Modules.Audit.csproj" />
   </ItemGroup>
 
   <ItemGroup Label="Fonts">

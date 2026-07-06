@@ -144,6 +144,20 @@ export const router = createBrowserRouter([
               },
             ],
           },
+          // ── Audit Log ────────────────────────────────────────────────────
+          {
+            path: 'audit',
+            element: <ProtectedRoute requiredRoles={['super_admin']} />,
+            children: [
+              {
+                path: '',
+                lazy: () =>
+                  import('@/features/audit/pages/AuditLogPage').then((m) => ({
+                    Component: m.default,
+                  })),
+              },
+            ],
+          },
           {
             path: 'master-data',
             element: <ProtectedRoute requiredRoles={['super_admin']} />,

@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\src\Modules\DocumentManagement\ProcureHub.Modules.DocumentManagement.csproj" />
     <ProjectReference Include="..\..\src\Modules\Notifications\ProcureHub.Modules.Notifications.csproj" />
     <ProjectReference Include="..\..\src\Modules\Analytics\ProcureHub.Modules.Analytics.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Audit\ProcureHub.Modules.Audit.csproj" />
   </ItemGroup>
 
 </Project>

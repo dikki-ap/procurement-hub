@@ -1,9 +1,2 @@
-namespace ProcureHub.Modules.VendorManagement.Infrastructure.Storage;
-
-public interface IStorageService
-{
-    Task<string> UploadAsync(string bucket, string objectKey, Stream content, string contentType, CancellationToken ct = default);
-    Task<string> GetPresignedUrlAsync(string bucket, string objectKey, TimeSpan expiry, CancellationToken ct = default);
-    Task         DeleteAsync(string bucket, string objectKey, CancellationToken ct = default);
-    Task         EnsureBucketExistsAsync(string bucket, CancellationToken ct = default);
-}
+// Promoted to SharedKernel.Abstractions — this alias keeps all existing code in this assembly compiling unchanged.
+global using IStorageService = ProcureHub.SharedKernel.Abstractions.IStorageService;
