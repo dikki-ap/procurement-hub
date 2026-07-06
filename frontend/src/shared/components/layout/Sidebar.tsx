@@ -10,6 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
+  ClipboardList,
+  FileText,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -69,6 +71,55 @@ export const Sidebar = () => {
             Dashboard
           </span>
         </NavLink>
+
+        {/* Procurement — visible to requester and purchasing */}
+        <div className="pt-3">
+          <NavLink
+            to="/app/procurement/prs"
+            title="Purchase Requisitions"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
+                sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
+              } ${
+                isActive
+                  ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
+                  : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
+              }`
+            }
+          >
+            <ClipboardList className="h-4 w-4 flex-shrink-0" />
+            <span
+              className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+              style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+            >
+              Purchase Requisitions
+            </span>
+          </NavLink>
+        </div>
+
+        <div className="pt-1">
+          <NavLink
+            to="/app/procurement/rfqs"
+            title="RFQs"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
+                sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
+              } ${
+                isActive
+                  ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
+                  : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
+              }`
+            }
+          >
+            <FileText className="h-4 w-4 flex-shrink-0" />
+            <span
+              className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+              style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
+            >
+              RFQs
+            </span>
+          </NavLink>
+        </div>
 
         {/* Vendors — visible to all internal users */}
         <div className="pt-3">

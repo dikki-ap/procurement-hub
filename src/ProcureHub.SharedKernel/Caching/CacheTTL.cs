@@ -13,4 +13,8 @@ public static class CacheTTL
     public static readonly TimeSpan ApprovalPolicies   = TimeSpan.FromDays(1);
     public static readonly TimeSpan VendorList         = TimeSpan.FromMinutes(30);
     public static readonly TimeSpan VendorById         = TimeSpan.FromHours(1);
+    public static readonly TimeSpan PRList             = TimeSpan.FromMinutes(5);
+    public static readonly TimeSpan PRById             = TimeSpan.FromMinutes(15);
+    public static readonly TimeSpan RFQList            = TimeSpan.FromMinutes(5);
+    public static readonly TimeSpan RFQById            = TimeSpan.FromMinutes(15);
 }

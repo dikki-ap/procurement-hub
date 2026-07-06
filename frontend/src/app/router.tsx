@@ -65,6 +65,37 @@ export const router = createBrowserRouter([
                 Component: m.default,
               })),
           },
+          // ── Procurement ──────────────────────────────────────────────────
+          {
+            path: 'procurement',
+            element: <ProtectedRoute requiredRoles={['super_admin', 'requester', 'purchasing']} />,
+            children: [
+              {
+                path: 'prs',
+                lazy: () => import('@/features/procurement/pages/PRListPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'prs/new',
+                lazy: () => import('@/features/procurement/pages/PRFormPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'prs/:id',
+                lazy: () => import('@/features/procurement/pages/PRDetailPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'rfqs',
+                lazy: () => import('@/features/procurement/pages/RFQListPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'rfqs/new',
+                lazy: () => import('@/features/procurement/pages/RFQFormPage').then(m => ({ Component: m.default })),
+              },
+              {
+                path: 'rfqs/:id',
+                lazy: () => import('@/features/procurement/pages/RFQDetailPage').then(m => ({ Component: m.default })),
+              },
+            ],
+          },
           {
             path: 'master-data',
             element: <ProtectedRoute requiredRoles={['super_admin']} />,
@@ -226,6 +257,20 @@ export const router = createBrowserRouter([
             path: 'documents',
             lazy: () =>
               import('@/features/vendor-portal/pages/VendorPortalDocumentsPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'bids',
+            lazy: () =>
+              import('@/features/vendor-portal/pages/VendorActiveBidsPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'bids/:id',
+            lazy: () =>
+              import('@/features/vendor-portal/pages/VendorRFQDetailPage').then((m) => ({
                 Component: m.default,
               })),
           },
