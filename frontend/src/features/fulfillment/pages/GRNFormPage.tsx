@@ -74,7 +74,7 @@ export default function GRNFormPage() {
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
       poId:           poId!,
-      receivedBy:     user?.fullName ?? user?.email ?? 'Unknown',
+      receivedBy:     user?.id ?? '',
       deliveryNoteNo: (fd.get('deliveryNoteNo') as string) || undefined,
       notes:          (fd.get('notes') as string) || undefined,
       items: rows.map(r => ({
