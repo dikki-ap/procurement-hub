@@ -107,15 +107,15 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                 table:   "approval_workflows",
                 column:  "created_at");
 
-            // ── notifications ────────────────────────────────────────────────
+            // ── in_app_notifications ─────────────────────────────────────────
             migrationBuilder.CreateIndex(
-                name:    "ix_notifications_is_read",
-                table:   "notifications",
+                name:    "ix_in_app_notifications_is_read",
+                table:   "in_app_notifications",
                 column:  "is_read");
 
             migrationBuilder.CreateIndex(
-                name:    "ix_notifications_created_at",
-                table:   "notifications",
+                name:    "ix_in_app_notifications_created_at",
+                table:   "in_app_notifications",
                 column:  "created_at");
         }
 
@@ -147,8 +147,8 @@ namespace ProcureHub.SharedKernel.Database.Migrations
             migrationBuilder.DropIndex(name: "ix_approval_workflows_status",     table: "approval_workflows");
             migrationBuilder.DropIndex(name: "ix_approval_workflows_created_at", table: "approval_workflows");
 
-            migrationBuilder.DropIndex(name: "ix_notifications_is_read",   table: "notifications");
-            migrationBuilder.DropIndex(name: "ix_notifications_created_at", table: "notifications");
+            migrationBuilder.DropIndex(name: "ix_in_app_notifications_is_read",   table: "in_app_notifications");
+            migrationBuilder.DropIndex(name: "ix_in_app_notifications_created_at", table: "in_app_notifications");
         }
     }
 }
