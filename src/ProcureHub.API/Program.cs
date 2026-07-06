@@ -43,7 +43,9 @@ try
     builder.Services.AddApplicationAuthorization();
     builder.Services.AddApplicationRateLimiting(builder.Configuration);
     builder.Services.AddApplicationCaching();
-    builder.Services.AddSwaggerDocumentation();
+
+    if (!builder.Environment.IsProduction())
+        builder.Services.AddSwaggerDocumentation();
 
     builder.Services.AddMediatR(
         typeof(Program).Assembly,
@@ -86,8 +88,6 @@ try
             opts.JsonSerializerOptions.DefaultIgnoreCondition      =
                 JsonIgnoreCondition.WhenWritingNull;
         });
-
-    builder.Services.AddEndpointsApiExplorer();
 
     builder.Services.AddCors(opts =>
         opts.AddPolicy("FrontendPolicy", policy =>
