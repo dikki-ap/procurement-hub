@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 import { useUIStore } from '@/stores/uiStore';
 import { keycloak } from '@/shared/lib/keycloak';
+import { NotificationPanel } from '@/features/notifications/components/NotificationPanel';
 
 export const Topbar = () => {
   const { user } = useAuthStore();
@@ -31,8 +32,9 @@ export const Topbar = () => {
         <PanelLeft className="h-4 w-4" />
       </button>
 
-      {/* Right: user info + logout */}
+      {/* Right: notifications + user info + logout */}
       <div className="flex items-center gap-3">
+        <NotificationPanel />
         <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-semibold flex-shrink-0">
           {initials}
         </div>

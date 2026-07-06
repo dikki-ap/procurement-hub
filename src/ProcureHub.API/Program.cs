@@ -4,7 +4,7 @@ using FluentValidation;
 using Hangfire;
 using MediatR;
 using ProcureHub.API.Extensions;
-using ProcureHub.API.Hubs;
+using ProcureHub.Modules.Notifications.Infrastructure.Hubs;
 using ProcureHub.API.Services;
 using ProcureHub.Modules.Analytics;
 using ProcureHub.Modules.ApprovalEngine;
@@ -65,6 +65,7 @@ try
     builder.Services.AddProcurementServices();
     builder.Services.AddApprovalEngineServices();
     builder.Services.AddDocumentManagementServices();
+    builder.Services.AddNotificationsModule(builder.Configuration);
 
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 

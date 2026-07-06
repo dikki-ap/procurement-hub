@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using ProcureHub.SharedKernel.Abstractions;
 
-namespace ProcureHub.API.Hubs;
+namespace ProcureHub.Modules.Notifications.Infrastructure.Hubs;
 
 [Authorize]
 public class NotificationHub : Hub
 {
-    private readonly ICurrentUserService _currentUser;
+    private readonly ICurrentUserService            _currentUser;
     private readonly ILogger<NotificationHub> _logger;
 
     public NotificationHub(ICurrentUserService currentUser, ILogger<NotificationHub> logger)

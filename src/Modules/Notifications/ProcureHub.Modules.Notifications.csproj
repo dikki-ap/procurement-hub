@@ -7,11 +7,17 @@
     <RootNamespace>ProcureHub.Modules.Notifications</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup Label="ASP.NET Core APIs (no extra NuGet needed — included in the shared framework)">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
   <ItemGroup Label="Packages">
     <PackageReference Include="MediatR" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="MimeKit" />
   </ItemGroup>
 
   <ItemGroup Label="Project References">
