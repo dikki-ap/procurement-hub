@@ -2,7 +2,6 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <ItemGroup Label="EF Core">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.14" />
@@ -11,12 +10,10 @@
     <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
   </ItemGroup>
-
   <ItemGroup Label="Identity &amp; Auth">
     <PackageVersion Include="Keycloak.AuthServices.Authentication" Version="2.5.2" />
     <PackageVersion Include="Keycloak.AuthServices.Authorization" Version="2.5.2" />
   </ItemGroup>
-
   <ItemGroup Label="CQRS &amp; Validation">
     <!-- PINNED: v11.x is last Apache 2.0. v13+ is RPL-1.5 / commercial. NEVER upgrade past 11.x. -->
     <PackageVersion Include="MediatR" Version="11.0.0" />
@@ -24,43 +21,35 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
   </ItemGroup>
-
   <ItemGroup Label="UUID">
     <!-- .NET 8 does not have Guid.CreateVersion7(). Use UUIDNext instead. -->
     <PackageVersion Include="UUIDNext" Version="2.0.0" />
   </ItemGroup>
-
   <ItemGroup Label="Logging">
     <PackageVersion Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
-
   <ItemGroup Label="Background Jobs">
     <PackageVersion Include="Hangfire.Core" Version="1.8.22" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.22" />
     <PackageVersion Include="Hangfire.MySqlStorage" Version="2.0.3" />
   </ItemGroup>
-
   <ItemGroup Label="Email">
     <PackageVersion Include="MailKit" Version="4.15.0" />
     <PackageVersion Include="MimeKit" Version="4.15.0" />
   </ItemGroup>
-
   <ItemGroup Label="Storage &amp; PDF">
     <PackageVersion Include="AWSSDK.S3" Version="3.7.414.0" />
     <PackageVersion Include="PdfSharp" Version="6.2.0" />
   </ItemGroup>
-
   <ItemGroup Label="Resilience">
     <PackageVersion Include="Polly.Core" Version="8.7.0" />
     <PackageVersion Include="Microsoft.Extensions.Resilience" Version="8.9.0" />
   </ItemGroup>
-
   <ItemGroup Label="API Documentation">
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.1" />
   </ItemGroup>
-
   <ItemGroup Label="Testing">
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.14" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
