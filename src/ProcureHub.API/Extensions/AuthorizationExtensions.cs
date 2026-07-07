@@ -2,7 +2,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using Keycloak.AuthServices.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 
 namespace ProcureHub.API.Extensions;
 
@@ -33,6 +32,10 @@ public static class AuthorizationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // The client whose roles are assigned to users (e.g. "procurehub-web").
+        // Roles appear in the JWT as resource_access.{clientId}.roles
+        var clientId = configuration["Keycloak:Resource"] ?? "procurehub-web";
+
         services.AddKeycloakWebApiAuthentication(configuration, options =>
         {
             options.RequireHttpsMetadata =
@@ -51,16 +54,17 @@ public static class AuthorizationExtensions
                         var identity = ctx.Principal?.Identity as ClaimsIdentity;
                         if (identity is null) return;
 
-                        // Map Keycloak realm_access.roles to .NET ClaimTypes.Role
-                        var realmAccessClaim = ctx.Principal?
-                            .FindFirst("realm_access")?.Value;
+                        // Map Keycloak resource_access.{clientId}.roles → ClaimTypes.Role
+                        var resourceAccessClaim = ctx.Principal?
+                            .FindFirst("resource_access")?.Value;
 
-                        if (!string.IsNullOrEmpty(realmAccessClaim))
+                        if (!string.IsNullOrEmpty(resourceAccessClaim))
                         {
                             try
                             {
-                                using var doc = JsonDocument.Parse(realmAccessClaim);
-                                if (doc.RootElement.TryGetProperty("roles", out var rolesEl))
+                                using var doc = JsonDocument.Parse(resourceAccessClaim);
+                                if (doc.RootElement.TryGetProperty(clientId, out var clientEl) &&
+                                    clientEl.TryGetProperty("roles", out var rolesEl))
                                 {
                                     foreach (var role in rolesEl.EnumerateArray())
                                     {

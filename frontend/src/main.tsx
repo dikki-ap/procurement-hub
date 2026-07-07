@@ -19,10 +19,11 @@ async function bootstrap() {
         email?: string;
         name?: string;
         preferred_username?: string;
-        realm_access?: { roles: string[] };
+        resource_access?: Record<string, { roles: string[] }>;
         company_id?: string;
       };
-      const roles: string[] = t.realm_access?.roles ?? [];
+      const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'procurehub-web';
+      const roles: string[] = t.resource_access?.[clientId]?.roles ?? [];
       useAuthStore.getState().setUser({
         id:        t.sub             ?? '',
         email:     t.email           ?? '',
