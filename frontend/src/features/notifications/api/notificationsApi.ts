@@ -12,8 +12,8 @@ export interface NotificationDto {
 
 export const notificationsApi = {
   getMyNotifications: () =>
-    apiClient.get<{ data: NotificationDto[] }>('/api/v1/notifications'),
+    apiClient.get<{ data: NotificationDto[] }>('/notifications'),
 
   markAsRead: (id: string) =>
-    apiClient.post(`/api/v1/notifications/${id}/read`),
+    apiClient.post(`/notifications/${id}/read`),
 };

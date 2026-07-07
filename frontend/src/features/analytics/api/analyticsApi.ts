@@ -55,20 +55,20 @@ export interface FunnelStats {
 
 export const analyticsApi = {
   getWidgets: (params: { companyId?: string; vendorId?: string }) =>
-    apiClient.get<{ data: DashboardWidgets | VendorDashboardWidgets }>('/api/v1/analytics/widgets', { params }),
+    apiClient.get<{ data: DashboardWidgets | VendorDashboardWidgets }>('/analytics/widgets', { params }),
 
   getSpendSummary: (companyId: string, months = 12) =>
-    apiClient.get<{ data: SpendSummary }>('/api/v1/analytics/spend-summary', {
+    apiClient.get<{ data: SpendSummary }>('/analytics/spend-summary', {
       params: { companyId, months },
     }),
 
   getVendorPerformance: (companyId: string, topN = 10) =>
-    apiClient.get<{ data: VendorPerformanceSummary }>('/api/v1/analytics/vendor-performance', {
+    apiClient.get<{ data: VendorPerformanceSummary }>('/analytics/vendor-performance', {
       params: { companyId, topN },
     }),
 
   getFunnelStats: (companyId: string, year?: number) =>
-    apiClient.get<{ data: FunnelStats }>('/api/v1/analytics/funnel', {
+    apiClient.get<{ data: FunnelStats }>('/analytics/funnel', {
       params: { companyId, year },
     }),
 };

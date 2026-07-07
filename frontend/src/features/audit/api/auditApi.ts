@@ -37,8 +37,8 @@ export interface AuditLogFilter {
 
 export const auditApi = {
   getAuditLog: (params: AuditLogFilter) =>
-    apiClient.get<{ data: PagedAuditLogDto }>('/api/v1/audit', { params }),
+    apiClient.get<{ data: PagedAuditLogDto }>('/audit', { params }),
 
   exportAuditLog: (filter: Omit<AuditLogFilter, 'page' | 'pageSize'>) =>
-    apiClient.post<{ data: string }>('/api/v1/audit/export', filter),
+    apiClient.post<{ data: string }>('/audit/export', filter),
 };
