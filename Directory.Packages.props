@@ -12,8 +12,7 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
   </ItemGroup>
   <ItemGroup Label="Identity &amp; Auth">
-    <PackageVersion Include="Keycloak.AuthServices.Authentication" Version="2.5.2" />
-    <PackageVersion Include="Keycloak.AuthServices.Authorization" Version="2.5.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
   </ItemGroup>
   <ItemGroup Label="CQRS &amp; Validation">
     <!-- PINNED: v11.x is last Apache 2.0. v13+ is RPL-1.5 / commercial. NEVER upgrade past 11.x. -->

@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Keycloak.AuthServices.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace ProcureHub.API.Extensions;
@@ -32,19 +31,16 @@ public static class AuthorizationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // The client whose roles are assigned to users (e.g. "procurehub-web").
-        // Roles appear in the JWT as resource_access.{clientId}.roles
-        var clientId = configuration["Keycloak:Resource"] ?? "procurehub-web";
+        // Roles live in resource_access.{clientId}.roles inside the JWT (client roles, not realm roles).
+        var clientId = configuration["Keycloak:ClientId"] ?? "procurehub-web";
 
-        services.AddKeycloakWebApiAuthentication(configuration, options =>
-        {
-            options.RequireHttpsMetadata =
-                configuration.GetValue<bool>("Keycloak:RequireHttpsMetadata");
-        });
-
-        services.Configure<JwtBearerOptions>(
-            JwtBearerDefaults.AuthenticationScheme, options =>
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
+                // Authority = full Keycloak realm URL, e.g. http://localhost:9090/realms/procurehub
+                options.Authority            = configuration["Keycloak:Authority"];
+                options.RequireHttpsMetadata = configuration.GetValue<bool>("Keycloak:RequireHttpsMetadata");
+
                 options.TokenValidationParameters.ValidateAudience = false;
 
                 options.Events = new JwtBearerEvents
@@ -54,7 +50,7 @@ public static class AuthorizationExtensions
                         var identity = ctx.Principal?.Identity as ClaimsIdentity;
                         if (identity is null) return;
 
-                        // Map Keycloak resource_access.{clientId}.roles → ClaimTypes.Role
+                        // Map resource_access.{clientId}.roles → ClaimTypes.Role
                         var resourceAccessClaim = ctx.Principal?
                             .FindFirst("resource_access")?.Value;
 
