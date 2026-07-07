@@ -38,7 +38,7 @@ INSERT IGNORE INTO currencies (id, code, name, symbol, exchange_rate, is_base, i
 ('cc000000-0000-0000-0000-000000000004', 'SGD', 'Singapore Dollar',  'S$', 12000.000000, 0, 1, @now, @now);
 
 -- ── Units of Measure ─────────────────────────────────────────────────────────
-INSERT IGNORE INTO units_of_measure (id, company_id, code, name, is_active, created_at, updated_at) VALUES
+INSERT IGNORE INTO unit_of_measures (id, company_id, code, name, is_active, created_at, updated_at) VALUES
 ('uu000000-0000-0000-0000-000000000001', @company_id, 'KG',   'Kilogram', 1, @now, @now),
 ('uu000000-0000-0000-0000-000000000002', @company_id, 'TON',  'Ton',      1, @now, @now),
 ('uu000000-0000-0000-0000-000000000003', @company_id, 'PCS',  'Pieces',   1, @now, @now),
