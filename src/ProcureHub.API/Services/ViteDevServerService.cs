@@ -55,10 +55,32 @@ public sealed class ViteDevServerService : IHostedService, IDisposable
     {
         if (_process is { HasExited: false })
         {
-            _process.Kill(entireProcessTree: true);
+            KillProcessTree(_process.Id);
             _logger.LogInformation("Vite dev server stopped");
         }
         return Task.CompletedTask;
+    }
+
+    private static void KillProcessTree(int pid)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            // taskkill /f /t is more reliable than Kill(entireProcessTree) on Windows
+            // because cmd.exe spawned by Process.Start may not propagate kills to grandchildren
+            using var killer = Process.Start(new ProcessStartInfo
+            {
+                FileName               = "taskkill",
+                Arguments              = $"/f /t /pid {pid}",
+                UseShellExecute        = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError  = true,
+            });
+            killer?.WaitForExit(3000);
+        }
+        else
+        {
+            Process.GetProcessById(pid).Kill(entireProcessTree: true);
+        }
     }
 
     public void Dispose() => _process?.Dispose();
