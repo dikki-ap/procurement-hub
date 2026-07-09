@@ -28,7 +28,7 @@ export default function RFQListPage() {
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['rfqs', COMPANY_ID],
-    queryFn:  () => procurementApi.listRFQs(COMPANY_ID).then(r => r.data),
+    queryFn:  () => procurementApi.listRFQs(COMPANY_ID),
   });
 
   const closeMut = useMutation({
@@ -38,25 +38,25 @@ export default function RFQListPage() {
   });
 
   const columns: DataTableColumn<RFQListDto>[] = [
-    { key: 'rfqNumber',  label: 'RFQ Number', sortable: true },
-    { key: 'title',      label: 'Title',       sortable: true },
+    { key: 'rfqNumber',  header: 'RFQ Number', sortable: true },
+    { key: 'title',      header: 'Title',       sortable: true },
     {
       key:    'bidDeadline',
-      label:  'Bid Deadline',
+      header:  'Bid Deadline',
       sortable: true,
       render: (v: RFQListDto) => new Date(v.bidDeadline).toLocaleDateString('id-ID'),
     },
     {
       key:    'status',
-      label:  'Status',
+      header:  'Status',
       sortable: true,
       render: (v: RFQListDto) => <StatusBadge status={v.status} />,
     },
-    { key: 'itemCount',   label: 'Items',   sortable: false },
-    { key: 'vendorCount', label: 'Vendors', sortable: false },
+    { key: 'itemCount',   header: 'Items',   sortable: false },
+    { key: 'vendorCount', header: 'Vendors', sortable: false },
     {
       key:    'actions' as keyof RFQListDto,
-      label:  'Actions',
+      header:  'Actions',
       sortable: false,
       render: (v: RFQListDto) => (
         <div className="flex gap-1">
@@ -84,7 +84,7 @@ export default function RFQListPage() {
           <Plus className="h-4 w-4 mr-2" /> New RFQ
         </Button>
       </div>
-      <DataTable columns={columns} data={data} loading={isLoading} searchable />
+      <DataTable columns={columns} data={data as unknown as Record<string, unknown>[]} isLoading={isLoading} searchPlaceholder="Search RFQs..." />
     </div>
   );
 }

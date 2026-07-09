@@ -29,7 +29,7 @@ export default function InvoiceListPage() {
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ['invoices'],
-    queryFn:  () => fulfillmentApi.getInvoiceList().then(r => r.data),
+    queryFn:  fulfillmentApi.getInvoiceList,
   });
 
   const reviewMut = useMutation({

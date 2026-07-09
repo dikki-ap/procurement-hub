@@ -27,7 +27,7 @@ export default function POListPage() {
 
   const { data: pos = [], isLoading } = useQuery({
     queryKey: ['purchase-orders', companyId],
-    queryFn:  () => fulfillmentApi.getPOList(companyId).then(r => r.data),
+    queryFn:  () => fulfillmentApi.getPOList(companyId),
     enabled:  !!companyId,
   });
 

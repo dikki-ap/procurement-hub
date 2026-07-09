@@ -123,14 +123,14 @@ export interface CreateGRNPayload {
 
 export const fulfillmentApi = {
   // POs
-  getPOList:   (companyId: string)  => apiClient.get<POListDto[]>(`/purchase-orders?companyId=${companyId}`),
+  getPOList:   (companyId: string)  => apiClient.get<{ data: POListDto[] }>(`/purchase-orders?companyId=${companyId}`).then(r => r.data.data),
   getPOById:   (id: string)         => apiClient.get<PODto>(`/purchase-orders/${id}`),
   createPO:    (data: CreatePOPayload) => apiClient.post<string>('/purchase-orders', data),
   issuePO:     (id: string)         => apiClient.post(`/purchase-orders/${id}/issue`),
   acknowledgePO: (id: string)       => apiClient.post(`/purchase-orders/${id}/acknowledge`),
 
   // Vendor POs
-  getVendorPOs: (vendorId: string)  => apiClient.get<POListDto[]>(`/purchase-orders?vendorId=${vendorId}`),
+  getVendorPOs: (vendorId: string)  => apiClient.get<{ data: POListDto[] }>(`/purchase-orders?vendorId=${vendorId}`).then(r => r.data.data),
 
   // GRNs
   getGRNList:  (poId: string)       => apiClient.get<GRNListDto[]>(`/goods-receipts?poId=${poId}`),
@@ -139,7 +139,7 @@ export const fulfillmentApi = {
   confirmGRN:  (id: string, vendorId: string) => apiClient.post(`/goods-receipts/${id}/confirm?vendorId=${vendorId}`),
 
   // Invoices
-  getInvoiceList: ()                => apiClient.get<InvoiceListDto[]>('/invoices'),
+  getInvoiceList: ()                => apiClient.get<{ data: InvoiceListDto[] }>('/invoices').then(r => r.data.data),
   getInvoiceById: (id: string)      => apiClient.get<InvoiceDto>(`/invoices/${id}`),
   submitInvoice:  (data: { poId: string; vendorId: string; amount: number; taxAmount: number; currencyId?: string; fileUrl?: string; dueAt?: string; notes?: string }) =>
     apiClient.post<string>('/invoices', data),
@@ -149,5 +149,5 @@ export const fulfillmentApi = {
     apiClient.post(`/invoices/${id}/confirm-payment`, { paymentReference }),
 
   // Vendor invoices
-  getVendorInvoices: (vendorId: string) => apiClient.get<InvoiceListDto[]>(`/invoices?vendorId=${vendorId}`),
+  getVendorInvoices: (vendorId: string) => apiClient.get<{ data: InvoiceListDto[] }>(`/invoices?vendorId=${vendorId}`).then(r => r.data.data),
 };

@@ -31,7 +31,7 @@ export default function PRListPage() {
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['prs', COMPANY_ID],
-    queryFn:  () => procurementApi.listPRs(COMPANY_ID).then(r => r.data),
+    queryFn:  () => procurementApi.listPRs(COMPANY_ID),
   });
 
   const submitMut = useMutation({
@@ -47,31 +47,31 @@ export default function PRListPage() {
   });
 
   const columns: DataTableColumn<PRListDto>[] = [
-    { key: 'prNumber',  label: 'PR Number',   sortable: true },
-    { key: 'title',     label: 'Title',        sortable: true },
-    { key: 'department', label: 'Department',  sortable: true },
+    { key: 'prNumber',  header: 'PR Number',   sortable: true },
+    { key: 'title',     header: 'Title',        sortable: true },
+    { key: 'department', header: 'Department',  sortable: true },
     {
       key:    'requiredDate',
-      label:  'Required Date',
+      header:  'Required Date',
       sortable: true,
       render: (v: PRListDto) => new Date(v.requiredDate).toLocaleDateString('id-ID'),
     },
     {
       key:    'status',
-      label:  'Status',
+      header:  'Status',
       sortable: true,
       render: (v: PRListDto) => <StatusBadge status={v.status} />,
     },
     {
       key:    'totalEstimatedValue',
-      label:  'Est. Value',
+      header:  'Est. Value',
       sortable: true,
       render: (v: PRListDto) => fmt.format(v.totalEstimatedValue),
     },
-    { key: 'itemCount', label: 'Items', sortable: false },
+    { key: 'itemCount', header: 'Items', sortable: false },
     {
       key:    'actions' as keyof PRListDto,
-      label:  'Actions',
+      header:  'Actions',
       sortable: false,
       render: (v: PRListDto) => (
         <div className="flex gap-1">
@@ -105,7 +105,7 @@ export default function PRListPage() {
           <Plus className="h-4 w-4 mr-2" /> New PR
         </Button>
       </div>
-      <DataTable columns={columns} data={data} loading={isLoading} searchable />
+      <DataTable columns={columns} data={data as unknown as Record<string, unknown>[]} isLoading={isLoading} searchPlaceholder="Search PRs..." />
     </div>
   );
 }

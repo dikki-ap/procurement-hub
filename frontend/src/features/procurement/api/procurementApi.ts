@@ -228,7 +228,7 @@ export interface CreateRFQRequest {
 
 export const procurementApi = {
   listPRs: (companyId: string) =>
-    apiClient.get<PRListDto[]>('/purchase-requisitions', { params: { companyId } }),
+    apiClient.get<{ data: PRListDto[] }>('/purchase-requisitions', { params: { companyId } }).then(r => r.data.data),
 
   getPR: (id: string) =>
     apiClient.get<PRDto>(`/purchase-requisitions/${id}`),
@@ -245,7 +245,7 @@ export const procurementApi = {
   // ── RFQ endpoints ─────────────────────────────────────────────────────────
 
   listRFQs: (companyId: string) =>
-    apiClient.get<RFQListDto[]>('/rfqs', { params: { companyId } }),
+    apiClient.get<{ data: RFQListDto[] }>('/rfqs', { params: { companyId } }).then(r => r.data.data),
 
   getRFQ: (id: string) =>
     apiClient.get<RFQDto>(`/rfqs/${id}`),
