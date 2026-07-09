@@ -65,7 +65,7 @@ export function VendorFormModal({ open, onClose }: Props) {
           {/* Company Info */}
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Company Information</p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Legal Name <span className="text-red-500">*</span></label>
                 <input name="legalName" required className={inputCls} />
@@ -98,7 +98,7 @@ export function VendorFormModal({ open, onClose }: Props) {
           {/* Primary Contact */}
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Primary Contact</p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Name <span className="text-red-500">*</span></label>
                 <input name="contactName" required className={inputCls} />

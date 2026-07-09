@@ -7,7 +7,7 @@ import { NotificationPanel } from '@/features/notifications/components/Notificat
 
 export const Topbar = () => {
   const { user } = useAuthStore();
-  const { toggleSidebarCollapse } = useUIStore();
+  const { toggleSidebar, toggleSidebarCollapse } = useUIStore();
 
   const initials = user?.fullName
     ? user.fullName
@@ -21,11 +21,19 @@ export const Topbar = () => {
     ? user.role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
     : '';
 
+  const handleHamburger = () => {
+    if (window.innerWidth < 768) {
+      toggleSidebar();
+    } else {
+      toggleSidebarCollapse();
+    }
+  };
+
   return (
     <header className="h-14 flex-shrink-0 bg-white border-b border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex items-center justify-between px-4">
       {/* Left: sidebar toggle */}
       <button
-        onClick={toggleSidebarCollapse}
+        onClick={handleHamburger}
         className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-150"
         aria-label="Toggle sidebar"
       >

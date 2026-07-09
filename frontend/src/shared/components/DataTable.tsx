@@ -119,7 +119,8 @@ export function DataTable<T extends Record<string, unknown>>({
 
       {/* Table container */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-slate-100">
               {columns.map((col) => (
@@ -183,10 +184,11 @@ export function DataTable<T extends Record<string, unknown>>({
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Footer: per-page + pagination */}
-      <div className="flex items-center justify-between text-sm text-slate-500">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-sm text-slate-500">
         <div className="flex items-center gap-2">
           <span>Rows per page</span>
           <select

@@ -89,7 +89,7 @@ export default function VendorRegistrationPage() {
         >
           <div>
             <h2 className="text-sm font-semibold text-slate-700 mb-4 uppercase tracking-wider">Company Information</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {field('Legal Name', 'legalName', true)}
               {field('Trade Name', 'tradeName')}
               <div>
@@ -112,7 +112,7 @@ export default function VendorRegistrationPage() {
 
           <div>
             <h2 className="text-sm font-semibold text-slate-700 mb-4 uppercase tracking-wider">Primary Contact</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {field('Contact Name', 'contactName', true)}
               {field('Position', 'contactPosition')}
               {field('Email', 'contactEmail', true, 'email')}

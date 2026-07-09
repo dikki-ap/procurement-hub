@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Package,
@@ -39,9 +40,16 @@ const navLink = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>
   }`;
 
 export const Sidebar = () => {
-  const { sidebarCollapsed, toggleSidebarCollapse } = useUIStore();
+  const { sidebarCollapsed, toggleSidebarCollapse, sidebarOpen, setSidebarOpen } = useUIStore();
   const { user } = useAuthStore();
   const location = useLocation();
+
+  // Auto-close sidebar on mobile when navigating
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, setSidebarOpen]);
 
   const isSuperAdmin  = user?.roles?.includes('super_admin') ?? false;
   const isPurchasing  = user?.roles?.some(r => ['purchasing', 'super_admin'].includes(r)) ?? false;
@@ -53,7 +61,14 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0 bg-[#0f1729] text-slate-200 transition-[width] duration-300 ease-in-out overflow-hidden"
+      className={[
+        'fixed md:static inset-y-0 left-0',
+        'z-50 md:z-auto',
+        'flex flex-col flex-shrink-0',
+        'bg-[#0f1729] text-slate-200',
+        'transition-all duration-300 ease-in-out',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+      ].join(' ')}
       style={{ width: sidebarCollapsed ? '64px' : '240px' }}
     >
       {/* Logo area */}
@@ -93,7 +108,7 @@ export const Sidebar = () => {
           </span>
         </NavLink>
 
-        {/* Procurement — visible to requester and purchasing */}
+        {/* Procurement */}
         <div className="pt-3">
           <NavLink
             to="/app/procurement/prs"
@@ -142,7 +157,6 @@ export const Sidebar = () => {
           </NavLink>
         </div>
 
-        {/* Purchase Orders — purchasing + finance */}
         {(isPurchasing || isFinance) && (
           <div className="pt-1">
             <NavLink
@@ -161,7 +175,6 @@ export const Sidebar = () => {
           </div>
         )}
 
-        {/* Invoices — finance only */}
         {isFinance && (
           <div className="pt-1">
             <NavLink
@@ -180,7 +193,6 @@ export const Sidebar = () => {
           </div>
         )}
 
-        {/* Vendor portal links */}
         {isVendor && vendorId && (
           <>
             <div className="pt-1">
@@ -216,7 +228,6 @@ export const Sidebar = () => {
           </>
         )}
 
-        {/* Approval Inbox — visible to approvers */}
         <div className="pt-3">
           <NavLink
             to="/app/approval/inbox"
@@ -241,7 +252,6 @@ export const Sidebar = () => {
           </NavLink>
         </div>
 
-        {/* Vendors — visible to all internal users */}
         <div className="pt-3">
           <NavLink
             to="/app/vendors"
@@ -268,7 +278,6 @@ export const Sidebar = () => {
 
         {isSuperAdmin && (
           <div className="pt-3">
-            {/* Approval Policies — super admin only */}
             <NavLink
               to="/app/approval/policies"
               title="Approval Policies"
@@ -291,7 +300,6 @@ export const Sidebar = () => {
               </span>
             </NavLink>
 
-            {/* Group label */}
             <div
               className="overflow-hidden transition-[max-height,opacity] duration-300 mt-3"
               style={{ maxHeight: sidebarCollapsed ? 0 : '40px', opacity: sidebarCollapsed ? 0 : 1 }}
@@ -329,8 +337,8 @@ export const Sidebar = () => {
         )}
       </nav>
 
-      {/* Collapse toggle */}
-      <div className="flex-shrink-0 border-t border-white/8 p-2">
+      {/* Collapse toggle — desktop only */}
+      <div className="hidden md:flex flex-shrink-0 border-t border-white/8 p-2">
         <button
           onClick={toggleSidebarCollapse}
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}

@@ -65,8 +65,8 @@ export function NewPRModal({ open, onClose }: Props) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 mt-2">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-sm font-medium mb-1">Title <span className="text-red-500">*</span></label>
               <input name="title" required className={inputCls} placeholder="e.g. Office Supplies Q3 2026" />
             </div>
@@ -87,7 +87,7 @@ export function NewPRModal({ open, onClose }: Props) {
               <label className="block text-sm font-medium mb-1">Description</label>
               <input name="description" className={inputCls} placeholder="Optional description" />
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-sm font-medium mb-1">Notes</label>
               <textarea name="notes" rows={2} className={inputCls} placeholder="Additional notes" />
             </div>
@@ -102,34 +102,38 @@ export function NewPRModal({ open, onClose }: Props) {
             </div>
             <div className="space-y-2">
               {items.map((item, idx) => (
-                <div key={idx} className="grid grid-cols-12 gap-2 items-end p-3 bg-muted/30 rounded-lg">
-                  <div className="col-span-5">
+                <div key={idx} className="p-3 bg-muted/30 rounded-lg space-y-2">
+                  {/* Description — full width */}
+                  <div>
                     <label className="block text-xs font-medium mb-1">Description <span className="text-red-500">*</span></label>
                     <input required className={inputCls} value={item.itemDescription} placeholder="Item description"
                       onChange={e => updateItem(idx, 'itemDescription', e.target.value)} />
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-xs font-medium mb-1">Qty <span className="text-red-500">*</span></label>
-                    <input required type="number" min="0.01" step="0.01" className={inputCls}
-                      value={item.quantity}
-                      onChange={e => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-xs font-medium mb-1">Unit</label>
-                    <input className={inputCls} value={item.unitLabel ?? ''} placeholder="pcs"
-                      onChange={e => updateItem(idx, 'unitLabel', e.target.value)} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-xs font-medium mb-1">Unit Price</label>
-                    <input type="number" min="0" step="1000" className={inputCls}
-                      value={item.estimatedUnitPrice}
-                      onChange={e => updateItem(idx, 'estimatedUnitPrice', parseFloat(e.target.value) || 0)} />
-                  </div>
-                  <div className="col-span-1 flex justify-end">
-                    <Button type="button" variant="ghost" size="sm" className="text-red-500"
-                      onClick={() => removeItem(idx)} disabled={items.length === 1}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                  {/* Qty + Unit + Unit Price + Delete */}
+                  <div className="flex items-end gap-2">
+                    <div className="w-20 flex-shrink-0">
+                      <label className="block text-xs font-medium mb-1">Qty <span className="text-red-500">*</span></label>
+                      <input required type="number" min="0.01" step="0.01" className={inputCls}
+                        value={item.quantity}
+                        onChange={e => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)} />
+                    </div>
+                    <div className="w-20 flex-shrink-0">
+                      <label className="block text-xs font-medium mb-1">Unit</label>
+                      <input className={inputCls} value={item.unitLabel ?? ''} placeholder="pcs"
+                        onChange={e => updateItem(idx, 'unitLabel', e.target.value)} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-xs font-medium mb-1">Unit Price</label>
+                      <input type="number" min="0" step="1000" className={inputCls}
+                        value={item.estimatedUnitPrice}
+                        onChange={e => updateItem(idx, 'estimatedUnitPrice', parseFloat(e.target.value) || 0)} />
+                    </div>
+                    <div className="flex items-end pb-0.5">
+                      <Button type="button" variant="ghost" size="sm" className="text-red-500"
+                        onClick={() => removeItem(idx)} disabled={items.length === 1}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
