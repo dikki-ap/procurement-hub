@@ -38,7 +38,7 @@ export default function ApprovalInboxPage() {
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="max-w-4xl flex flex-col min-h-[calc(100vh-112px)]">
       <div className="flex items-center gap-3">
         <Inbox className="h-5 w-5 text-muted-foreground" />
         <h1 className="text-2xl font-semibold">Approval Inbox</h1>
@@ -48,12 +48,12 @@ export default function ApprovalInboxPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[55vh] text-muted-foreground">
+        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
           <Inbox className="h-12 w-12 mb-3 opacity-30" />
           <p className="text-sm">No pending approvals.</p>
         </div>
       ) : (
-        <div className="rounded-md border overflow-hidden">
+        <div className="rounded-md border overflow-hidden mt-6">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>

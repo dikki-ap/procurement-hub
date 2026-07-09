@@ -64,10 +64,12 @@ export default function ApprovalPoliciesPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-3">
-        <Shield className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-2xl font-semibold">Approval Policies</h1>
-        <Button size="sm" className="ml-auto" onClick={() => setShowModal(true)}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Shield className="h-5 w-5 text-muted-foreground" />
+          <h1 className="text-2xl font-semibold">Approval Policies</h1>
+        </div>
+        <Button size="sm" onClick={() => setShowModal(true)}>
           <Plus className="h-4 w-4 mr-1" /> Add Policy
         </Button>
       </div>
@@ -140,17 +142,20 @@ export default function ApprovalPoliciesPage() {
                 <label className="text-xs font-medium text-muted-foreground">Required Levels (1–5)</label>
                 <Input type="number" min={1} max={5} value={form.requiredLevels} onChange={e => setForm(p => ({ ...p, requiredLevels: e.target.value }))} />
               </div>
-              <div className="space-y-2 flex flex-col justify-end pb-1">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" checked={form.isStrategicOverride}
-                    onChange={e => setForm(p => ({ ...p, isStrategicOverride: e.target.checked }))} />
-                  Add level for strategic items
-                </label>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" checked={form.isSingleSourceOverride}
-                    onChange={e => setForm(p => ({ ...p, isSingleSourceOverride: e.target.checked }))} />
-                  Add level for single-source
-                </label>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Overrides</label>
+                <div className="flex flex-col gap-2 pt-1">
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="checkbox" checked={form.isStrategicOverride}
+                      onChange={e => setForm(p => ({ ...p, isStrategicOverride: e.target.checked }))} />
+                    Add level for strategic items
+                  </label>
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="checkbox" checked={form.isSingleSourceOverride}
+                      onChange={e => setForm(p => ({ ...p, isSingleSourceOverride: e.target.checked }))} />
+                    Add level for single-source
+                  </label>
+                </div>
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
