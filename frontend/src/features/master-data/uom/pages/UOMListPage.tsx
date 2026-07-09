@@ -1,11 +1,15 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
+import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
+import { UOMFormModal } from './UOMFormModal';
 import { useAuthStore } from '@/stores/authStore';
 import { uomApi, type UomDto } from '../api/uomApi';
+
+type ModalState = { mode: 'add' | 'edit'; id?: string } | null;
 
 const StatusBadge = ({ active }: { active: boolean }) => (
   <span
@@ -18,9 +22,10 @@ const StatusBadge = ({ active }: { active: boolean }) => (
 );
 
 export default function UOMListPage() {
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const companyId = useAuthStore((s) => s.user?.companyId ?? '');
+  const [modal, setModal] = useState<ModalState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['uoms', companyId],
@@ -32,9 +37,13 @@ export default function UOMListPage() {
     mutationFn: uomApi.delete,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['uoms'] });
-      toast.success('Unit of measure deleted');
+      toast.success('Unit of measure deleted', { duration: 3000 });
+      setDeleteTarget(null);
     },
-    onError: () => toast.error('Delete failed'),
+    onError: () => {
+      toast.error('Delete failed');
+      setDeleteTarget(null);
+    },
   });
 
   const columns: DataTableColumn<UomDto>[] = [
@@ -59,7 +68,7 @@ export default function UOMListPage() {
           <h1 className="text-xl font-semibold text-slate-900">Units of Measure</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage measurement units for materials</p>
         </div>
-        <Button onClick={() => navigate('new')} className="gap-2">
+        <Button onClick={() => setModal({ mode: 'add' })} className="gap-2">
           <Plus className="h-4 w-4" /> Add UOM
         </Button>
       </div>
@@ -78,7 +87,7 @@ export default function UOMListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigate(uom.id)}
+                onClick={() => setModal({ mode: 'edit', id: uom.id })}
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
@@ -86,15 +95,28 @@ export default function UOMListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-red-500 hover:text-red-600"
-                onClick={() => {
-                  if (confirm('Delete this unit of measure?')) deleteMut.mutate(uom.id);
-                }}
+                onClick={() => setDeleteTarget({ id: uom.id, name: uom.code })}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </>
           );
         }}
+      />
+
+      <UOMFormModal
+        open={modal !== null}
+        id={modal?.mode === 'edit' ? modal.id : undefined}
+        onClose={() => setModal(null)}
+      />
+
+      <ConfirmDeleteModal
+        open={deleteTarget !== null}
+        title="Delete Unit of Measure"
+        description={`Delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        isPending={deleteMut.isPending}
+        onConfirm={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

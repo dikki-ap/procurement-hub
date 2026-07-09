@@ -1,11 +1,15 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
+import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
+import { CurrencyFormModal } from './CurrencyFormModal';
 import { currencyApi, type CurrencyDto } from '../api/currencyApi';
+
+type ModalState = { mode: 'add' | 'edit'; id?: string } | null;
 
 const StatusBadge = ({ active }: { active: boolean }) => (
   <span
@@ -18,8 +22,9 @@ const StatusBadge = ({ active }: { active: boolean }) => (
 );
 
 export default function CurrencyListPage() {
-  const navigate = useNavigate();
   const qc = useQueryClient();
+  const [modal, setModal] = useState<ModalState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['currencies'],
@@ -30,9 +35,13 @@ export default function CurrencyListPage() {
     mutationFn: currencyApi.delete,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['currencies'] });
-      toast.success('Currency deleted');
+      toast.success('Currency deleted', { duration: 3000 });
+      setDeleteTarget(null);
     },
-    onError: () => toast.error('Delete failed'),
+    onError: () => {
+      toast.error('Delete failed');
+      setDeleteTarget(null);
+    },
   });
 
   const columns: DataTableColumn<CurrencyDto>[] = [
@@ -78,7 +87,7 @@ export default function CurrencyListPage() {
           <h1 className="text-xl font-semibold text-slate-900">Currencies</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage exchange rates and base currency</p>
         </div>
-        <Button onClick={() => navigate('new')} className="gap-2">
+        <Button onClick={() => setModal({ mode: 'add' })} className="gap-2">
           <Plus className="h-4 w-4" /> Add Currency
         </Button>
       </div>
@@ -97,7 +106,7 @@ export default function CurrencyListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigate(currency.id)}
+                onClick={() => setModal({ mode: 'edit', id: currency.id })}
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
@@ -105,15 +114,28 @@ export default function CurrencyListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-red-500 hover:text-red-600"
-                onClick={() => {
-                  if (confirm('Delete this currency?')) deleteMut.mutate(currency.id);
-                }}
+                onClick={() => setDeleteTarget({ id: currency.id, name: currency.code })}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </>
           );
         }}
+      />
+
+      <CurrencyFormModal
+        open={modal !== null}
+        id={modal?.mode === 'edit' ? modal.id : undefined}
+        onClose={() => setModal(null)}
+      />
+
+      <ConfirmDeleteModal
+        open={deleteTarget !== null}
+        title="Delete Currency"
+        description={`Delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        isPending={deleteMut.isPending}
+        onConfirm={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

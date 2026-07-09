@@ -170,38 +170,10 @@ export const router = createBrowserRouter([
                   ).then((m) => ({ Component: m.default })),
               },
               {
-                path: 'materials/new',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/material/pages/MaterialFormPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'materials/:id',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/material/pages/MaterialFormPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
                 path: 'currencies',
                 lazy: () =>
                   import(
                     '@/features/master-data/currency/pages/CurrencyListPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'currencies/new',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/currency/pages/CurrencyFormPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'currencies/:id',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/currency/pages/CurrencyFormPage'
                   ).then((m) => ({ Component: m.default })),
               },
               {
@@ -212,38 +184,10 @@ export const router = createBrowserRouter([
                   ).then((m) => ({ Component: m.default })),
               },
               {
-                path: 'locations/new',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/location/pages/LocationFormPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'locations/:id',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/location/pages/LocationFormPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
                 path: 'payment-terms',
                 lazy: () =>
                   import(
                     '@/features/master-data/payment-term/pages/PaymentTermListPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'payment-terms/new',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/payment-term/pages/PaymentTermFormPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'payment-terms/:id',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/payment-term/pages/PaymentTermFormPage'
                   ).then((m) => ({ Component: m.default })),
               },
               {
@@ -254,38 +198,10 @@ export const router = createBrowserRouter([
                   ),
               },
               {
-                path: 'uoms/new',
-                lazy: () =>
-                  import('@/features/master-data/uom/pages/UOMFormPage').then(
-                    (m) => ({ Component: m.default })
-                  ),
-              },
-              {
-                path: 'uoms/:id',
-                lazy: () =>
-                  import('@/features/master-data/uom/pages/UOMFormPage').then(
-                    (m) => ({ Component: m.default })
-                  ),
-              },
-              {
                 path: 'material-categories',
                 lazy: () =>
                   import(
                     '@/features/master-data/material-category/pages/MaterialCategoryListPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'material-categories/new',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/material-category/pages/MaterialCategoryFormPage'
-                  ).then((m) => ({ Component: m.default })),
-              },
-              {
-                path: 'material-categories/:id',
-                lazy: () =>
-                  import(
-                    '@/features/master-data/material-category/pages/MaterialCategoryFormPage'
                   ).then((m) => ({ Component: m.default })),
               },
             ],

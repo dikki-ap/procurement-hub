@@ -1,11 +1,15 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
+import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
+import { LocationFormModal } from './LocationFormModal';
 import { useAuthStore } from '@/stores/authStore';
 import { locationApi, type LocationDto } from '../api/locationApi';
+
+type ModalState = { mode: 'add' | 'edit'; id?: string } | null;
 
 const StatusBadge = ({ active }: { active: boolean }) => (
   <span
@@ -18,9 +22,10 @@ const StatusBadge = ({ active }: { active: boolean }) => (
 );
 
 export default function LocationListPage() {
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const companyId = useAuthStore((s) => s.user?.companyId ?? '');
+  const [modal, setModal] = useState<ModalState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['locations', companyId],
@@ -32,9 +37,13 @@ export default function LocationListPage() {
     mutationFn: locationApi.delete,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['locations'] });
-      toast.success('Location deleted');
+      toast.success('Location deleted', { duration: 3000 });
+      setDeleteTarget(null);
     },
-    onError: () => toast.error('Delete failed'),
+    onError: () => {
+      toast.error('Delete failed');
+      setDeleteTarget(null);
+    },
   });
 
   const columns: DataTableColumn<LocationDto>[] = [
@@ -48,9 +57,7 @@ export default function LocationListPage() {
       key: 'type',
       header: 'Type',
       sortable: true,
-      render: (row) => (
-        <span className="capitalize">{row.type}</span>
-      ),
+      render: (row) => <span className="capitalize">{row.type}</span>,
     },
     {
       key: 'city',
@@ -78,7 +85,7 @@ export default function LocationListPage() {
           <h1 className="text-xl font-semibold text-slate-900">Locations</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage warehouses, plants, and offices</p>
         </div>
-        <Button onClick={() => navigate('new')} className="gap-2">
+        <Button onClick={() => setModal({ mode: 'add' })} className="gap-2">
           <Plus className="h-4 w-4" /> Add Location
         </Button>
       </div>
@@ -97,7 +104,7 @@ export default function LocationListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigate(location.id)}
+                onClick={() => setModal({ mode: 'edit', id: location.id })}
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
@@ -105,15 +112,28 @@ export default function LocationListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-red-500 hover:text-red-600"
-                onClick={() => {
-                  if (confirm('Delete this location?')) deleteMut.mutate(location.id);
-                }}
+                onClick={() => setDeleteTarget({ id: location.id, name: location.name })}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </>
           );
         }}
+      />
+
+      <LocationFormModal
+        open={modal !== null}
+        id={modal?.mode === 'edit' ? modal.id : undefined}
+        onClose={() => setModal(null)}
+      />
+
+      <ConfirmDeleteModal
+        open={deleteTarget !== null}
+        title="Delete Location"
+        description={`Delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        isPending={deleteMut.isPending}
+        onConfirm={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

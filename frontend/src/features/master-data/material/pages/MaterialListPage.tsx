@@ -1,10 +1,14 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
+import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
+import { MaterialFormModal } from './MaterialFormModal';
 import { materialApi, type MaterialDto } from '../api/materialApi';
+
+type ModalState = { mode: 'add' | 'edit'; id?: string } | null;
 
 const StatusBadge = ({ active }: { active: boolean }) => (
   <span
@@ -17,8 +21,9 @@ const StatusBadge = ({ active }: { active: boolean }) => (
 );
 
 export default function MaterialListPage() {
-  const navigate = useNavigate();
   const qc = useQueryClient();
+  const [modal, setModal] = useState<ModalState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['materials'],
@@ -29,9 +34,13 @@ export default function MaterialListPage() {
     mutationFn: materialApi.delete,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['materials'] });
-      toast.success('Material deleted');
+      toast.success('Material deleted', { duration: 3000 });
+      setDeleteTarget(null);
     },
-    onError: () => toast.error('Delete failed'),
+    onError: () => {
+      toast.error('Delete failed');
+      setDeleteTarget(null);
+    },
   });
 
   const columns: DataTableColumn<MaterialDto>[] = [
@@ -76,7 +85,7 @@ export default function MaterialListPage() {
           <h1 className="text-xl font-semibold text-slate-900">Materials</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage your material master data catalog</p>
         </div>
-        <Button onClick={() => navigate('new')} className="gap-2">
+        <Button onClick={() => setModal({ mode: 'add' })} className="gap-2">
           <Plus className="h-4 w-4" /> Add Material
         </Button>
       </div>
@@ -95,7 +104,7 @@ export default function MaterialListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => navigate(material.id)}
+                onClick={() => setModal({ mode: 'edit', id: material.id })}
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
@@ -103,15 +112,28 @@ export default function MaterialListPage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-red-500 hover:text-red-600"
-                onClick={() => {
-                  if (confirm('Delete this material?')) deleteMut.mutate(material.id);
-                }}
+                onClick={() => setDeleteTarget({ id: material.id, name: material.code })}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </>
           );
         }}
+      />
+
+      <MaterialFormModal
+        open={modal !== null}
+        id={modal?.mode === 'edit' ? modal.id : undefined}
+        onClose={() => setModal(null)}
+      />
+
+      <ConfirmDeleteModal
+        open={deleteTarget !== null}
+        title="Delete Material"
+        description={`Delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        isPending={deleteMut.isPending}
+        onConfirm={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );
