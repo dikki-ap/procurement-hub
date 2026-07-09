@@ -2,6 +2,13 @@ import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { keycloak } from '@/shared/lib/keycloak';
 
+const silentLogger: signalR.ILogger = {
+  log(level: signalR.LogLevel, message: string) {
+    if (message.includes('stopped during negotiation')) return;
+    if (level >= signalR.LogLevel.Warning) console.warn('[SignalR]', message);
+  },
+};
+
 type NotificationPayload = {
   id:        string;
   title:     string;
@@ -25,7 +32,7 @@ export function useSignalR(onNotification: (n: NotificationPayload) => void) {
         },
       })
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Warning)
+      .configureLogging(silentLogger)
       .build();
 
     connection.on('ReceiveNotification', (payload: NotificationPayload) => {
