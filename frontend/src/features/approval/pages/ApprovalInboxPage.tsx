@@ -38,7 +38,7 @@ export default function ApprovalInboxPage() {
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
   return (
-    <div className="max-w-4xl flex flex-col min-h-[calc(100vh-112px)]">
+    <div className="flex flex-col min-h-[calc(100vh-112px)]">
       <div className="flex items-center gap-3">
         <Inbox className="h-5 w-5 text-muted-foreground" />
         <h1 className="text-2xl font-semibold">Approval Inbox</h1>
