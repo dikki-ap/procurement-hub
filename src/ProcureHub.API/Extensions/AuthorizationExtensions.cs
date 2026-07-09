@@ -45,6 +45,17 @@ public static class AuthorizationExtensions
 
                 options.Events = new JwtBearerEvents
                 {
+                    // SignalR passes the token as a query param for WebSocket/SSE connections
+                    OnMessageReceived = ctx =>
+                    {
+                        var accessToken = ctx.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            ctx.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                        {
+                            ctx.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    },
                     OnTokenValidated = async ctx =>
                     {
                         var identity = ctx.Principal?.Identity as ClaimsIdentity;
