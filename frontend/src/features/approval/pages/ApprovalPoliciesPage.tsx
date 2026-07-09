@@ -4,31 +4,39 @@ import { Shield, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { approvalApi } from '../api/approvalApi';
 import { useAuthStore } from '@/stores/authStore';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
 
+const EMPTY_FORM = {
+  referenceType: 'PR',
+  name: '',
+  minValue: '0',
+  maxValue: '',
+  requiredLevels: '1',
+  isStrategicOverride: false,
+  isSingleSourceOverride: false,
+};
+
 export default function ApprovalPoliciesPage() {
   const queryClient = useQueryClient();
   const { user }    = useAuthStore();
   const companyId   = user?.companyId ?? '';
 
-  const [showForm,  setShowForm]  = useState(false);
-  const [form, setForm] = useState({
-    referenceType:         'PR',
-    name:                  '',
-    minValue:              '0',
-    maxValue:              '',
-    requiredLevels:        '1',
-    isStrategicOverride:   false,
-    isSingleSourceOverride: false,
-  });
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
 
   const { data: policies = [], isLoading } = useQuery({
     queryKey: ['approval-policies', companyId],
-    queryFn:  () => approvalApi.getPolicies(companyId).then(r => r.data),
+    queryFn:  () => approvalApi.getPolicies(companyId),
     enabled:  !!companyId,
   });
 
@@ -45,10 +53,9 @@ export default function ApprovalPoliciesPage() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['approval-policies', companyId] });
-      toast.success('Policy created.');
-      setShowForm(false);
-      setForm({ referenceType: 'PR', name: '', minValue: '0', maxValue: '',
-        requiredLevels: '1', isStrategicOverride: false, isSingleSourceOverride: false });
+      toast.success('Policy created.', { duration: 3000 });
+      setShowModal(false);
+      setForm(EMPTY_FORM);
     },
     onError: (e: any) => toast.error(e?.response?.data?.message ?? 'Failed to create policy'),
   });
@@ -60,62 +67,10 @@ export default function ApprovalPoliciesPage() {
       <div className="flex items-center gap-3">
         <Shield className="h-5 w-5 text-muted-foreground" />
         <h1 className="text-2xl font-semibold">Approval Policies</h1>
-        <Button size="sm" className="ml-auto" onClick={() => setShowForm(v => !v)}>
+        <Button size="sm" className="ml-auto" onClick={() => setShowModal(true)}>
           <Plus className="h-4 w-4 mr-1" /> Add Policy
         </Button>
       </div>
-
-      {showForm && (
-        <div className="rounded-lg border p-4 space-y-4 bg-muted/20">
-          <h2 className="text-base font-semibold">New Policy</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Reference Type</label>
-              <select
-                className="w-full rounded-md border px-3 py-2 text-sm h-9 bg-background"
-                value={form.referenceType}
-                onChange={e => setForm(p => ({ ...p, referenceType: e.target.value }))}
-              >
-                {['PR', 'PO', 'RFQ'].map(t => <option key={t}>{t}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Policy Name</label>
-              <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Small Purchase" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Min Value (Rp)</label>
-              <Input type="number" min={0} value={form.minValue} onChange={e => setForm(p => ({ ...p, minValue: e.target.value }))} />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Max Value (Rp, blank = unlimited)</label>
-              <Input type="number" min={0} value={form.maxValue} onChange={e => setForm(p => ({ ...p, maxValue: e.target.value }))} placeholder="Unlimited" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Required Levels (1–5)</label>
-              <Input type="number" min={1} max={5} value={form.requiredLevels} onChange={e => setForm(p => ({ ...p, requiredLevels: e.target.value }))} />
-            </div>
-            <div className="space-y-2 pt-1">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={form.isStrategicOverride}
-                  onChange={e => setForm(p => ({ ...p, isStrategicOverride: e.target.checked }))} />
-                Add level for strategic items
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={form.isSingleSourceOverride}
-                  onChange={e => setForm(p => ({ ...p, isSingleSourceOverride: e.target.checked }))} />
-                Add level for single-source procurement
-              </label>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => createMut.mutate()} disabled={createMut.isPending || !form.name}>
-              {createMut.isPending ? 'Saving…' : 'Save Policy'}
-            </Button>
-            <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
-          </div>
-        </div>
-      )}
 
       {policies.length === 0 ? (
         <p className="text-sm text-muted-foreground">No policies configured yet. Add one to enable multi-level approvals.</p>
@@ -151,6 +106,64 @@ export default function ApprovalPoliciesPage() {
           </table>
         </div>
       )}
+
+      <Dialog open={showModal} onOpenChange={(v) => { if (!v && !createMut.isPending) { setShowModal(false); setForm(EMPTY_FORM); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add Approval Policy</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Reference Type</label>
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                  value={form.referenceType}
+                  onChange={e => setForm(p => ({ ...p, referenceType: e.target.value }))}
+                >
+                  {['PR', 'PO', 'RFQ'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Policy Name</label>
+                <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Small Purchase" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Min Value (Rp)</label>
+                <Input type="number" min={0} value={form.minValue} onChange={e => setForm(p => ({ ...p, minValue: e.target.value }))} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Max Value (blank = unlimited)</label>
+                <Input type="number" min={0} value={form.maxValue} onChange={e => setForm(p => ({ ...p, maxValue: e.target.value }))} placeholder="Unlimited" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Required Levels (1–5)</label>
+                <Input type="number" min={1} max={5} value={form.requiredLevels} onChange={e => setForm(p => ({ ...p, requiredLevels: e.target.value }))} />
+              </div>
+              <div className="space-y-2 flex flex-col justify-end pb-1">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="checkbox" checked={form.isStrategicOverride}
+                    onChange={e => setForm(p => ({ ...p, isStrategicOverride: e.target.checked }))} />
+                  Add level for strategic items
+                </label>
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="checkbox" checked={form.isSingleSourceOverride}
+                    onChange={e => setForm(p => ({ ...p, isSingleSourceOverride: e.target.checked }))} />
+                  Add level for single-source
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => { setShowModal(false); setForm(EMPTY_FORM); }} disabled={createMut.isPending}>
+                Cancel
+              </Button>
+              <Button onClick={() => createMut.mutate()} disabled={createMut.isPending || !form.name}>
+                {createMut.isPending ? 'Saving…' : 'Save Policy'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

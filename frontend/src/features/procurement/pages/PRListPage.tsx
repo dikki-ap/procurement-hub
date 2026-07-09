@@ -101,7 +101,7 @@ export default function PRListPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Purchase Requisitions</h1>
           <p className="text-sm text-muted-foreground">Manage and track all purchase requests</p>
         </div>
-        <Button onClick={() => navigate('/procurement/prs/new')}>
+        <Button onClick={() => navigate('new')}>
           <Plus className="h-4 w-4 mr-2" /> New PR
         </Button>
       </div>

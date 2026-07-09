@@ -63,9 +63,9 @@ export interface ApprovalPolicyDto {
 
 export const approvalApi = {
   getInbox: (userId: string, companyId: string) =>
-    apiClient.get<ApprovalInboxItemDto[]>('/approval-workflows/inbox', {
+    apiClient.get<{ data: ApprovalInboxItemDto[] }>('/approval-workflows/inbox', {
       params: { userId, companyId },
-    }),
+    }).then(r => r.data.data),
 
   getWorkflow: (id: string) =>
     apiClient.get<ApprovalWorkflowDto>(`/approval-workflows/${id}`),
@@ -85,7 +85,7 @@ export const approvalApi = {
     }),
 
   getPolicies: (companyId: string) =>
-    apiClient.get<ApprovalPolicyDto[]>('/approval-policies', { params: { companyId } }),
+    apiClient.get<{ data: ApprovalPolicyDto[] }>('/approval-policies', { params: { companyId } }).then(r => r.data.data),
 
   createPolicy: (data: {
     companyId: string; referenceType: string; name: string;

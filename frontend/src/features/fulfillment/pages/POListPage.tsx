@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Plus, Eye } from 'lucide-react';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type POListDto, type POStatus } from '../api/fulfillmentApi';
 import { useAuthStore } from '@/stores/authStore';
+import { NewPOModal } from './NewPOModal';
 
 const statusColor: Record<POStatus, string> = {
   Draft:           'bg-gray-100 text-gray-600',
@@ -21,9 +23,10 @@ const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
 
 export default function POListPage() {
-  const navigate  = useNavigate();
-  const { user }  = useAuthStore();
-  const companyId = user?.companyId ?? '';
+  const navigate      = useNavigate();
+  const { user }      = useAuthStore();
+  const companyId     = user?.companyId ?? '';
+  const [showNew, setShowNew] = useState(false);
 
   const { data: pos = [], isLoading } = useQuery({
     queryKey: ['purchase-orders', companyId],
@@ -66,7 +69,7 @@ export default function POListPage() {
       <div className="flex items-center gap-3">
         <ShoppingCart className="h-5 w-5 text-muted-foreground" />
         <h1 className="text-2xl font-semibold">Purchase Orders</h1>
-        <Button size="sm" className="ml-auto" onClick={() => navigate('new')}>
+        <Button size="sm" className="ml-auto" onClick={() => setShowNew(true)}>
           <Plus className="h-4 w-4 mr-1" /> New PO
         </Button>
       </div>
@@ -82,6 +85,7 @@ export default function POListPage() {
           </Button>
         )}
       />
+      <NewPOModal open={showNew} onClose={() => setShowNew(false)} />
     </div>
   );
 }

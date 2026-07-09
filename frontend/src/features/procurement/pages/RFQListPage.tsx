@@ -80,7 +80,7 @@ export default function RFQListPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Request for Quotations</h1>
           <p className="text-sm text-muted-foreground">Manage bidding rounds and vendor invitations</p>
         </div>
-        <Button onClick={() => navigate('/procurement/rfqs/new')}>
+        <Button onClick={() => navigate('new')}>
           <Plus className="h-4 w-4 mr-2" /> New RFQ
         </Button>
       </div>

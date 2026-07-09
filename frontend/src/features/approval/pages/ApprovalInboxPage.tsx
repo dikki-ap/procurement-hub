@@ -31,7 +31,7 @@ export default function ApprovalInboxPage() {
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['approval-inbox', userId, companyId],
-    queryFn:  () => approvalApi.getInbox(userId, companyId).then(r => r.data),
+    queryFn:  () => approvalApi.getInbox(userId, companyId),
     enabled:  !!userId && !!companyId,
   });
 
@@ -48,8 +48,8 @@ export default function ApprovalInboxPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <Inbox className="h-12 w-12 mx-auto mb-3 opacity-30" />
+        <div className="flex flex-col items-center justify-center min-h-[55vh] text-muted-foreground">
+          <Inbox className="h-12 w-12 mb-3 opacity-30" />
           <p className="text-sm">No pending approvals.</p>
         </div>
       ) : (

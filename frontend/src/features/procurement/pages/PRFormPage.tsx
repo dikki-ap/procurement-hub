@@ -26,7 +26,7 @@ export default function PRFormPage() {
     onSuccess:  () => {
       qc.invalidateQueries({ queryKey: ['prs'] });
       toast.success('Purchase Requisition created');
-      navigate('/procurement/prs');
+      navigate('..');
     },
     onError: () => toast.error('Failed to create PR'),
   });
@@ -54,7 +54,7 @@ export default function PRFormPage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/procurement/prs')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate('..')}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Back
         </Button>
         <h1 className="text-xl font-semibold">New Purchase Requisition</h1>
@@ -138,7 +138,7 @@ export default function PRFormPage() {
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? 'Creating...' : 'Create PR'}
           </Button>
-          <Button type="button" variant="outline" onClick={() => navigate('/procurement/prs')}>
+          <Button type="button" variant="outline" onClick={() => navigate('..')}>
             Cancel
           </Button>
         </div>

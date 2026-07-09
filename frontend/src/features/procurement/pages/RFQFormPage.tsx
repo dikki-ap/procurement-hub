@@ -20,7 +20,7 @@ export default function RFQFormPage() {
     onSuccess:  () => {
       qc.invalidateQueries({ queryKey: ['rfqs'] });
       toast.success('RFQ created successfully');
-      navigate('/procurement/rfqs');
+      navigate('..');
     },
     onError: () => toast.error('Failed to create RFQ'),
   });
@@ -50,7 +50,7 @@ export default function RFQFormPage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/procurement/rfqs')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate('..')}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Back
         </Button>
         <h1 className="text-xl font-semibold">New Request for Quotation</h1>
@@ -125,7 +125,7 @@ export default function RFQFormPage() {
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? 'Creating...' : 'Create RFQ'}
           </Button>
-          <Button type="button" variant="outline" onClick={() => navigate('/procurement/rfqs')}>
+          <Button type="button" variant="outline" onClick={() => navigate('..')}>
             Cancel
           </Button>
         </div>
