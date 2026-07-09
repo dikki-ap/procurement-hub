@@ -32,10 +32,18 @@ export function useSignalR(onNotification: (n: NotificationPayload) => void) {
       onNotification(payload);
     });
 
-    connection.start().catch(console.error);
+    let cancelled = false;
+
+    connection.start().then(() => {
+      if (cancelled) connection.stop();
+    }).catch((err) => {
+      if (!cancelled) console.error('[SignalR]', err);
+    });
+
     connectionRef.current = connection;
 
     return () => {
+      cancelled = true;
       connection.stop();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
