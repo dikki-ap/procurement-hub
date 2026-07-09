@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye, Plus, XCircle } from 'lucide-react';
@@ -5,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type PRListDto, type PRStatus } from '../api/procurementApi';
+import { NewPRModal } from './NewPRModal';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -26,8 +28,9 @@ const StatusBadge = ({ status }: { status: PRStatus }) => {
 const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
 export default function PRListPage() {
-  const navigate = useNavigate();
-  const qc       = useQueryClient();
+  const navigate   = useNavigate();
+  const qc         = useQueryClient();
+  const [showNew, setShowNew] = useState(false);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['prs', COMPANY_ID],
@@ -101,11 +104,12 @@ export default function PRListPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Purchase Requisitions</h1>
           <p className="text-sm text-muted-foreground">Manage and track all purchase requests</p>
         </div>
-        <Button onClick={() => navigate('new')}>
+        <Button onClick={() => setShowNew(true)}>
           <Plus className="h-4 w-4 mr-2" /> New PR
         </Button>
       </div>
       <DataTable columns={columns} data={data as unknown as Record<string, unknown>[]} isLoading={isLoading} searchPlaceholder="Search PRs..." />
+      <NewPRModal open={showNew} onClose={() => setShowNew(false)} />
     </div>
   );
 }

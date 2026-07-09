@@ -50,13 +50,6 @@ export const router = createBrowserRouter([
               })),
           },
           {
-            path: 'vendors/new',
-            lazy: () =>
-              import('@/features/vendors/pages/VendorFormPage').then((m) => ({
-                Component: m.default,
-              })),
-          },
-          {
             path: 'vendors/:id',
             lazy: () =>
               import('@/features/vendors/pages/VendorDetailPage').then((m) => ({
@@ -92,20 +85,12 @@ export const router = createBrowserRouter([
                 lazy: () => import('@/features/procurement/pages/PRListPage').then(m => ({ Component: m.default })),
               },
               {
-                path: 'prs/new',
-                lazy: () => import('@/features/procurement/pages/PRFormPage').then(m => ({ Component: m.default })),
-              },
-              {
                 path: 'prs/:id',
                 lazy: () => import('@/features/procurement/pages/PRDetailPage').then(m => ({ Component: m.default })),
               },
               {
                 path: 'rfqs',
                 lazy: () => import('@/features/procurement/pages/RFQListPage').then(m => ({ Component: m.default })),
-              },
-              {
-                path: 'rfqs/new',
-                lazy: () => import('@/features/procurement/pages/RFQFormPage').then(m => ({ Component: m.default })),
               },
               {
                 path: 'rfqs/:id',
@@ -125,10 +110,6 @@ export const router = createBrowserRouter([
               {
                 path: 'purchase-orders',
                 lazy: () => import('@/features/fulfillment/pages/POListPage').then(m => ({ Component: m.default })),
-              },
-              {
-                path: 'purchase-orders/new',
-                lazy: () => import('@/features/fulfillment/pages/NewPOPage').then(m => ({ Component: m.default })),
               },
               {
                 path: 'purchase-orders/:id',

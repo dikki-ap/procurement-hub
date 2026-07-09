@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye, Plus, Lock } from 'lucide-react';
@@ -5,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type RFQListDto, type RFQStatus } from '../api/procurementApi';
+import { NewRFQModal } from './NewRFQModal';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -23,8 +25,9 @@ const StatusBadge = ({ status }: { status: RFQStatus }) => {
 };
 
 export default function RFQListPage() {
-  const navigate = useNavigate();
-  const qc       = useQueryClient();
+  const navigate   = useNavigate();
+  const qc         = useQueryClient();
+  const [showNew, setShowNew] = useState(false);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['rfqs', COMPANY_ID],
@@ -80,11 +83,12 @@ export default function RFQListPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Request for Quotations</h1>
           <p className="text-sm text-muted-foreground">Manage bidding rounds and vendor invitations</p>
         </div>
-        <Button onClick={() => navigate('new')}>
+        <Button onClick={() => setShowNew(true)}>
           <Plus className="h-4 w-4 mr-2" /> New RFQ
         </Button>
       </div>
       <DataTable columns={columns} data={data as unknown as Record<string, unknown>[]} isLoading={isLoading} searchPlaceholder="Search RFQs..." />
+      <NewRFQModal open={showNew} onClose={() => setShowNew(false)} />
     </div>
   );
 }
