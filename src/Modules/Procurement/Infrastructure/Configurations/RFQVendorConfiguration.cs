@@ -19,5 +19,7 @@ public class RFQVendorConfiguration : BaseAuditableEntityConfiguration<RFQVendor
 
         builder.HasIndex(e => new { e.RFQId, e.VendorId }).IsUnique();
         builder.HasIndex(e => e.VendorId);
+
+        builder.HasQueryFilter(e => !e.RFQ.IsDeleted);
     }
 }

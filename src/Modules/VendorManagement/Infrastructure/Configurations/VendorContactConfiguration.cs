@@ -17,5 +17,7 @@ public class VendorContactConfiguration : BaseAuditableEntityConfiguration<Vendo
         builder.Property(e => e.Position).HasMaxLength(100);
         builder.Property(e => e.Email).HasMaxLength(255);
         builder.Property(e => e.Phone).HasMaxLength(30);
+
+        builder.HasQueryFilter(e => e.Vendor == null || !e.Vendor.IsDeleted);
     }
 }

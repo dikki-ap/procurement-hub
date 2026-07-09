@@ -27,5 +27,7 @@ public class ApprovalHistoryConfiguration : BaseAuditableEntityConfiguration<App
                .WithMany(w => w.History)
                .HasForeignKey(e => e.WorkflowId)
                .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(e => e.Workflow == null || !e.Workflow.IsDeleted);
     }
 }

@@ -20,5 +20,7 @@ public class POItemConfiguration : BaseAuditableEntityConfiguration<POItem>
         builder.Property(e => e.ReceivedQty).HasColumnType("DECIMAL(18,4)");
 
         builder.HasIndex(e => e.POId);
+
+        builder.HasQueryFilter(e => e.PurchaseOrder == null || !e.PurchaseOrder.IsDeleted);
     }
 }

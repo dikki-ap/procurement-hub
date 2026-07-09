@@ -22,5 +22,7 @@ public class ApproverAssignmentConfiguration : BaseAuditableEntityConfiguration<
                .WithMany(w => w.Assignments)
                .HasForeignKey(e => e.WorkflowId)
                .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(e => e.Workflow == null || !e.Workflow.IsDeleted);
     }
 }

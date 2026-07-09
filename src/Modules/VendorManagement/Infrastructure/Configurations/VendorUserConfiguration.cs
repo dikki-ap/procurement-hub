@@ -20,5 +20,7 @@ public class VendorUserConfiguration : BaseAuditableEntityConfiguration<VendorUs
 
         builder.HasIndex(e => e.KeycloakId).IsUnique();
         builder.HasIndex(e => new { e.VendorId, e.Email }).IsUnique();
+
+        builder.HasQueryFilter(e => e.Vendor == null || !e.Vendor.IsDeleted);
     }
 }

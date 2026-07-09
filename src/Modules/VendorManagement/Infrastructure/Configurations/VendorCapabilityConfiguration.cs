@@ -17,5 +17,7 @@ public class VendorCapabilityConfiguration : BaseAuditableEntityConfiguration<Ve
         builder.Property(e => e.Notes).HasColumnType("TEXT");
 
         builder.HasIndex(e => new { e.VendorId, e.MaterialCategoryId }).IsUnique();
+
+        builder.HasQueryFilter(e => e.Vendor == null || !e.Vendor.IsDeleted);
     }
 }

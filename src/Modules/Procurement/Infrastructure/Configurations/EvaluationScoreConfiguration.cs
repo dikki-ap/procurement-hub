@@ -20,5 +20,7 @@ public class EvaluationScoreConfiguration : BaseAuditableEntityConfiguration<Eva
 
         builder.HasIndex(e => e.BidEvaluationId);
         builder.HasIndex(e => e.QuotationId);
+
+        builder.HasQueryFilter(e => !e.Evaluation.IsDeleted);
     }
 }

@@ -25,5 +25,7 @@ public class VendorScoreConfiguration : IEntityTypeConfiguration<VendorScore>
         builder.Property(e => e.Notes).HasColumnType("TEXT");
 
         builder.HasIndex(e => new { e.VendorId, e.PeriodYear, e.PeriodQuarter }).IsUnique();
+
+        builder.HasQueryFilter(e => e.Vendor == null || !e.Vendor.IsDeleted);
     }
 }

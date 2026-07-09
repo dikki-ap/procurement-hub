@@ -18,5 +18,7 @@ public class RFQItemConfiguration : BaseAuditableEntityConfiguration<RFQItem>
         builder.Property(e => e.UnitLabel).HasMaxLength(30);
 
         builder.HasIndex(e => e.RFQId);
+
+        builder.HasQueryFilter(e => !e.RFQ.IsDeleted);
     }
 }

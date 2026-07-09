@@ -20,5 +20,7 @@ public class PRItemConfiguration : BaseAuditableEntityConfiguration<PRItem>
         builder.Property(e => e.Notes).HasColumnType("TEXT");
 
         builder.HasIndex(e => e.PurchaseRequisitionId);
+
+        builder.HasQueryFilter(e => !e.PurchaseRequisition.IsDeleted);
     }
 }

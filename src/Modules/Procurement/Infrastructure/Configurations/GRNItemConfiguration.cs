@@ -21,5 +21,7 @@ public class GRNItemConfiguration : BaseAuditableEntityConfiguration<GRNItem>
 
         builder.HasIndex(e => e.GRNId);
         builder.HasIndex(e => e.POItemId);
+
+        builder.HasQueryFilter(e => e.GoodsReceipt == null || !e.GoodsReceipt.IsDeleted);
     }
 }

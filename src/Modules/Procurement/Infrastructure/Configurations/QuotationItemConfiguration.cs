@@ -19,5 +19,7 @@ public class QuotationItemConfiguration : BaseAuditableEntityConfiguration<Quota
 
         builder.HasIndex(e => e.QuotationId);
         builder.HasIndex(e => e.RFQItemId);
+
+        builder.HasQueryFilter(e => !e.Quotation.IsDeleted);
     }
 }
