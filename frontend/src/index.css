@@ -146,6 +146,18 @@
   50%       { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
 }
 
+/* error pages — text typewriter reveal (left → right, char by char) */
+@keyframes typewriter {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+/* error pages — elements fade + slide up */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
