@@ -85,8 +85,8 @@ try
         .AddJsonOptions(opts =>
         {
             opts.JsonSerializerOptions.PropertyNamingPolicy        = JsonNamingPolicy.CamelCase;
-            opts.JsonSerializerOptions.DefaultIgnoreCondition      =
-                JsonIgnoreCondition.WhenWritingNull;
+            opts.JsonSerializerOptions.DefaultIgnoreCondition      = JsonIgnoreCondition.WhenWritingNull;
+            opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
     builder.Services.AddCors(opts =>
