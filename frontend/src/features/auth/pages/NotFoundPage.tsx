@@ -3,18 +3,31 @@ import { Ghost } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 
+const VENDOR_ROLES = ['vendor_admin', 'vendor_staff'];
+
 export default function NotFoundPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
-  const goHome = () => {
-    const isVendor = user?.roles.some(r => ['vendor_admin', 'vendor_staff'].includes(r));
+  const isVendor = user?.roles.some(r => VENDOR_ROLES.includes(r)) ?? false;
+
+  const handleHome = () => {
     if (isVendor && user?.vendorId) {
       navigate(`/app/vendor-portal/${user.vendorId}/profile`, { replace: true });
-    } else {
+    } else if (isVendor) {
+      navigate('/', { replace: true });
+    } else if (user) {
       navigate('/app/dashboard', { replace: true });
+    } else {
+      navigate('/', { replace: true });
     }
   };
+
+  const label = isVendor && user?.vendorId
+    ? 'Go to Vendor Portal'
+    : user
+      ? 'Go to Dashboard'
+      : 'Login';
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 text-center">
@@ -26,17 +39,10 @@ export default function NotFoundPage() {
 
       <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Page Not Found</h1>
       <p className="text-slate-500 max-w-sm mb-8">
-        The page you're looking for doesn't exist or may have been moved. Double-check the URL or head back home.
+        The page you're looking for doesn't exist or may have been moved.
       </p>
 
-      <div className="flex gap-3">
-        <Button variant="outline" onClick={() => navigate(-1)}>
-          Go Back
-        </Button>
-        <Button onClick={goHome}>
-          Go to Dashboard
-        </Button>
-      </div>
+      <Button onClick={handleHome}>{label}</Button>
     </div>
   );
 }

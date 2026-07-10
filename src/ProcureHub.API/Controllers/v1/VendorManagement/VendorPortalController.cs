@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocument;
+using ProcureHub.Modules.VendorManagement.Application.Queries.GetMyVendorId;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocuments;
 using ProcureHub.SharedKernel.Abstractions;
@@ -23,6 +24,18 @@ public class VendorPortalController : ControllerBase
     {
         _mediator    = mediator;
         _currentUser = currentUser;
+    }
+
+    /// <summary>Resolve the vendorId for the currently authenticated vendor user.</summary>
+    [HttpGet("me")]
+    public async Task<ActionResult<ApiResponse<object>>> GetMyVendorId(CancellationToken ct)
+    {
+        var keycloakId = _currentUser.KeycloakId;
+        if (string.IsNullOrEmpty(keycloakId))
+            return Unauthorized();
+
+        var vendorId = await _mediator.Send(new GetMyVendorIdQuery(keycloakId), ct);
+        return Ok(ApiResponse.Ok(new { vendorId }));
     }
 
     /// <summary>Get own vendor profile.</summary>

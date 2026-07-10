@@ -106,6 +106,9 @@ export const vendorRegistrationApi = {
 };
 
 export const vendorPortalApi = {
+  getMyVendorId: () =>
+    apiClient.get<{ data: { vendorId: string } }>('/vendor-portal/me').then((r) => r.data.data.vendorId),
+
   getProfile: (vendorId: string) =>
     apiClient.get<{ data: VendorDetailDto }>(`/vendor-portal/${vendorId}`).then((r) => r.data.data),
 

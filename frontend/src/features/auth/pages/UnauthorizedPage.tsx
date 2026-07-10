@@ -3,20 +3,32 @@ import { ShieldX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 
+const VENDOR_ROLES = ['vendor_admin', 'vendor_staff'];
+
 export default function UnauthorizedPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
-  const goHome = () => {
-    const isVendor = user?.roles.some(r => ['vendor_admin', 'vendor_staff'].includes(r));
+  const isVendor = user?.roles.some(r => VENDOR_ROLES.includes(r)) ?? false;
+
+  const handleHome = () => {
     if (isVendor && user?.vendorId) {
       navigate(`/app/vendor-portal/${user.vendorId}/profile`, { replace: true });
+    } else if (isVendor) {
+      // No vendorId yet — go back to root so LoginRedirectPage resolves it
+      navigate('/', { replace: true });
     } else if (user) {
       navigate('/app/dashboard', { replace: true });
     } else {
       navigate('/', { replace: true });
     }
   };
+
+  const label = isVendor && user?.vendorId
+    ? 'Go to Vendor Portal'
+    : user
+      ? 'Go to Dashboard'
+      : 'Login';
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 text-center">
@@ -28,17 +40,10 @@ export default function UnauthorizedPage() {
 
       <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Access Denied</h1>
       <p className="text-slate-500 max-w-sm mb-8">
-        You don't have permission to view this page. If you believe this is a mistake, please contact your administrator.
+        You don't have permission to view this page. Contact your administrator if you believe this is a mistake.
       </p>
 
-      <div className="flex gap-3">
-        <Button variant="outline" onClick={() => navigate(-1)}>
-          Go Back
-        </Button>
-        <Button onClick={goHome}>
-          Go to Dashboard
-        </Button>
-      </div>
+      <Button onClick={handleHome}>{label}</Button>
     </div>
   );
 }
