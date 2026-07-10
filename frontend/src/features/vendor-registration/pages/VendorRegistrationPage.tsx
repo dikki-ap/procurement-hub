@@ -81,7 +81,7 @@ export default function VendorRegistrationPage() {
             PH
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Vendor Registration</h1>
-          <p className="text-sm text-slate-500 mt-1">Register your company as a vendor on Procure Hub</p>
+          <p className="text-sm text-slate-500 mt-1">Register your company as a vendor on Procurement Hub</p>
         </div>
 
         <form

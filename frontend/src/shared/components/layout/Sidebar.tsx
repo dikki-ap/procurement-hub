@@ -97,7 +97,7 @@ export const Sidebar = () => {
           className="font-semibold text-sm text-white whitespace-nowrap transition-[opacity,width] duration-300 overflow-hidden"
           style={{ opacity: ec ? 0 : 1, width: ec ? 0 : 'auto' }}
         >
-          Procure Hub
+          Procurement Hub
         </span>
       </div>
 
