@@ -31,12 +31,21 @@ public class UserSyncMiddleware
                         ?? ctx.User.FindFirstValue(ClaimTypes.Role)
                         ?? string.Empty;
 
-                var localId = InternalRoles.Contains(role)
-                    ? await SyncInternalUserAsync(ctx, db, keycloakId, role)
-                    : await SyncVendorUserAsync(ctx, db, keycloakId);
-
-                if (localId.HasValue)
-                    ctx.Items["LocalUserId"] = localId.Value;
+                if (InternalRoles.Contains(role))
+                {
+                    var internalId = await SyncInternalUserAsync(ctx, db, keycloakId, role);
+                    if (internalId.HasValue)
+                        ctx.Items["LocalUserId"] = internalId.Value;
+                }
+                else
+                {
+                    // Vendor users are stored in vendor_users, NOT in users.
+                    // LocalUserId must only ever hold a users.id (FK target), so we
+                    // keep it null for vendor users to avoid FK constraint violations.
+                    var vendorId = await SyncVendorUserAsync(ctx, db, keycloakId);
+                    if (vendorId.HasValue)
+                        ctx.Items["VendorLocalUserId"] = vendorId.Value;
+                }
             }
         }
 
