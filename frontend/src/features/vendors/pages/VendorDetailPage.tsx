@@ -87,7 +87,9 @@ export default function VendorDetailPage() {
           <p className="text-xs text-slate-500 mb-1.5">Approved</p>
           <p className="text-sm font-semibold text-slate-900">
             {vendor.approvedAt
-              ? new Date(vendor.approvedAt).toLocaleString('en-GB', {
+              ? new Date(
+                  vendor.approvedAt.endsWith('Z') ? vendor.approvedAt : vendor.approvedAt + 'Z'
+                ).toLocaleString('en-GB', {
                   day: 'numeric', month: 'long', year: 'numeric',
                   hour: '2-digit', minute: '2-digit', hour12: false,
                 })
