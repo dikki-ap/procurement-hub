@@ -20,14 +20,14 @@ export default function NotFoundPage() {
 
       <h1
         className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 whitespace-nowrap"
-        style={{ animation: 'typewriter 1.4s steps(14, end) 0.4s both' }}
+        style={{ clipPath: 'inset(0 100% 0 0)', animation: 'type-loop 5s steps(28, end) 0.4s infinite' }}
       >
         Page Not Found
       </h1>
 
       <p
         className="text-slate-500 max-w-sm"
-        style={{ animation: 'fade-up 0.5s ease-out 2s both' }}
+        style={{ animation: 'fade-up 0.5s ease-out 3s both' }}
       >
         The page you're looking for doesn't exist or may have been moved.
       </p>

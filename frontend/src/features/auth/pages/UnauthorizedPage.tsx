@@ -23,14 +23,14 @@ export default function UnauthorizedPage() {
 
       <h1
         className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 whitespace-nowrap"
-        style={{ animation: 'typewriter 1.3s steps(13, end) 0.4s both' }}
+        style={{ clipPath: 'inset(0 100% 0 0)', animation: 'type-loop 5s steps(26, end) 0.4s infinite' }}
       >
         Access Denied
       </h1>
 
       <p
         className="text-slate-500 max-w-sm"
-        style={{ animation: 'fade-up 0.5s ease-out 1.9s both' }}
+        style={{ animation: 'fade-up 0.5s ease-out 3s both' }}
       >
         You don't have permission to view this page. Contact your administrator if you believe this is a mistake.
       </p>

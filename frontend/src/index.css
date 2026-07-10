@@ -146,10 +146,15 @@
   50%       { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
 }
 
-/* error pages — text typewriter reveal (left → right, char by char) */
-@keyframes typewriter {
-  from { clip-path: inset(0 100% 0 0); }
-  to   { clip-path: inset(0 0% 0 0); }
+/* error pages — looping typewriter: type → hold → erase → repeat
+   Use steps(chars × 2) so the typing phase (50% of duration)
+   gets exactly N steps = N characters typed one-by-one.
+   Erasing phase (25%) is faster: ~N/2 steps = 2 chars per step. */
+@keyframes type-loop {
+  0%        { clip-path: inset(0 100% 0 0); }  /* empty          */
+  50%       { clip-path: inset(0 0%   0 0); }  /* fully typed    */
+  75%       { clip-path: inset(0 0%   0 0); }  /* hold — read it */
+  100%      { clip-path: inset(0 100% 0 0); }  /* erased         */
 }
 
 /* error pages — elements fade + slide up */
