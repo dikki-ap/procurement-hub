@@ -12,15 +12,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
-import { vendorPortalApi, type DocumentStatus, type DocumentType } from '@/features/vendors/api/vendorApi';
+import { vendorPortalApi, type DocumentStatus, type DocumentTypeConfigDto } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
 
-const DOCUMENT_TYPES: DocumentType[] = ['Siup', 'Npwp', 'Nib', 'Iso9001', 'Halal', 'Akta', 'Other'];
-
-const ALLOWED_EXTENSIONS = '.pdf,.jpg,.jpeg,.png,.webp,.xlsx,.xls';
-const ALLOWED_LABEL       = 'PDF, JPG, PNG, WebP, XLSX';
-const MAX_SIZE_MB          = 10;
-const MAX_SIZE_BYTES       = MAX_SIZE_MB * 1024 * 1024;
+const GLOBAL_ALLOWED_LABEL = 'PDF, JPG, PNG, XLSX';
+const GLOBAL_ALLOWED_EXTS  = ['.pdf', '.jpg', '.jpeg', '.png', '.xlsx', '.xls'];
+const GLOBAL_MAX_MB        = 10;
 
 const StatusBadge = ({ status }: { status: DocumentStatus }) => {
   const cfg: Record<DocumentStatus, string> = {
@@ -37,7 +34,7 @@ const StatusBadge = ({ status }: { status: DocumentStatus }) => {
 
 type UploadForm = {
   file: File | null;
-  documentType: DocumentType;
+  documentType: string;
   documentNumber: string;
   expiredAt: string;
   issuedAt: string;
@@ -46,12 +43,25 @@ type UploadForm = {
 
 const EMPTY_FORM: UploadForm = {
   file: null,
-  documentType: 'Npwp',
+  documentType: '',
   documentNumber: '',
   expiredAt: '',
   issuedAt: '',
   notes: '',
 };
+
+function getAllowedExtensions(dt: DocumentTypeConfigDto | undefined): string[] {
+  if (!dt?.allowedExtensions) return GLOBAL_ALLOWED_EXTS;
+  return dt.allowedExtensions.split(',').map((s) => s.trim().toLowerCase());
+}
+
+function getAllowedLabel(dt: DocumentTypeConfigDto | undefined): string {
+  if (!dt?.allowedExtensions) return GLOBAL_ALLOWED_LABEL;
+  return dt.allowedExtensions
+    .split(',')
+    .map((s) => s.trim().replace('.', '').toUpperCase())
+    .join(', ');
+}
 
 export default function VendorPortalDocumentsPage() {
   const { vendorId } = useParams<{ vendorId: string }>();
@@ -62,12 +72,36 @@ export default function VendorPortalDocumentsPage() {
   const [form, setForm] = useState<UploadForm>(EMPTY_FORM);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const { data: docs = [], isLoading } = useQuery({
     queryKey: ['vendor-portal', 'documents', vendorId],
     queryFn: () => vendorPortalApi.getDocuments(vendorId!),
     enabled: !!vendorId,
   });
+
+  const { data: docTypes = [] } = useQuery({
+    queryKey: ['vendor-portal', 'document-types', vendorId],
+    queryFn: () => vendorPortalApi.getDocumentTypes(vendorId!),
+    enabled: !!vendorId,
+  });
+
+  const activeTypes = docTypes.filter((t) => t.isActive);
+  const selectedType = activeTypes.find((t) => t.name === form.documentType);
+
+  const allowedExts = getAllowedExtensions(selectedType);
+  const allowedLabel = getAllowedLabel(selectedType);
+  const maxMb = selectedType?.maxFileSizeMb ?? GLOBAL_MAX_MB;
+  const maxBytes = maxMb * 1024 * 1024;
+  const acceptAttr = allowedExts.join(',');
+
+  const resetUpload = () => {
+    setShowUpload(false);
+    setForm(EMPTY_FORM);
+    setFileError(null);
+    setUploadProgress(0);
+    if (fileRef.current) fileRef.current.value = '';
+  };
 
   const uploadMut = useMutation({
     mutationFn: () => {
@@ -79,15 +113,13 @@ export default function VendorPortalDocumentsPage() {
       if (form.expiredAt)      data.append('expiredAt', form.expiredAt);
       if (form.issuedAt)       data.append('issuedAt', form.issuedAt);
       if (form.notes)          data.append('notes', form.notes);
-      return vendorPortalApi.uploadDocument(vendorId!, data);
+      setUploadProgress(0);
+      return vendorPortalApi.uploadDocument(vendorId!, data, setUploadProgress);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vendor-portal', 'documents', vendorId] });
       toast.success('Document uploaded');
-      setShowUpload(false);
-      setForm(EMPTY_FORM);
-      setFileError(null);
-      if (fileRef.current) fileRef.current.value = '';
+      resetUpload();
     },
     onError: (error: unknown) => toast.error(extractApiError(error, 'Upload failed')),
   });
@@ -104,6 +136,33 @@ export default function VendorPortalDocumentsPage() {
 
   const set = (key: keyof UploadForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }));
+
+  const onTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setForm(f => ({ ...f, documentType: e.target.value, file: null }));
+    setFileError(null);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) { setForm(f => ({ ...f, file: null })); return; }
+
+    const ext = '.' + file.name.split('.').pop()!.toLowerCase();
+    if (!allowedExts.includes(ext)) {
+      setFileError(`File type '${ext}' is not allowed. Accepted: ${allowedLabel}.`);
+      e.target.value = '';
+      setForm(f => ({ ...f, file: null }));
+      return;
+    }
+    if (file.size > maxBytes) {
+      setFileError(`File is too large. Maximum size for this type is ${maxMb} MB.`);
+      e.target.value = '';
+      setForm(f => ({ ...f, file: null }));
+      return;
+    }
+    setFileError(null);
+    setForm(f => ({ ...f, file }));
+  };
 
   return (
     <div>
@@ -162,7 +221,7 @@ export default function VendorPortalDocumentsPage() {
       )}
 
       {/* Upload modal */}
-      <Dialog open={showUpload} onOpenChange={(v) => { if (!v && !uploadMut.isPending) { setShowUpload(false); setForm(EMPTY_FORM); setFileError(null); if (fileRef.current) fileRef.current.value = ''; } }}>
+      <Dialog open={showUpload} onOpenChange={(v) => { if (!v && !uploadMut.isPending) resetUpload(); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -176,40 +235,33 @@ export default function VendorPortalDocumentsPage() {
               <select
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={form.documentType}
-                onChange={set('documentType') as React.ChangeEventHandler<HTMLSelectElement>}
+                onChange={onTypeChange}
               >
-                {DOCUMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                <option value="">Select a document type…</option>
+                {activeTypes.map(t => <option key={t.id} value={t.name}>{t.name}</option>)}
               </select>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-700">File <span className="text-red-500">*</span></label>
-              <input
-                ref={fileRef}
-                type="file"
-                accept={ALLOWED_EXTENSIONS}
-                className="w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-primary file:text-primary-foreground hover:file:opacity-90"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] ?? null;
-                  if (file && file.size > MAX_SIZE_BYTES) {
-                    setFileError(`File is too large. Maximum size is ${MAX_SIZE_MB} MB.`);
-                    e.target.value = '';
-                    setForm(f => ({ ...f, file: null }));
-                  } else {
-                    setFileError(null);
-                    setForm(f => ({ ...f, file }));
-                  }
-                }}
-              />
-              <p className="text-xs text-slate-400">
-                Allowed: {ALLOWED_LABEL} · Max {MAX_SIZE_MB} MB
-              </p>
-              {fileError && (
-                <p className="text-xs text-red-500 flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" /> {fileError}
+            {form.documentType && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-700">File <span className="text-red-500">*</span></label>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept={acceptAttr}
+                  className="w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-primary file:text-primary-foreground hover:file:opacity-90"
+                  onChange={onFileChange}
+                />
+                <p className="text-xs text-slate-400">
+                  Allowed: {allowedLabel} · Max {maxMb} MB
                 </p>
-              )}
-            </div>
+                {fileError && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" /> {fileError}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
@@ -240,20 +292,44 @@ export default function VendorPortalDocumentsPage() {
               <Input placeholder="e.g. Renewed certificate, replaces previous" value={form.notes} onChange={set('notes')} />
             </div>
 
-            {!form.file && !fileError && (
+            {!form.documentType && (
+              <p className="text-xs text-amber-600 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" /> Please select a document type first.
+              </p>
+            )}
+            {form.documentType && !form.file && !fileError && (
               <p className="text-xs text-amber-600 flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" /> Please select a file to upload.
               </p>
             )}
           </div>
 
+          {uploadMut.isPending && (
+            <div className="space-y-1.5 mt-2">
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>Uploading…</span>
+                <span className="font-medium tabular-nums">{uploadProgress}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-150 ease-out"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 mt-2">
-            <Button variant="outline" onClick={() => { setShowUpload(false); setForm(EMPTY_FORM); setFileError(null); if (fileRef.current) fileRef.current.value = ''; }} disabled={uploadMut.isPending}>
+            <Button variant="outline" onClick={resetUpload} disabled={uploadMut.isPending}>
               Cancel
             </Button>
-            <Button onClick={() => uploadMut.mutate()} disabled={uploadMut.isPending || !form.file || !!fileError} className="gap-1">
+            <Button
+              onClick={() => uploadMut.mutate()}
+              disabled={uploadMut.isPending || !form.file || !!fileError || !form.documentType}
+              className="gap-1"
+            >
               <Upload className="h-4 w-4" />
-              {uploadMut.isPending ? 'Uploading…' : 'Upload'}
+              {uploadMut.isPending ? `Uploading ${uploadProgress}%` : 'Upload'}
             </Button>
           </div>
         </DialogContent>

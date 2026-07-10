@@ -185,6 +185,13 @@ export const router = createBrowserRouter([
                     '@/features/master-data/material-category/pages/MaterialCategoryListPage'
                   ).then((m) => ({ Component: m.default })),
               },
+              {
+                path: 'document-types',
+                lazy: () =>
+                  import(
+                    '@/features/master-data/document-type/pages/DocumentTypeListPage'
+                  ).then((m) => ({ Component: m.default })),
+              },
             ],
           },
         ],

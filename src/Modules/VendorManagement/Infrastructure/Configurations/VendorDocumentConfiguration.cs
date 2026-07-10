@@ -13,7 +13,7 @@ public class VendorDocumentConfiguration : BaseSoftDeleteEntityConfiguration<Ven
 
         builder.ToTable("vendor_documents");
 
-        builder.Property(e => e.DocumentType).HasConversion<string>().HasMaxLength(30);
+        builder.Property(e => e.DocumentType).HasMaxLength(100).IsRequired();
         builder.Property(e => e.DocumentNumber).HasMaxLength(100);
         builder.Property(e => e.FileUrl).HasMaxLength(1000).IsRequired();
         builder.Property(e => e.FileName).HasMaxLength(255);

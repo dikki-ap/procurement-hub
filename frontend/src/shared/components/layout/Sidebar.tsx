@@ -29,6 +29,7 @@ const masterDataLinks = [
   { to: '/app/master-data/payment-terms', icon: CreditCard, label: 'Payment Terms' },
   { to: '/app/master-data/uoms', icon: Ruler, label: 'Units of Measure' },
   { to: '/app/master-data/material-categories', icon: FolderOpen, label: 'Material Categories' },
+  { to: '/app/master-data/document-types', icon: FileText, label: 'Document Types' },
 ];
 
 const navCls = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>

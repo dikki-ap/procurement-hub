@@ -14,6 +14,7 @@ public static class MasterDataModule
         services.AddScoped<ICurrencyRepository,         CurrencyRepository>();
         services.AddScoped<IPaymentTermRepository,      PaymentTermRepository>();
         services.AddScoped<ILocationRepository,         LocationRepository>();
+        services.AddScoped<IDocumentTypeRepository,     DocumentTypeRepository>();
 
         return services;
     }

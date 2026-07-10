@@ -1,6 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProcureHub.API.Security;
+using ProcureHub.Modules.MasterData.Application.Queries.GetDocumentTypeList;
 using ProcureHub.Modules.VendorManagement.Application.Commands.ApproveVendor;
 using ProcureHub.Modules.VendorManagement.Application.Commands.BlacklistVendor;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocument;
@@ -10,9 +12,9 @@ using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocum
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocuments;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorList;
-using ProcureHub.Modules.VendorManagement.Domain.Enums;
 using ProcureHub.SharedKernel.Abstractions;
 using ProcureHub.SharedKernel.Common;
+using ProcureHub.SharedKernel.Exceptions;
 
 namespace ProcureHub.API.Controllers.v1.VendorManagement;
 
@@ -95,13 +97,53 @@ public class VendorsController : ControllerBase
         return Ok(ApiResponse.Ok("Vendor reinstated."));
     }
 
+    private static readonly HashSet<string> GlobalAllowedTypes =
+    [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+    ];
+
     /// <summary>Upload a document for a vendor.</summary>
     [HttpPost("{id:guid}/documents")]
     [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> UploadDocument(
         Guid id, [FromForm] UploadDocumentRequest request, CancellationToken ct)
     {
+        var docTypes = await _mediator.Send(new GetDocumentTypeListQuery(), ct);
+        var docType  = docTypes.FirstOrDefault(t => t.Name == request.DocumentType && t.IsActive)
+            ?? throw new BusinessRuleException("UploadDocument",
+                $"Document type '{request.DocumentType}' is not recognised or is inactive.");
+
+        var ext      = Path.GetExtension(request.File.FileName).ToLowerInvariant();
+        var maxBytes = (long)docType.MaxFileSizeMb * 1024 * 1024;
+
+        if (!GlobalAllowedTypes.Contains(request.File.ContentType))
+            throw new BusinessRuleException("UploadDocument", "Allowed content types: PDF, JPEG, PNG, XLSX.");
+
+        if (!string.IsNullOrWhiteSpace(docType.AllowedExtensions))
+        {
+            var allowed = docType.AllowedExtensions
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            if (!allowed.Contains(ext))
+                throw new BusinessRuleException("UploadDocument",
+                    $"'{ext}' is not allowed for {docType.Name}. Allowed: {docType.AllowedExtensions}.");
+        }
+
+        if (request.File.Length > maxBytes)
+            throw new BusinessRuleException("UploadDocument",
+                $"File exceeds the {docType.MaxFileSizeMb} MB limit for {docType.Name}.");
+
         await using var stream = request.File.OpenReadStream();
+
+        if (!await FileSignatureValidator.IsValidAsync(stream, ext))
+            throw new BusinessRuleException("UploadDocument",
+                "File content does not match the declared file type.");
+
         var docId = await _mediator.Send(new UploadVendorDocumentCommand(
             id,
             request.DocumentType,
@@ -109,6 +151,7 @@ public class VendorsController : ControllerBase
             stream,
             request.File.FileName,
             request.File.ContentType,
+            docType.MaxFileSizeMb,
             request.ExpiredAt,
             request.IssuedAt,
             request.Notes), ct);
@@ -132,10 +175,10 @@ public record BlacklistRequest(string Reason);
 
 public class UploadDocumentRequest
 {
-    public IFormFile    File           { get; set; } = null!;
-    public DocumentType DocumentType   { get; set; }
-    public string?      DocumentNumber { get; set; }
-    public DateOnly?    ExpiredAt      { get; set; }
-    public DateOnly?    IssuedAt       { get; set; }
-    public string?      Notes          { get; set; }
+    public IFormFile File           { get; set; } = null!;
+    public string    DocumentType   { get; set; } = string.Empty;
+    public string?   DocumentNumber { get; set; }
+    public DateOnly? ExpiredAt      { get; set; }
+    public DateOnly? IssuedAt       { get; set; }
+    public string?   Notes          { get; set; }
 }

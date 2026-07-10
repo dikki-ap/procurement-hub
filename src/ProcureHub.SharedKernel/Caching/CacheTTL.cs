@@ -2,6 +2,7 @@ namespace ProcureHub.SharedKernel.Caching;
 
 public static class CacheTTL
 {
+    public static readonly TimeSpan DocumentTypes       = TimeSpan.FromDays(30);
     public static readonly TimeSpan UnitOfMeasures     = TimeSpan.FromDays(30);
     public static readonly TimeSpan PaymentTerms       = TimeSpan.FromDays(30);
     public static readonly TimeSpan CurrencyList       = TimeSpan.FromDays(7);

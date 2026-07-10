@@ -3,7 +3,15 @@ import { apiClient } from '@/shared/lib/axios';
 export type VendorStatus = 'Pending' | 'Active' | 'Suspended' | 'Blacklisted';
 export type VendorType   = 'Manufacturer' | 'Distributor' | 'Trader';
 export type VendorTier   = 'Probation' | 'Bronze' | 'Silver' | 'Gold';
-export type DocumentType = 'Siup' | 'Npwp' | 'Nib' | 'Iso9001' | 'Halal' | 'Akta' | 'Other';
+export type DocumentType = string;
+
+export interface DocumentTypeConfigDto {
+  id: string;
+  name: string;
+  isActive: boolean;
+  allowedExtensions: string | null;
+  maxFileSizeMb: number;
+}
 export type DocumentStatus = 'Active' | 'Expired' | 'Revoked';
 
 export interface VendorDto {
@@ -115,11 +123,17 @@ export const vendorPortalApi = {
   getDocuments: (vendorId: string) =>
     apiClient.get<{ data: VendorDocumentDto[] }>(`/vendor-portal/${vendorId}/documents`).then((r) => r.data.data),
 
-  uploadDocument: (vendorId: string, formData: FormData) =>
+  uploadDocument: (vendorId: string, formData: FormData, onProgress?: (pct: number) => void) =>
     apiClient.post<{ data: { id: string } }>(`/vendor-portal/${vendorId}/documents`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: onProgress
+        ? (e) => { if (e.total) onProgress(Math.round((e.loaded / e.total) * 100)); }
+        : undefined,
     }).then((r) => r.data.data),
 
   deleteDocument: (vendorId: string, documentId: string) =>
     apiClient.delete(`/vendor-portal/${vendorId}/documents/${documentId}`),
+
+  getDocumentTypes: (vendorId: string) =>
+    apiClient.get<{ data: DocumentTypeConfigDto[] }>(`/vendor-portal/${vendorId}/document-types`).then((r) => r.data.data),
 };

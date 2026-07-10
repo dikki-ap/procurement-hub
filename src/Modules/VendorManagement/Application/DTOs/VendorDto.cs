@@ -2,6 +2,7 @@ using ProcureHub.Modules.VendorManagement.Domain.Enums;
 
 namespace ProcureHub.Modules.VendorManagement.Application.DTOs;
 
+
 public record VendorDto(
     Guid         Id,
     string       VendorCode,
@@ -52,7 +53,7 @@ public record VendorContactDto(
 
 public record VendorDocumentDto(
     Guid           Id,
-    DocumentType   DocumentType,
+    string         DocumentType,
     string?        DocumentNumber,
     string         FileUrl,
     string?        FileName,

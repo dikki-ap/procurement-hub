@@ -6,7 +6,7 @@ namespace ProcureHub.Modules.VendorManagement.Domain.Entities;
 public class VendorDocument : BaseSoftDeleteEntity
 {
     public Guid           VendorId       { get; set; }
-    public DocumentType   DocumentType   { get; set; }
+    public string         DocumentType   { get; set; } = string.Empty;
     public string?        DocumentNumber { get; set; }
     public string         FileUrl        { get; set; } = string.Empty;
     public string?        FileName       { get; set; }

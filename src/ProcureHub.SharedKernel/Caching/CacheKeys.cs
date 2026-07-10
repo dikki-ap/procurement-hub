@@ -50,6 +50,13 @@ public static class CacheKeys
         public const string List   = "approval-policies:list";
     }
 
+    public static class DocumentTypes
+    {
+        public const string Prefix = "document-types:";
+        public const string List   = "document-types:list";
+        public static string ById(Guid id) => $"document-types:{id}";
+    }
+
     public static class Vendors
     {
         public const string Prefix = "vendors:";
