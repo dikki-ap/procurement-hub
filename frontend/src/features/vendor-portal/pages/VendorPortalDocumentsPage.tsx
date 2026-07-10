@@ -17,6 +17,11 @@ import { extractApiError } from '@/shared/lib/apiError';
 
 const DOCUMENT_TYPES: DocumentType[] = ['Siup', 'Npwp', 'Nib', 'Iso9001', 'Halal', 'Akta', 'Other'];
 
+const ALLOWED_EXTENSIONS = '.pdf,.jpg,.jpeg,.png,.webp,.xlsx,.xls';
+const ALLOWED_LABEL       = 'PDF, JPG, PNG, WebP, XLSX';
+const MAX_SIZE_MB          = 10;
+const MAX_SIZE_BYTES       = MAX_SIZE_MB * 1024 * 1024;
+
 const StatusBadge = ({ status }: { status: DocumentStatus }) => {
   const cfg: Record<DocumentStatus, string> = {
     Active:  'bg-emerald-50 text-emerald-700',
@@ -56,6 +61,7 @@ export default function VendorPortalDocumentsPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [form, setForm] = useState<UploadForm>(EMPTY_FORM);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const { data: docs = [], isLoading } = useQuery({
     queryKey: ['vendor-portal', 'documents', vendorId],
@@ -80,6 +86,7 @@ export default function VendorPortalDocumentsPage() {
       toast.success('Document uploaded');
       setShowUpload(false);
       setForm(EMPTY_FORM);
+      setFileError(null);
       if (fileRef.current) fileRef.current.value = '';
     },
     onError: (error: unknown) => toast.error(extractApiError(error, 'Upload failed')),
@@ -155,7 +162,7 @@ export default function VendorPortalDocumentsPage() {
       )}
 
       {/* Upload modal */}
-      <Dialog open={showUpload} onOpenChange={(v) => { if (!v && !uploadMut.isPending) { setShowUpload(false); setForm(EMPTY_FORM); } }}>
+      <Dialog open={showUpload} onOpenChange={(v) => { if (!v && !uploadMut.isPending) { setShowUpload(false); setForm(EMPTY_FORM); setFileError(null); if (fileRef.current) fileRef.current.value = ''; } }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -180,33 +187,60 @@ export default function VendorPortalDocumentsPage() {
               <input
                 ref={fileRef}
                 type="file"
+                accept={ALLOWED_EXTENSIONS}
                 className="w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-primary file:text-primary-foreground hover:file:opacity-90"
-                onChange={(e) => setForm(f => ({ ...f, file: e.target.files?.[0] ?? null }))}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  if (file && file.size > MAX_SIZE_BYTES) {
+                    setFileError(`File is too large. Maximum size is ${MAX_SIZE_MB} MB.`);
+                    e.target.value = '';
+                    setForm(f => ({ ...f, file: null }));
+                  } else {
+                    setFileError(null);
+                    setForm(f => ({ ...f, file }));
+                  }
+                }}
               />
+              <p className="text-xs text-slate-400">
+                Allowed: {ALLOWED_LABEL} · Max {MAX_SIZE_MB} MB
+              </p>
+              {fileError && (
+                <p className="text-xs text-red-500 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" /> {fileError}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-700">Document Number</label>
+                <label className="text-xs font-medium text-slate-700">
+                  Document Number <span className="text-slate-400 font-normal">(optional)</span>
+                </label>
                 <Input placeholder="e.g. 123/SK/2024" value={form.documentNumber} onChange={set('documentNumber')} />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-700">Issued Date</label>
+                <label className="text-xs font-medium text-slate-700">
+                  Issued Date <span className="text-slate-400 font-normal">(optional)</span>
+                </label>
                 <Input type="date" value={form.issuedAt} onChange={set('issuedAt')} />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-700">Expiry Date</label>
+              <label className="text-xs font-medium text-slate-700">
+                Expiry Date <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
               <Input type="date" value={form.expiredAt} onChange={set('expiredAt')} />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-700">Notes</label>
-              <Input placeholder="Optional notes" value={form.notes} onChange={set('notes')} />
+              <label className="text-xs font-medium text-slate-700">
+                Notes <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <Input placeholder="e.g. Renewed certificate, replaces previous" value={form.notes} onChange={set('notes')} />
             </div>
 
-            {!form.file && (
+            {!form.file && !fileError && (
               <p className="text-xs text-amber-600 flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" /> Please select a file to upload.
               </p>
@@ -214,10 +248,10 @@ export default function VendorPortalDocumentsPage() {
           </div>
 
           <div className="flex justify-end gap-2 mt-2">
-            <Button variant="outline" onClick={() => { setShowUpload(false); setForm(EMPTY_FORM); }} disabled={uploadMut.isPending}>
+            <Button variant="outline" onClick={() => { setShowUpload(false); setForm(EMPTY_FORM); setFileError(null); if (fileRef.current) fileRef.current.value = ''; }} disabled={uploadMut.isPending}>
               Cancel
             </Button>
-            <Button onClick={() => uploadMut.mutate()} disabled={uploadMut.isPending || !form.file} className="gap-1">
+            <Button onClick={() => uploadMut.mutate()} disabled={uploadMut.isPending || !form.file || !!fileError} className="gap-1">
               <Upload className="h-4 w-4" />
               {uploadMut.isPending ? 'Uploading…' : 'Upload'}
             </Button>
