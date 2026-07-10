@@ -18,7 +18,7 @@ export const ProtectedRoute = ({ requiredRoles }: Props) => {
   }
 
   if (!keycloak.authenticated) {
-    keycloak.login({ redirectUri: `${window.location.origin}/app/dashboard` });
+    keycloak.login({ redirectUri: window.location.origin });
     return null;
   }
 

@@ -7,6 +7,7 @@ interface UserProfile {
   fullName: string;
   role: string;
   companyId: string;
+  vendorId?: string;
   roles: string[];
 }
 

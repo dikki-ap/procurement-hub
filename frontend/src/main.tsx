@@ -21,6 +21,7 @@ async function bootstrap() {
         preferred_username?: string;
         resource_access?: Record<string, { roles: string[] }>;
         company_id?: string;
+        vendor_id?: string;
       };
       const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? 'procurehub-web';
       const roles: string[] = t.resource_access?.[clientId]?.roles ?? [];
@@ -30,6 +31,7 @@ async function bootstrap() {
         fullName:  t.name            ?? t.preferred_username ?? '',
         role:      roles[0]          ?? '',
         companyId: t.company_id      ?? '',
+        vendorId:  t.vendor_id,
         roles,
       });
     } else {
