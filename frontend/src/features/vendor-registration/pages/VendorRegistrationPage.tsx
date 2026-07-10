@@ -77,9 +77,7 @@ export default function VendorRegistrationPage() {
     <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white text-lg font-bold mx-auto mb-3">
-            PH
-          </div>
+          <img src="/favicon.svg" alt="Procurement Hub" className="w-12 h-12 mx-auto mb-3" />
           <h1 className="text-2xl font-bold text-slate-900">Vendor Registration</h1>
           <p className="text-sm text-slate-500 mt-1">Register your company as a vendor on Procurement Hub</p>
         </div>
