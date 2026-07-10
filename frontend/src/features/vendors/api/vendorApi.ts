@@ -115,6 +115,11 @@ export const vendorPortalApi = {
   getDocuments: (vendorId: string) =>
     apiClient.get<{ data: VendorDocumentDto[] }>(`/vendor-portal/${vendorId}/documents`).then((r) => r.data.data),
 
+  uploadDocument: (vendorId: string, formData: FormData) =>
+    apiClient.post<{ data: { id: string } }>(`/vendor-portal/${vendorId}/documents`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data.data),
+
   deleteDocument: (vendorId: string, documentId: string) =>
     apiClient.delete(`/vendor-portal/${vendorId}/documents/${documentId}`),
 };

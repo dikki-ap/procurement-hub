@@ -17,6 +17,7 @@ import {
   Shield,
   ShoppingCart,
   Receipt,
+  Building2,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -101,45 +102,20 @@ export const Sidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 space-y-0.5">
-        <NavLink to="/app/dashboard" title="Dashboard" className={navCls(ec)}>
-          <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-          <NavLabel collapsed={ec}>Dashboard</NavLabel>
-        </NavLink>
 
-        <div className="pt-3">
-          <NavLink to="/app/procurement/prs" title="Purchase Requisitions" className={navCls(ec)}>
-            <ClipboardList className="h-4 w-4 flex-shrink-0" />
-            <NavLabel collapsed={ec}>Purchase Requisitions</NavLabel>
-          </NavLink>
-        </div>
-
-        <div className="pt-1">
-          <NavLink to="/app/procurement/rfqs" title="RFQs" className={navCls(ec)}>
-            <FileText className="h-4 w-4 flex-shrink-0" />
-            <NavLabel collapsed={ec}>RFQs</NavLabel>
-          </NavLink>
-        </div>
-
-        {(isPurchasing || isFinance) && (
-          <div className="pt-1">
-            <NavLink to="/app/fulfillment/purchase-orders" title="Purchase Orders" className={navCls(ec)}>
-              <ShoppingCart className="h-4 w-4 flex-shrink-0" />
-              <NavLabel collapsed={ec}>Purchase Orders</NavLabel>
-            </NavLink>
-          </div>
-        )}
-
-        {isFinance && (
-          <div className="pt-1">
-            <NavLink to="/app/fulfillment/invoices" title="Invoices" className={navCls(ec)}>
-              <Receipt className="h-4 w-4 flex-shrink-0" />
-              <NavLabel collapsed={ec}>Invoices</NavLabel>
-            </NavLink>
-          </div>
-        )}
-
+        {/* ── Vendor Portal ── */}
         {isVendor && vendorId && (
           <>
+            <NavLink to={`/app/vendor-portal/${vendorId}/profile`} title="Company Profile" className={navCls(ec)}>
+              <Building2 className="h-4 w-4 flex-shrink-0" />
+              <NavLabel collapsed={ec}>Company Profile</NavLabel>
+            </NavLink>
+            <div className="pt-1">
+              <NavLink to={`/app/vendor-portal/${vendorId}/documents`} title="Documents" className={navCls(ec)}>
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <NavLabel collapsed={ec}>Documents</NavLabel>
+              </NavLink>
+            </div>
             <div className="pt-1">
               <NavLink to={`/app/vendor-portal/${vendorId}/orders`} title="Purchase Orders" className={navCls(ec)}>
                 <ShoppingCart className="h-4 w-4 flex-shrink-0" />
@@ -155,43 +131,85 @@ export const Sidebar = () => {
           </>
         )}
 
-        <div className="pt-3">
-          <NavLink to="/app/approval/inbox" title="Approval Inbox" className={navCls(ec)}>
-            <Inbox className="h-4 w-4 flex-shrink-0" />
-            <NavLabel collapsed={ec}>Approval Inbox</NavLabel>
-          </NavLink>
-        </div>
-
-        <div className="pt-3">
-          <NavLink to="/app/vendors" title="Vendors" className={navCls(ec)}>
-            <Users className="h-4 w-4 flex-shrink-0" />
-            <NavLabel collapsed={ec}>Vendors</NavLabel>
-          </NavLink>
-        </div>
-
-        {isSuperAdmin && (
-          <div className="pt-3">
-            <NavLink to="/app/approval/policies" title="Approval Policies" className={navCls(ec)}>
-              <Shield className="h-4 w-4 flex-shrink-0" />
-              <NavLabel collapsed={ec}>Approval Policies</NavLabel>
+        {/* ── Internal Portal ── */}
+        {!isVendor && (
+          <>
+            <NavLink to="/app/dashboard" title="Dashboard" className={navCls(ec)}>
+              <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
+              <NavLabel collapsed={ec}>Dashboard</NavLabel>
             </NavLink>
 
-            <div
-              className="overflow-hidden transition-[max-height,opacity] duration-300 mt-3"
-              style={{ maxHeight: ec ? 0 : '40px', opacity: ec ? 0 : 1 }}
-            >
-              <p className="px-5 pb-1 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
-                Master Data
-              </p>
+            <div className="pt-3">
+              <NavLink to="/app/procurement/prs" title="Purchase Requisitions" className={navCls(ec)}>
+                <ClipboardList className="h-4 w-4 flex-shrink-0" />
+                <NavLabel collapsed={ec}>Purchase Requisitions</NavLabel>
+              </NavLink>
             </div>
 
-            {masterDataLinks.map(({ to, icon: Icon, label }) => (
-              <NavLink key={to} to={to} title={label} className={navCls(ec)}>
-                <Icon className="h-4 w-4 flex-shrink-0" />
-                <NavLabel collapsed={ec}>{label}</NavLabel>
+            <div className="pt-1">
+              <NavLink to="/app/procurement/rfqs" title="RFQs" className={navCls(ec)}>
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <NavLabel collapsed={ec}>RFQs</NavLabel>
               </NavLink>
-            ))}
-          </div>
+            </div>
+
+            {(isPurchasing || isFinance) && (
+              <div className="pt-1">
+                <NavLink to="/app/fulfillment/purchase-orders" title="Purchase Orders" className={navCls(ec)}>
+                  <ShoppingCart className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Purchase Orders</NavLabel>
+                </NavLink>
+              </div>
+            )}
+
+            {isFinance && (
+              <div className="pt-1">
+                <NavLink to="/app/fulfillment/invoices" title="Invoices" className={navCls(ec)}>
+                  <Receipt className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Invoices</NavLabel>
+                </NavLink>
+              </div>
+            )}
+
+            <div className="pt-3">
+              <NavLink to="/app/approval/inbox" title="Approval Inbox" className={navCls(ec)}>
+                <Inbox className="h-4 w-4 flex-shrink-0" />
+                <NavLabel collapsed={ec}>Approval Inbox</NavLabel>
+              </NavLink>
+            </div>
+
+            <div className="pt-3">
+              <NavLink to="/app/vendors" title="Vendors" className={navCls(ec)}>
+                <Users className="h-4 w-4 flex-shrink-0" />
+                <NavLabel collapsed={ec}>Vendors</NavLabel>
+              </NavLink>
+            </div>
+
+            {isSuperAdmin && (
+              <div className="pt-3">
+                <NavLink to="/app/approval/policies" title="Approval Policies" className={navCls(ec)}>
+                  <Shield className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Approval Policies</NavLabel>
+                </NavLink>
+
+                <div
+                  className="overflow-hidden transition-[max-height,opacity] duration-300 mt-3"
+                  style={{ maxHeight: ec ? 0 : '40px', opacity: ec ? 0 : 1 }}
+                >
+                  <p className="px-5 pb-1 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
+                    Master Data
+                  </p>
+                </div>
+
+                {masterDataLinks.map(({ to, icon: Icon, label }) => (
+                  <NavLink key={to} to={to} title={label} className={navCls(ec)}>
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <NavLabel collapsed={ec}>{label}</NavLabel>
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </nav>
 

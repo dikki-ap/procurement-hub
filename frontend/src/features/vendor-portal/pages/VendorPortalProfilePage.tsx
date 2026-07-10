@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { User, Building2 } from 'lucide-react';
 import { vendorPortalApi, type VendorStatus } from '@/features/vendors/api/vendorApi';
+import { TierBadge, ScoreDisplay } from '@/features/vendors/components/VendorBadges';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
   const cfg: Record<VendorStatus, string> = {
@@ -51,27 +52,29 @@ export default function VendorPortalProfilePage() {
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {[
-          { label: 'Score', value: vendor.score.toFixed(1) },
-          { label: 'Tier', value: vendor.tier },
-          { label: 'Type', value: vendor.vendorType },
-        ].map(({ label, value }) => (
-          <div key={label} className="bg-white rounded-xl border border-slate-100 p-4">
-            <p className="text-xs text-slate-500">{label}</p>
-            <p className="text-lg font-semibold text-slate-900 mt-0.5">{value}</p>
-          </div>
-        ))}
+        <div className="bg-white rounded-xl border border-slate-100 p-4">
+          <p className="text-xs text-slate-500 mb-1.5">Score</p>
+          <ScoreDisplay score={vendor.score} />
+        </div>
+        <div className="bg-white rounded-xl border border-slate-100 p-4">
+          <p className="text-xs text-slate-500 mb-1.5">Tier</p>
+          <TierBadge tier={vendor.tier} />
+        </div>
+        <div className="bg-white rounded-xl border border-slate-100 p-4">
+          <p className="text-xs text-slate-500 mb-1.5">Type</p>
+          <p className="text-sm font-medium text-slate-800">{vendor.vendorType}</p>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-slate-100 p-6 mb-6">
         <h2 className="text-sm font-semibold text-slate-700 mb-4">Company Details</h2>
         <div className="grid grid-cols-2 gap-6">
           {[
-            { label: 'Legal Name', value: vendor.legalName },
-            { label: 'Trade Name', value: vendor.tradeName ?? '—' },
-            { label: 'NPWP', value: vendor.npwp ?? '—' },
-            { label: 'SIUP', value: vendor.siup ?? '—' },
-            { label: 'NIB', value: vendor.nib ?? '—' },
+            { label: 'Legal Name',  value: vendor.legalName },
+            { label: 'Trade Name',  value: vendor.tradeName ?? '—' },
+            { label: 'NPWP',        value: vendor.npwp ?? '—' },
+            { label: 'SIUP',        value: vendor.siup ?? '—' },
+            { label: 'NIB',         value: vendor.nib ?? '—' },
           ].map(({ label, value }) => (
             <div key={label}>
               <p className="text-xs text-slate-500">{label}</p>
@@ -86,14 +89,14 @@ export default function VendorPortalProfilePage() {
         <div className="space-y-3">
           {vendor.contacts.map((c) => (
             <div key={c.id} className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <User className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="h-4 w-4 text-primary" />
               </div>
               <div>
                 <p className="text-sm font-medium text-slate-900">
                   {c.name}
                   {c.isPrimary && (
-                    <span className="ml-2 text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">Primary</span>
+                    <span className="ml-2 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">Primary</span>
                   )}
                 </p>
                 <p className="text-xs text-slate-500">{c.position} · {c.email}</p>
