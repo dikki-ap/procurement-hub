@@ -46,13 +46,13 @@ export function ScoreBadge({ score }: { score: number }) {
   );
 }
 
-/** Larger display for detail cards */
+/** Display for detail cards — matches TierBadge pill sizing */
 export function ScoreDisplay({ score }: { score: number }) {
   const { icon: Icon, text, bg } = scoreCfg(score);
   return (
-    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg ${bg} ${text}`}>
-      <Icon className="h-4 w-4" />
-      <span className="text-xl font-bold">{score.toFixed(1)}</span>
-    </div>
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${bg} ${text}`}>
+      <Icon className="h-3 w-3" />
+      {score.toFixed(1)}
+    </span>
   );
 }
