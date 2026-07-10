@@ -96,10 +96,15 @@ export default function VendorInvoicesPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Receipt className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-2xl font-semibold">Invoices</h1>
-        <Button size="sm" className="ml-auto" onClick={() => setShowForm(true)}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Receipt className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Invoices</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Submit and track your invoices</p>
+          </div>
+        </div>
+        <Button size="sm" onClick={() => setShowForm(true)}>
           <Plus className="h-4 w-4 mr-1" /> Submit Invoice
         </Button>
       </div>

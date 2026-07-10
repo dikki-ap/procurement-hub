@@ -71,9 +71,12 @@ export default function VendorOrdersPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <ShoppingCart className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-2xl font-semibold">Purchase Orders</h1>
+      <div className="flex items-center gap-2">
+        <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        <div>
+          <h1 className="text-xl sm:text-2xl font-semibold">Purchase Orders</h1>
+          <p className="text-sm text-muted-foreground hidden sm:block">Track and acknowledge your purchase orders</p>
+        </div>
       </div>
 
       <DataTable

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -82,12 +82,15 @@ export default function CurrencyListPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Currencies</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage exchange rates and base currency</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <DollarSign className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Currencies</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Manage exchange rates and base currency</p>
+          </div>
         </div>
-        <Button onClick={() => setModal({ mode: 'add' })} className="gap-2">
+        <Button size="sm" onClick={() => setModal({ mode: 'add' })} className="gap-1">
           <Plus className="h-4 w-4" /> Add Currency
         </Button>
       </div>

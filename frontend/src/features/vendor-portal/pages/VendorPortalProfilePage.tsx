@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { User } from 'lucide-react';
+import { User, Building2 } from 'lucide-react';
 import { vendorPortalApi, type VendorStatus } from '@/features/vendors/api/vendorApi';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
@@ -39,10 +39,13 @@ export default function VendorPortalProfilePage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Company Profile</h1>
-          <p className="text-sm text-slate-500 mt-0.5">{vendor.vendorCode}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <Building2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Company Profile</h1>
+            <p className="text-sm text-muted-foreground">{vendor.vendorCode}</p>
+          </div>
         </div>
         <StatusBadge status={vendor.status} />
       </div>

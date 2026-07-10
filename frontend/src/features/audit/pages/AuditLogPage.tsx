@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { ScrollText } from 'lucide-react';
 import { auditApi, type AuditLogDto, type AuditLogFilter } from '../api/auditApi';
 
 const ACTION_COLORS: Record<string, string> = {
@@ -82,12 +83,18 @@ export default function AuditLogPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Audit Log</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ScrollText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Audit Log</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Track all system activity and changes</p>
+          </div>
+        </div>
         <button
           onClick={() => exportMut.mutate()}
           disabled={exportMut.isPending}
-          className="px-4 py-2 text-sm bg-slate-800 text-white rounded-lg hover:bg-slate-700 disabled:opacity-50"
+          className="px-3 py-1.5 text-sm bg-slate-800 text-white rounded-lg hover:bg-slate-700 disabled:opacity-50"
         >
           {exportMut.isPending ? 'Exporting…' : 'Export CSV'}
         </button>

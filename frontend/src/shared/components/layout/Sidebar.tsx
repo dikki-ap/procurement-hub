@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Package,
@@ -30,7 +30,7 @@ const masterDataLinks = [
   { to: '/app/master-data/material-categories', icon: FolderOpen, label: 'Material Categories' },
 ];
 
-const navLink = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>
+const navCls = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>
   `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
     collapsed ? 'px-[18px] justify-center' : 'px-3'
   } ${
@@ -39,25 +39,42 @@ const navLink = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>
       : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
   }`;
 
+const NavLabel = ({ collapsed, children }: { collapsed: boolean; children: React.ReactNode }) => (
+  <span
+    className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
+    style={{ opacity: collapsed ? 0 : 1, maxWidth: collapsed ? 0 : '200px' }}
+  >
+    {children}
+  </span>
+);
+
 export const Sidebar = () => {
   const { sidebarCollapsed, toggleSidebarCollapse, sidebarOpen, setSidebarOpen } = useUIStore();
   const { user } = useAuthStore();
   const location = useLocation();
 
-  // Auto-close sidebar on mobile when navigating
+  // Always full-width on mobile — collapse state only applies on desktop
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   useEffect(() => {
-    if (window.innerWidth < 768) {
-      setSidebarOpen(false);
-    }
-  }, [location.pathname, setSidebarOpen]);
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
 
-  const isSuperAdmin  = user?.roles?.includes('super_admin') ?? false;
-  const isPurchasing  = user?.roles?.some(r => ['purchasing', 'super_admin'].includes(r)) ?? false;
-  const isFinance     = user?.roles?.some(r => ['finance',    'super_admin'].includes(r)) ?? false;
-  const isVendor      = user?.roles?.some(r => ['vendor_admin', 'vendor_staff'].includes(r)) ?? false;
+  const ec = !isMobile && sidebarCollapsed; // effectiveCollapsed
 
-  const vendorMatch   = location.pathname.match(/\/app\/vendor-portal\/([^/]+)/);
-  const vendorId      = vendorMatch?.[1];
+  // Auto-close drawer when navigating on mobile
+  useEffect(() => {
+    if (isMobile) setSidebarOpen(false);
+  }, [location.pathname, isMobile, setSidebarOpen]);
+
+  const isSuperAdmin = user?.roles?.includes('super_admin') ?? false;
+  const isPurchasing = user?.roles?.some(r => ['purchasing', 'super_admin'].includes(r)) ?? false;
+  const isFinance    = user?.roles?.some(r => ['finance',    'super_admin'].includes(r)) ?? false;
+  const isVendor     = user?.roles?.some(r => ['vendor_admin', 'vendor_staff'].includes(r)) ?? false;
+
+  const vendorMatch = location.pathname.match(/\/app\/vendor-portal\/([^/]+)/);
+  const vendorId    = vendorMatch?.[1];
 
   return (
     <aside
@@ -69,16 +86,16 @@ export const Sidebar = () => {
         'transition-all duration-300 ease-in-out',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
       ].join(' ')}
-      style={{ width: sidebarCollapsed ? '64px' : '240px' }}
+      style={{ width: ec ? '64px' : '240px' }}
     >
-      {/* Logo area */}
+      {/* Logo */}
       <div className="flex items-center gap-3 h-14 px-3 flex-shrink-0 border-b border-white/8">
         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-xs font-bold tracking-wide">
           PH
         </div>
         <span
           className="font-semibold text-sm text-white whitespace-nowrap transition-[opacity,width] duration-300 overflow-hidden"
-          style={{ opacity: sidebarCollapsed ? 0 : 1, width: sidebarCollapsed ? 0 : 'auto' }}
+          style={{ opacity: ec ? 0 : 1, width: ec ? 0 : 'auto' }}
         >
           Procure Hub
         </span>
@@ -86,109 +103,39 @@ export const Sidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 space-y-0.5">
-        <NavLink
-          to="/app/dashboard"
-          title="Dashboard"
-          className={({ isActive }) =>
-            `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
-              sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
-            } ${
-              isActive
-                ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
-                : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
-            }`
-          }
-        >
+        <NavLink to="/app/dashboard" title="Dashboard" className={navCls(ec)}>
           <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-          <span
-            className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-            style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-          >
-            Dashboard
-          </span>
+          <NavLabel collapsed={ec}>Dashboard</NavLabel>
         </NavLink>
 
-        {/* Procurement */}
         <div className="pt-3">
-          <NavLink
-            to="/app/procurement/prs"
-            title="Purchase Requisitions"
-            className={({ isActive }) =>
-              `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
-                sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
-              } ${
-                isActive
-                  ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
-                  : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
-              }`
-            }
-          >
+          <NavLink to="/app/procurement/prs" title="Purchase Requisitions" className={navCls(ec)}>
             <ClipboardList className="h-4 w-4 flex-shrink-0" />
-            <span
-              className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-              style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-            >
-              Purchase Requisitions
-            </span>
+            <NavLabel collapsed={ec}>Purchase Requisitions</NavLabel>
           </NavLink>
         </div>
 
         <div className="pt-1">
-          <NavLink
-            to="/app/procurement/rfqs"
-            title="RFQs"
-            className={({ isActive }) =>
-              `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
-                sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
-              } ${
-                isActive
-                  ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
-                  : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
-              }`
-            }
-          >
+          <NavLink to="/app/procurement/rfqs" title="RFQs" className={navCls(ec)}>
             <FileText className="h-4 w-4 flex-shrink-0" />
-            <span
-              className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-              style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-            >
-              RFQs
-            </span>
+            <NavLabel collapsed={ec}>RFQs</NavLabel>
           </NavLink>
         </div>
 
         {(isPurchasing || isFinance) && (
           <div className="pt-1">
-            <NavLink
-              to="/app/fulfillment/purchase-orders"
-              title="Purchase Orders"
-              className={navLink(sidebarCollapsed)}
-            >
+            <NavLink to="/app/fulfillment/purchase-orders" title="Purchase Orders" className={navCls(ec)}>
               <ShoppingCart className="h-4 w-4 flex-shrink-0" />
-              <span
-                className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-                style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-              >
-                Purchase Orders
-              </span>
+              <NavLabel collapsed={ec}>Purchase Orders</NavLabel>
             </NavLink>
           </div>
         )}
 
         {isFinance && (
           <div className="pt-1">
-            <NavLink
-              to="/app/fulfillment/invoices"
-              title="Invoices"
-              className={navLink(sidebarCollapsed)}
-            >
+            <NavLink to="/app/fulfillment/invoices" title="Invoices" className={navCls(ec)}>
               <Receipt className="h-4 w-4 flex-shrink-0" />
-              <span
-                className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-                style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-              >
-                Invoices
-              </span>
+              <NavLabel collapsed={ec}>Invoices</NavLabel>
             </NavLink>
           </div>
         )}
@@ -196,113 +143,44 @@ export const Sidebar = () => {
         {isVendor && vendorId && (
           <>
             <div className="pt-1">
-              <NavLink
-                to={`/app/vendor-portal/${vendorId}/orders`}
-                title="Purchase Orders"
-                className={navLink(sidebarCollapsed)}
-              >
+              <NavLink to={`/app/vendor-portal/${vendorId}/orders`} title="Purchase Orders" className={navCls(ec)}>
                 <ShoppingCart className="h-4 w-4 flex-shrink-0" />
-                <span
-                  className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-                  style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-                >
-                  Purchase Orders
-                </span>
+                <NavLabel collapsed={ec}>Purchase Orders</NavLabel>
               </NavLink>
             </div>
             <div className="pt-1">
-              <NavLink
-                to={`/app/vendor-portal/${vendorId}/invoices`}
-                title="My Invoices"
-                className={navLink(sidebarCollapsed)}
-              >
+              <NavLink to={`/app/vendor-portal/${vendorId}/invoices`} title="My Invoices" className={navCls(ec)}>
                 <Receipt className="h-4 w-4 flex-shrink-0" />
-                <span
-                  className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-                  style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-                >
-                  My Invoices
-                </span>
+                <NavLabel collapsed={ec}>My Invoices</NavLabel>
               </NavLink>
             </div>
           </>
         )}
 
         <div className="pt-3">
-          <NavLink
-            to="/app/approval/inbox"
-            title="Approval Inbox"
-            className={({ isActive }) =>
-              `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
-                sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
-              } ${
-                isActive
-                  ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
-                  : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
-              }`
-            }
-          >
+          <NavLink to="/app/approval/inbox" title="Approval Inbox" className={navCls(ec)}>
             <Inbox className="h-4 w-4 flex-shrink-0" />
-            <span
-              className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-              style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-            >
-              Approval Inbox
-            </span>
+            <NavLabel collapsed={ec}>Approval Inbox</NavLabel>
           </NavLink>
         </div>
 
         <div className="pt-3">
-          <NavLink
-            to="/app/vendors"
-            title="Vendors"
-            className={({ isActive }) =>
-              `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
-                sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
-              } ${
-                isActive
-                  ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
-                  : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
-              }`
-            }
-          >
+          <NavLink to="/app/vendors" title="Vendors" className={navCls(ec)}>
             <Users className="h-4 w-4 flex-shrink-0" />
-            <span
-              className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-              style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-            >
-              Vendors
-            </span>
+            <NavLabel collapsed={ec}>Vendors</NavLabel>
           </NavLink>
         </div>
 
         {isSuperAdmin && (
           <div className="pt-3">
-            <NavLink
-              to="/app/approval/policies"
-              title="Approval Policies"
-              className={({ isActive }) =>
-                `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
-                  sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
-                } ${
-                  isActive
-                    ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
-                    : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
-                }`
-              }
-            >
+            <NavLink to="/app/approval/policies" title="Approval Policies" className={navCls(ec)}>
               <Shield className="h-4 w-4 flex-shrink-0" />
-              <span
-                className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-                style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-              >
-                Approval Policies
-              </span>
+              <NavLabel collapsed={ec}>Approval Policies</NavLabel>
             </NavLink>
 
             <div
               className="overflow-hidden transition-[max-height,opacity] duration-300 mt-3"
-              style={{ maxHeight: sidebarCollapsed ? 0 : '40px', opacity: sidebarCollapsed ? 0 : 1 }}
+              style={{ maxHeight: ec ? 0 : '40px', opacity: ec ? 0 : 1 }}
             >
               <p className="px-5 pb-1 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
                 Master Data
@@ -310,27 +188,9 @@ export const Sidebar = () => {
             </div>
 
             {masterDataLinks.map(({ to, icon: Icon, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                title={label}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 py-2.5 rounded-lg mx-2 text-sm transition-all duration-150 ${
-                    sidebarCollapsed ? 'px-[18px] justify-center' : 'px-3'
-                  } ${
-                    isActive
-                      ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
-                      : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
-                  }`
-                }
-              >
+              <NavLink key={to} to={to} title={label} className={navCls(ec)}>
                 <Icon className="h-4 w-4 flex-shrink-0" />
-                <span
-                  className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-300"
-                  style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-                >
-                  {label}
-                </span>
+                <NavLabel collapsed={ec}>{label}</NavLabel>
               </NavLink>
             ))}
           </div>
@@ -349,11 +209,7 @@ export const Sidebar = () => {
           ) : (
             <>
               <ChevronLeft className="h-4 w-4" />
-              <span className="text-xs overflow-hidden whitespace-nowrap transition-[opacity,max-width] duration-300"
-                style={{ opacity: sidebarCollapsed ? 0 : 1, maxWidth: sidebarCollapsed ? 0 : '200px' }}
-              >
-                Collapse
-              </span>
+              <span className="text-xs overflow-hidden whitespace-nowrap">Collapse</span>
             </>
           )}
         </button>

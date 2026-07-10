@@ -4,6 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts';
+import { LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { analyticsApi, type DashboardWidgets, type VendorDashboardWidgets } from '../api/analyticsApi';
 
@@ -63,7 +64,10 @@ export default function AnalyticsDashboardPage() {
     const tierColor = TIER_COLOR[v?.myTier ?? 'Bronze'] ?? TIER_COLOR.Bronze;
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold">My Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <h1 className="text-xl sm:text-2xl font-semibold">My Dashboard</h1>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard label="Active POs"         value={String(v?.myActivePOs ?? 0)} />
           <StatCard label="Pending Invoices"   value={String(v?.myPendingInvoices ?? 0)} />
@@ -93,7 +97,10 @@ export default function AnalyticsDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <div className="flex items-center gap-2">
+        <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        <h1 className="text-xl sm:text-2xl font-semibold">Dashboard</h1>
+      </div>
 
       {/* Widget row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

@@ -64,10 +64,13 @@ export default function ApprovalPoliciesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Shield className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-2xl font-semibold">Approval Policies</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Approval Policies</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Configure multi-level approval rules</p>
+          </div>
         </div>
         <Button size="sm" onClick={() => setShowModal(true)}>
           <Plus className="h-4 w-4 mr-1" /> Add Policy

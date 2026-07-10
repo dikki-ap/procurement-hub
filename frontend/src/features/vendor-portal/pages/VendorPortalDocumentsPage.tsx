@@ -40,10 +40,13 @@ export default function VendorPortalDocumentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Documents</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage your compliance documents</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Documents</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Manage your compliance documents</p>
+          </div>
         </div>
       </div>
 

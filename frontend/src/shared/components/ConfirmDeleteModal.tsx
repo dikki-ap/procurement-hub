@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog';
 
 type Props = {
@@ -31,14 +30,15 @@ export function ConfirmDeleteModal({ open, title, description, isPending, onConf
             {description ?? 'Are you sure? This action cannot be undone.'}
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+        {/* Always horizontal — prevents accidental tap on mobile if stacked vertically */}
+        <div className="flex justify-end gap-2 mt-2">
           <Button variant="outline" onClick={onCancel} disabled={isPending}>
             Cancel
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isPending}>
             {isPending ? 'Deleting…' : 'Delete'}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

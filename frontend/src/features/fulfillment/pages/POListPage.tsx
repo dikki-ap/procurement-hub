@@ -66,10 +66,12 @@ export default function POListPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <ShoppingCart className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-2xl font-semibold">Purchase Orders</h1>
-        <Button size="sm" className="ml-auto" onClick={() => setShowNew(true)}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <h1 className="text-xl sm:text-2xl font-semibold">Purchase Orders</h1>
+        </div>
+        <Button size="sm" onClick={() => setShowNew(true)}>
           <Plus className="h-4 w-4 mr-1" /> New PO
         </Button>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
@@ -80,12 +80,15 @@ export default function MaterialListPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Materials</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage your material master data catalog</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <Package className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Materials</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Manage your material master data catalog</p>
+          </div>
         </div>
-        <Button onClick={() => setModal({ mode: 'add' })} className="gap-2">
+        <Button size="sm" onClick={() => setModal({ mode: 'add' })} className="gap-1">
           <Plus className="h-4 w-4" /> Add Material
         </Button>
       </div>

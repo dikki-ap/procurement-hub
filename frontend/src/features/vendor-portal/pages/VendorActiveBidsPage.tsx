@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Eye, Clock } from 'lucide-react';
+import { Eye, Clock, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type RFQListDto, type RFQStatus } from '@/features/procurement/api/procurementApi';
@@ -67,9 +67,12 @@ export default function VendorActiveBidsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Active Bids</h1>
-        <p className="text-sm text-muted-foreground">Open RFQs you have been invited to bid on</p>
+      <div className="flex items-center gap-2">
+        <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        <div>
+          <h1 className="text-xl sm:text-2xl font-semibold">Active Bids</h1>
+          <p className="text-sm text-muted-foreground hidden sm:block">Open RFQs you have been invited to bid on</p>
+        </div>
       </div>
       <DataTable columns={columns} data={data} loading={isLoading} searchable />
     </div>

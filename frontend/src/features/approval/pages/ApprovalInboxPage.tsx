@@ -39,11 +39,16 @@ export default function ApprovalInboxPage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-112px)]">
-      <div className="flex items-center gap-3">
-        <Inbox className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-2xl font-semibold">Approval Inbox</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-2">
+          <Inbox className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Approval Inbox</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Review and act on pending approvals</p>
+          </div>
+        </div>
         {items.length > 0 && (
-          <span className="ml-auto text-sm text-muted-foreground">{items.length} pending</span>
+          <span className="text-sm text-muted-foreground">{items.length} pending</span>
         )}
       </div>
 

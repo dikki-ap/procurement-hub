@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Eye, Plus, XCircle } from 'lucide-react';
+import { Eye, Plus, XCircle, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
@@ -99,13 +99,16 @@ export default function PRListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Purchase Requisitions</h1>
-          <p className="text-sm text-muted-foreground">Manage and track all purchase requests</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ClipboardList className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Purchase Requisitions</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Manage and track all purchase requests</p>
+          </div>
         </div>
-        <Button onClick={() => setShowNew(true)}>
-          <Plus className="h-4 w-4 mr-2" /> New PR
+        <Button size="sm" onClick={() => setShowNew(true)}>
+          <Plus className="h-4 w-4 mr-1" /> New PR
         </Button>
       </div>
       <DataTable columns={columns} data={data as unknown as Record<string, unknown>[]} isLoading={isLoading} searchPlaceholder="Search PRs..." />

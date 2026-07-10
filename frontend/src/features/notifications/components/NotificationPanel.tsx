@@ -59,7 +59,8 @@ export function NotificationPanel() {
           {/* Backdrop */}
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 
-          <div className="absolute right-0 top-10 z-50 w-80 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
+          {/* On mobile: full-width anchored below topbar. On sm+: 320px dropdown from button */}
+          <div className="fixed sm:absolute inset-x-2 sm:inset-x-auto top-[60px] sm:top-10 sm:right-0 z-50 sm:w-80 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
               <span className="font-semibold text-sm">Notifications</span>
               {unread > 0 && (
@@ -67,7 +68,7 @@ export function NotificationPanel() {
               )}
             </div>
 
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto">
               {notifications.length === 0 ? (
                 <p className="text-center text-sm text-muted-foreground py-8">No notifications yet.</p>
               ) : (

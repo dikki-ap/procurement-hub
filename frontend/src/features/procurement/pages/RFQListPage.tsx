@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Eye, Plus, Lock } from 'lucide-react';
+import { Eye, Plus, Lock, FileText as FileTextIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
@@ -78,13 +78,16 @@ export default function RFQListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Request for Quotations</h1>
-          <p className="text-sm text-muted-foreground">Manage bidding rounds and vendor invitations</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <FileTextIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold">Request for Quotations</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Manage bidding rounds and vendor invitations</p>
+          </div>
         </div>
-        <Button onClick={() => setShowNew(true)}>
-          <Plus className="h-4 w-4 mr-2" /> New RFQ
+        <Button size="sm" onClick={() => setShowNew(true)}>
+          <Plus className="h-4 w-4 mr-1" /> New RFQ
         </Button>
       </div>
       <DataTable columns={columns} data={data as unknown as Record<string, unknown>[]} isLoading={isLoading} searchPlaceholder="Search RFQs..." />
