@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { vendorApi, type VendorDto, type VendorStatus } from '../api/vendorApi';
 import { VendorFormModal } from './VendorFormModal';
+import { TierBadge, ScoreBadge } from '../components/VendorBadges';
+import { SuspendModal, BlacklistModal, ReinstateModal } from '../components/VendorActionModals';
 
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001'; // TODO: from auth context
+const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
   const cfg: Record<VendorStatus, string> = {
@@ -24,22 +26,36 @@ const StatusBadge = ({ status }: { status: VendorStatus }) => {
   );
 };
 
+type ActionModal =
+  | { type: 'suspend';   vendor: VendorDto }
+  | { type: 'blacklist'; vendor: VendorDto }
+  | { type: 'reinstate'; vendor: VendorDto }
+  | null;
+
 export default function VendorListPage() {
-  const navigate       = useNavigate();
-  const qc             = useQueryClient();
-  const [showAdd, setShowAdd] = useState(false);
+  const navigate = useNavigate();
+  const qc       = useQueryClient();
+
+  const [showAdd,  setShowAdd]  = useState(false);
+  const [modal,    setModal]    = useState<ActionModal>(null);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['vendors', COMPANY_ID],
     queryFn: () => vendorApi.getAll(COMPANY_ID),
   });
 
+  const closeModal = () => setModal(null);
+
   const mutOpts = (action: string) => ({
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vendors'] });
       toast.success(`Vendor ${action} successfully`);
+      closeModal();
     },
-    onError: () => toast.error(`Failed to ${action} vendor`),
+    onError: () => {
+      toast.error(`Failed to ${action} vendor`);
+      closeModal();
+    },
   });
 
   const approveMut   = useMutation({ mutationFn: vendorApi.approve,   ...mutOpts('approved') });
@@ -61,22 +77,18 @@ export default function VendorListPage() {
     {
       key: 'vendorType',
       header: 'Type',
-      render: (row) => (
-        <span className="text-xs text-slate-500">{row.vendorType}</span>
-      ),
+      render: (row) => <span className="text-xs text-slate-500">{row.vendorType}</span>,
     },
     {
       key: 'tier',
       header: 'Tier',
-      render: (row) => (
-        <span className="text-xs font-medium text-blue-600">{row.tier}</span>
-      ),
+      render: (row) => <TierBadge tier={row.tier} />,
     },
     {
       key: 'score',
       header: 'Score',
       sortable: true,
-      render: (row) => <span className="font-medium">{row.score.toFixed(1)}</span>,
+      render: (row) => <ScoreBadge score={row.score} />,
     },
     {
       key: 'status',
@@ -84,6 +96,8 @@ export default function VendorListPage() {
       render: (row) => <StatusBadge status={row.status} />,
     },
   ];
+
+  const activeModal = modal?.vendor;
 
   return (
     <div>
@@ -131,17 +145,14 @@ export default function VendorListPage() {
                   <Button
                     variant="ghost" size="icon" className="h-8 w-8 text-orange-500 hover:text-orange-600"
                     title="Suspend"
-                    onClick={() => { if (confirm('Suspend this vendor?')) suspendMut.mutate(v.id); }}
+                    onClick={() => setModal({ type: 'suspend', vendor: v })}
                   >
                     <PauseCircle className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600"
                     title="Blacklist"
-                    onClick={() => {
-                      const reason = prompt('Enter blacklist reason (required):');
-                      if (reason?.trim()) blacklistMut.mutate({ id: v.id, reason: reason.trim() });
-                    }}
+                    onClick={() => setModal({ type: 'blacklist', vendor: v })}
                   >
                     <Ban className="h-3.5 w-3.5" />
                   </Button>
@@ -151,7 +162,7 @@ export default function VendorListPage() {
                 <Button
                   variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600"
                   title="Reinstate"
-                  onClick={() => { if (confirm('Reinstate this vendor?')) reinstateMut.mutate(v.id); }}
+                  onClick={() => setModal({ type: 'reinstate', vendor: v })}
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                 </Button>
@@ -160,7 +171,32 @@ export default function VendorListPage() {
           );
         }}
       />
+
       <VendorFormModal open={showAdd} onClose={() => setShowAdd(false)} />
+
+      <SuspendModal
+        open={modal?.type === 'suspend'}
+        vendorName={activeModal?.legalName ?? ''}
+        isPending={suspendMut.isPending}
+        onConfirm={() => activeModal && suspendMut.mutate(activeModal.id)}
+        onCancel={closeModal}
+      />
+
+      <BlacklistModal
+        open={modal?.type === 'blacklist'}
+        vendorName={activeModal?.legalName ?? ''}
+        isPending={blacklistMut.isPending}
+        onConfirm={(reason) => activeModal && blacklistMut.mutate({ id: activeModal.id, reason })}
+        onCancel={closeModal}
+      />
+
+      <ReinstateModal
+        open={modal?.type === 'reinstate'}
+        vendorName={activeModal?.legalName ?? ''}
+        isPending={reinstateMut.isPending}
+        onConfirm={() => activeModal && reinstateMut.mutate(activeModal.id)}
+        onCancel={closeModal}
+      />
     </div>
   );
 }

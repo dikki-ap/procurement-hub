@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, FileText, User, Wrench, Star } from 'lucide-react';
+import { ArrowLeft, FileText, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { vendorApi, type VendorStatus, type DocumentStatus } from '../api/vendorApi';
+import { TierBadge, ScoreDisplay } from '../components/VendorBadges';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
   const cfg: Record<VendorStatus, string> = {
@@ -74,16 +75,25 @@ export default function VendorDetailPage() {
 
       {/* Score card row */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {[
-          { label: 'Score', value: vendor.score.toFixed(1) },
-          { label: 'Tier', value: vendor.tier },
-          { label: 'Approved', value: vendor.approvedAt ? new Date(vendor.approvedAt).toLocaleDateString() : '—' },
-        ].map(({ label, value }) => (
-          <div key={label} className="bg-white rounded-xl border border-slate-100 p-4">
-            <p className="text-xs text-slate-500">{label}</p>
-            <p className="text-xl font-semibold text-slate-900 mt-0.5">{value}</p>
-          </div>
-        ))}
+        <div className="bg-white rounded-xl border border-slate-100 p-4">
+          <p className="text-xs text-slate-500 mb-1.5">Score</p>
+          <ScoreDisplay score={vendor.score} />
+        </div>
+        <div className="bg-white rounded-xl border border-slate-100 p-4">
+          <p className="text-xs text-slate-500 mb-1.5">Tier</p>
+          <TierBadge tier={vendor.tier} />
+        </div>
+        <div className="bg-white rounded-xl border border-slate-100 p-4">
+          <p className="text-xs text-slate-500 mb-1.5">Approved</p>
+          <p className="text-sm font-semibold text-slate-900">
+            {vendor.approvedAt
+              ? new Date(vendor.approvedAt).toLocaleString('en-GB', {
+                  day: 'numeric', month: 'long', year: 'numeric',
+                  hour: '2-digit', minute: '2-digit', hour12: false,
+                })
+              : '—'}
+          </p>
+        </div>
       </div>
 
       {/* Tabs */}
