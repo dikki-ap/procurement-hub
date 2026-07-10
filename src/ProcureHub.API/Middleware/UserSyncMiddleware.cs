@@ -97,7 +97,7 @@ public class UserSyncMiddleware
         if (string.IsNullOrEmpty(email)) return null;
 
         var contact = await db.Set<VendorContact>()
-            .FirstOrDefaultAsync(c => c.Email == email && c.IsPrimary);
+            .FirstOrDefaultAsync(c => c.Email == email);
         if (contact is null) return null;
 
         var role = ctx.User.FindFirstValue("roles")

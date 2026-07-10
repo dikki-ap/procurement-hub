@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { keycloak } from '@/shared/lib/keycloak';
 import { useAuthStore } from '@/stores/authStore';
 import { vendorPortalApi } from '@/features/vendors/api/vendorApi';
+import VendorNotLinkedPage from './VendorNotLinkedPage';
 
 const VENDOR_ROLES = ['vendor_admin', 'vendor_staff'];
 
@@ -68,20 +69,7 @@ export default function LoginRedirectPage() {
     }
 
     // API call failed — vendor account not linked yet
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center p-6">
-        <p className="text-lg font-semibold text-slate-800">Vendor account not linked</p>
-        <p className="text-sm text-slate-500 max-w-sm">
-          Your account has not been linked to a vendor profile yet. Please contact your administrator.
-        </p>
-        <button
-          className="px-4 py-2 text-sm bg-slate-800 text-white rounded-lg hover:bg-slate-700"
-          onClick={() => keycloak.logout({ redirectUri: window.location.origin })}
-        >
-          Sign Out
-        </button>
-      </div>
-    );
+    return <VendorNotLinkedPage />;
   }
 
   // Internal user
