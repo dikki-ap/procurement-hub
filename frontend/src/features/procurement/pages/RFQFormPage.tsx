@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type CreateRFQItemRequest } from '../api/procurementApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 const inputCls = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
@@ -22,7 +23,7 @@ export default function RFQFormPage() {
       toast.success('RFQ created successfully');
       navigate('..');
     },
-    onError: () => toast.error('Failed to create RFQ'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to create RFQ')),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

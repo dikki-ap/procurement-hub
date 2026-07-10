@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { approvalApi } from '../api/approvalApi';
 import { useAuthStore } from '@/stores/authStore';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -57,7 +58,7 @@ export default function ApprovalPoliciesPage() {
       setShowModal(false);
       setForm(EMPTY_FORM);
     },
-    onError: (e: any) => toast.error(e?.response?.data?.message ?? 'Failed to create policy'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to create policy')),
   });
 
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;

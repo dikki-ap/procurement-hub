@@ -9,6 +9,7 @@ import { vendorApi, type VendorDto, type VendorStatus } from '../api/vendorApi';
 import { VendorFormModal } from './VendorFormModal';
 import { TierBadge, ScoreBadge } from '../components/VendorBadges';
 import { SuspendModal, BlacklistModal, ReinstateModal } from '../components/VendorActionModals';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -49,11 +50,12 @@ export default function VendorListPage() {
   const mutOpts = (action: string) => ({
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vendors'] });
+      qc.invalidateQueries({ queryKey: ['vendor'] });
       toast.success(`Vendor ${action} successfully`);
       closeModal();
     },
-    onError: () => {
-      toast.error(`Failed to ${action} vendor`);
+    onError: (error: unknown) => {
+      toast.error(extractApiError(error, `Failed to ${action} vendor`));
       closeModal();
     },
   });

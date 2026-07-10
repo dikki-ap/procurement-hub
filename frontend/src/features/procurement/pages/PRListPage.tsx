@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type PRListDto, type PRStatus } from '../api/procurementApi';
 import { NewPRModal } from './NewPRModal';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -40,13 +41,13 @@ export default function PRListPage() {
   const submitMut = useMutation({
     mutationFn: (id: string) => procurementApi.submitPR(id),
     onSuccess:  () => { qc.invalidateQueries({ queryKey: ['prs'] }); toast.success('PR submitted'); },
-    onError:    () => toast.error('Failed to submit PR'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to submit PR')),
   });
 
   const cancelMut = useMutation({
     mutationFn: (id: string) => procurementApi.cancelPR(id),
     onSuccess:  () => { qc.invalidateQueries({ queryKey: ['prs'] }); toast.success('PR cancelled'); },
-    onError:    () => toast.error('Failed to cancel PR'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to cancel PR')),
   });
 
   const columns: DataTableColumn<PRListDto>[] = [

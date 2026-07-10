@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type PRStatus } from '../api/procurementApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
@@ -36,13 +37,13 @@ export default function PRDetailPage() {
   const submitMut = useMutation({
     mutationFn: () => procurementApi.submitPR(id!),
     onSuccess:  () => { qc.invalidateQueries({ queryKey: ['pr', id], exact: true }); qc.invalidateQueries({ queryKey: ['prs'] }); toast.success('PR submitted'); },
-    onError:    () => toast.error('Failed to submit PR'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to submit PR')),
   });
 
   const cancelMut = useMutation({
     mutationFn: () => procurementApi.cancelPR(id!),
     onSuccess:  () => { qc.invalidateQueries({ queryKey: ['pr', id], exact: true }); qc.invalidateQueries({ queryKey: ['prs'] }); toast.success('PR cancelled'); },
-    onError:    () => toast.error('Failed to cancel PR'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to cancel PR')),
   });
 
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;

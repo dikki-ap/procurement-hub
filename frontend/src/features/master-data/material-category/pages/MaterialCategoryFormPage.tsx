@@ -16,6 +16,7 @@ import {
   type UpdateMaterialCategoryRequest,
   type MaterialCategoryDto,
 } from '../api/materialCategoryApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const schema = z.object({
   code: z.string().min(1).max(20),
@@ -75,7 +76,7 @@ export default function MaterialCategoryFormPage() {
       toast.success('Category created');
       navigate('..');
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -86,7 +87,7 @@ export default function MaterialCategoryFormPage() {
       toast.success('Category updated');
       navigate('..');
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const onSubmit = (data: FormData) => {

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { fulfillmentApi, type POStatus, type GRNStatus } from '../api/fulfillmentApi';
 import { useAuthStore } from '@/stores/authStore';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -52,7 +53,7 @@ export default function PODetailPage() {
       qc.invalidateQueries({ queryKey: ['purchase-order', id] });
       toast.success('PO issued successfully');
     },
-    onError: () => toast.error('Failed to issue PO'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to issue PO')),
   });
 
   const ackMut = useMutation({
@@ -61,7 +62,7 @@ export default function PODetailPage() {
       qc.invalidateQueries({ queryKey: ['purchase-order', id] });
       toast.success('PO acknowledged');
     },
-    onError: () => toast.error('Failed to acknowledge PO'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to acknowledge PO')),
   });
 
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;

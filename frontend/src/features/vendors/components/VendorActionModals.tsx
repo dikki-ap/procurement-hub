@@ -90,9 +90,14 @@ export function BlacklistModal({ open, vendorName, isPending, onConfirm, onCance
         </DialogHeader>
 
         <div className="space-y-1 mt-1">
-          <label className="text-xs font-medium text-slate-700">
-            Reason <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-slate-700">
+              Reason <span className="text-red-500">*</span>
+            </label>
+            <span className={`text-xs ${reason.trim().length >= 10 ? 'text-slate-400' : 'text-red-400'}`}>
+              {reason.trim().length}/10 min
+            </span>
+          </div>
           <Input
             placeholder="e.g. Repeated delivery failures, fraud"
             value={reason}
@@ -100,10 +105,14 @@ export function BlacklistModal({ open, vendorName, isPending, onConfirm, onCance
             disabled={isPending}
             autoFocus
           />
-          {reason.trim() === '' && (
+          {reason.trim().length > 0 && reason.trim().length < 10 && (
             <p className="text-xs text-red-500 flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" /> Reason is required.
+              <AlertTriangle className="h-3 w-3" />
+              Please provide at least 10 characters so the reason is clear.
             </p>
+          )}
+          {reason.trim().length === 0 && (
+            <p className="text-xs text-slate-400">A clear reason is required to blacklist a vendor.</p>
           )}
         </div>
 
@@ -114,7 +123,7 @@ export function BlacklistModal({ open, vendorName, isPending, onConfirm, onCance
           <Button
             variant="destructive"
             onClick={handleConfirm}
-            disabled={isPending || !reason.trim()}
+            disabled={isPending || reason.trim().length < 10}
           >
             {isPending ? 'Blacklisting…' : 'Blacklist'}
           </Button>

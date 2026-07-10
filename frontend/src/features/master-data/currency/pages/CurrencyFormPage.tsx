@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { currencyApi, type UpdateCurrencyRequest } from '../api/currencyApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const schema = z.object({
   code: z.string().min(1).max(5),
@@ -65,7 +66,7 @@ export default function CurrencyFormPage() {
       toast.success('Currency created');
       navigate('..');
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -75,7 +76,7 @@ export default function CurrencyFormPage() {
       toast.success('Currency updated');
       navigate('..');
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const onSubmit = (data: FormData) => {

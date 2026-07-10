@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { useAuthStore } from '@/stores/authStore';
 import { materialApi, type UpdateMaterialRequest } from '../api/materialApi';
+import { extractApiError } from '@/shared/lib/apiError';
 import { materialCategoryApi, type MaterialCategoryDto } from '@/features/master-data/material-category/api/materialCategoryApi';
 import { uomApi, type UomDto } from '@/features/master-data/uom/api/uomApi';
 import { currencyApi, type CurrencyDto } from '@/features/master-data/currency/api/currencyApi';
@@ -105,7 +106,7 @@ export function MaterialFormModal({ open, id, onClose }: Props) {
       toast.success('Material created', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -115,7 +116,7 @@ export function MaterialFormModal({ open, id, onClose }: Props) {
       toast.success('Material updated', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const isPending = createMut.isPending || updateMut.isPending;

@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/authStore';
 import { locationApi, type UpdateLocationRequest } from '../api/locationApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const LOCATION_TYPES = ['warehouse', 'plant', 'office'] as const;
 
@@ -71,7 +72,7 @@ export default function LocationFormPage() {
       toast.success('Location created');
       navigate('..');
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -81,7 +82,7 @@ export default function LocationFormPage() {
       toast.success('Location updated');
       navigate('..');
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const onSubmit = (data: FormData) => {

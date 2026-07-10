@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { procurementApi, type CreatePRItemRequest } from '../api/procurementApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -32,7 +33,7 @@ export function NewPRModal({ open, onClose }: Props) {
       setItems([emptyItem()]);
       onClose();
     },
-    onError: () => toast.error('Failed to create PR'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to create PR')),
   });
 
   const addItem    = () => setItems(p => [...p, emptyItem()]);

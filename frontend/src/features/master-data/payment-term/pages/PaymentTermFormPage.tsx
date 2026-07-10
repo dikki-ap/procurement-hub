@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/authStore';
 import { paymentTermApi, type UpdatePaymentTermRequest } from '../api/paymentTermApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const schema = z.object({
   code: z.string().min(1).max(20),
@@ -65,7 +66,7 @@ export default function PaymentTermFormPage() {
       toast.success('Payment term created');
       navigate('..');
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -76,7 +77,7 @@ export default function PaymentTermFormPage() {
       toast.success('Payment term updated');
       navigate('..');
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const onSubmit = (data: FormData) => {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type RFQListDto, type RFQStatus } from '../api/procurementApi';
 import { NewRFQModal } from './NewRFQModal';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -37,7 +38,7 @@ export default function RFQListPage() {
   const closeMut = useMutation({
     mutationFn: (id: string) => procurementApi.closeRFQ(id),
     onSuccess:  () => { qc.invalidateQueries({ queryKey: ['rfqs'] }); toast.success('RFQ closed'); },
-    onError:    () => toast.error('Failed to close RFQ'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to close RFQ')),
   });
 
   const columns: DataTableColumn<RFQListDto>[] = [

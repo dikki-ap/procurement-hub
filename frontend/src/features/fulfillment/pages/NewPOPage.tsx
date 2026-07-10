@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { fulfillmentApi, type CreatePOPayload } from '../api/fulfillmentApi';
 import { vendorApi } from '@/features/vendors/api/vendorApi';
 import { useAuthStore } from '@/stores/authStore';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const inputCls =
   'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
@@ -38,7 +39,7 @@ export default function NewPOPage() {
       toast.success('Purchase Order created');
       navigate(-1);
     },
-    onError: () => toast.error('Failed to create PO'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to create PO')),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

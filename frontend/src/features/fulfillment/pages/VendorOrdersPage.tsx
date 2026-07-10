@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type POListDto, type POStatus } from '../api/fulfillmentApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const statusColor: Record<POStatus, string> = {
   Draft:           'bg-gray-100 text-gray-600',
@@ -36,7 +37,7 @@ export default function VendorOrdersPage() {
       qc.invalidateQueries({ queryKey: ['vendor-orders', vendorId] });
       toast.success('PO acknowledged');
     },
-    onError: () => toast.error('Failed to acknowledge PO'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to acknowledge PO')),
   });
 
   const columns: DataTableColumn<POListDto>[] = [

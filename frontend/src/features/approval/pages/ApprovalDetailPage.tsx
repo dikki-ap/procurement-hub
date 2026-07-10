@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { approvalApi, type ApprovalActionType, type WorkflowStatus } from '../api/approvalApi';
 import { useAuthStore } from '@/stores/authStore';
 import ApprovalActionModal from './ApprovalActionModal';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -56,7 +57,7 @@ export default function ApprovalDetailPage() {
   const approveMut = useMutation({
     mutationFn: () => approvalApi.approve(id!, user!.id, user!.fullName),
     onSuccess:  () => { invalidate(); toast.success('Approved successfully.'); },
-    onError:    (e: any) => toast.error(e?.response?.data?.message ?? 'Failed to approve'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to approve')),
   });
 
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;

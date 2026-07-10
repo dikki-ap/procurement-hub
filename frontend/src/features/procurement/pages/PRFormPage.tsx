@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type CreatePRItemRequest } from '../api/procurementApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -28,7 +29,7 @@ export default function PRFormPage() {
       toast.success('Purchase Requisition created');
       navigate('..');
     },
-    onError: () => toast.error('Failed to create PR'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to create PR')),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

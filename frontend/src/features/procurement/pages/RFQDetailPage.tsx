@@ -4,6 +4,7 @@ import { ArrowLeft, Lock, Play, BarChart2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type RFQStatus, type RFQVendorStatus } from '../api/procurementApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const StatusBadge = ({ status }: { status: RFQStatus }) => {
   const cfg: Record<RFQStatus, string> = {
@@ -43,13 +44,13 @@ export default function RFQDetailPage() {
   const openMut = useMutation({
     mutationFn: () => procurementApi.openRFQ(id!),
     onSuccess:  () => { invalidate(); toast.success('RFQ opened for bidding'); },
-    onError:    (e: any) => toast.error(e?.response?.data?.message ?? 'Failed to open RFQ'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to open RFQ')),
   });
 
   const closeMut = useMutation({
     mutationFn: () => procurementApi.closeRFQ(id!),
     onSuccess:  () => { invalidate(); toast.success('RFQ closed'); },
-    onError:    () => toast.error('Failed to close RFQ'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to close RFQ')),
   });
 
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;

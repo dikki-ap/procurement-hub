@@ -5,6 +5,7 @@ import { FileText, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { vendorPortalApi, type DocumentStatus } from '@/features/vendors/api/vendorApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const StatusBadge = ({ status }: { status: DocumentStatus }) => {
   const cfg: Record<DocumentStatus, string> = {
@@ -35,7 +36,7 @@ export default function VendorPortalDocumentsPage() {
       qc.invalidateQueries({ queryKey: ['vendor-portal', 'documents', vendorId] });
       toast.success('Document deleted');
     },
-    onError: () => toast.error('Delete failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Delete failed')),
   });
 
   return (

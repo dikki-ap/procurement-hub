@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { vendorRegistrationApi, type VendorType } from '../api/vendorApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -31,7 +32,7 @@ export function VendorFormModal({ open, onClose }: Props) {
       toast.success('Vendor registered successfully', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Failed to register vendor'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to register vendor')),
   });
 
   const isPending = mutation.isPending;

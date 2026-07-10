@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/authStore';
 import { uomApi, type UpdateUomRequest } from '../api/uomApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const schema = z.object({
   code: z.string().min(1).max(10),
@@ -57,7 +58,7 @@ export default function UOMFormPage() {
       toast.success('Unit of measure created');
       navigate('..');
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -67,7 +68,7 @@ export default function UOMFormPage() {
       toast.success('Unit of measure updated');
       navigate('..');
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const onSubmit = (data: FormData) => {

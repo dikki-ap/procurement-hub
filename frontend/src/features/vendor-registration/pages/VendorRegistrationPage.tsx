@@ -4,6 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { vendorRegistrationApi, type VendorType } from '@/features/vendors/api/vendorApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001'; // default company
 
@@ -40,7 +41,7 @@ export default function VendorRegistrationPage() {
         contactPhone:    form.contactPhone || undefined,
       }),
     onSuccess: () => setSubmitted(true),
-    onError: () => toast.error('Registration failed. Please try again.'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Registration failed. Please try again.')),
   });
 
   const field = (label: string, key: keyof typeof form, required = false, type = 'text') => (

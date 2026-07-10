@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { useAuthStore } from '@/stores/authStore';
 import { locationApi, type UpdateLocationRequest } from '../api/locationApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const LOCATION_TYPES = ['warehouse', 'plant', 'office'] as const;
 
@@ -82,7 +83,7 @@ export function LocationFormModal({ open, id, onClose }: Props) {
       toast.success('Location created', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -92,7 +93,7 @@ export function LocationFormModal({ open, id, onClose }: Props) {
       toast.success('Location updated', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const isPending = createMut.isPending || updateMut.isPending;

@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { currencyApi, type UpdateCurrencyRequest } from '../api/currencyApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const schema = z.object({
   code: z.string().min(1).max(5),
@@ -74,7 +75,7 @@ export function CurrencyFormModal({ open, id, onClose }: Props) {
       toast.success('Currency created', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -84,7 +85,7 @@ export function CurrencyFormModal({ open, id, onClose }: Props) {
       toast.success('Currency updated', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const isPending = createMut.isPending || updateMut.isPending;

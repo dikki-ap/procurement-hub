@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/authStore';
 import { materialApi, type UpdateMaterialRequest } from '../api/materialApi';
+import { extractApiError } from '@/shared/lib/apiError';
 import { materialCategoryApi, type MaterialCategoryDto } from '@/features/master-data/material-category/api/materialCategoryApi';
 import { uomApi, type UomDto } from '@/features/master-data/uom/api/uomApi';
 import { currencyApi, type CurrencyDto } from '@/features/master-data/currency/api/currencyApi';
@@ -93,7 +94,7 @@ export default function MaterialFormPage() {
       toast.success('Material created');
       navigate('..');
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -103,7 +104,7 @@ export default function MaterialFormPage() {
       toast.success('Material updated');
       navigate('..');
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const onSubmit = (data: FormData) => {

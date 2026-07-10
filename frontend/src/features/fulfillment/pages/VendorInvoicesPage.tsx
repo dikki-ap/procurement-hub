@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type InvoiceListDto, type InvoiceStatus } from '../api/fulfillmentApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const statusColor: Record<InvoiceStatus, string> = {
   Submitted:   'bg-blue-50 text-blue-700',
@@ -48,7 +49,7 @@ export default function VendorInvoicesPage() {
       toast.success('Invoice submitted');
       setShowForm(false);
     },
-    onError: () => toast.error('Failed to submit invoice'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to submit invoice')),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

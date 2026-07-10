@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { approvalApi } from '../api/approvalApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 type ModalType = 'revise' | 'reject' | 'delegate' | null;
 
@@ -23,19 +24,19 @@ export default function ApprovalActionModal({ workflowId, type, user, onClose, o
   const reviseMut = useMutation({
     mutationFn: () => approvalApi.revise(workflowId, user!.id, user!.fullName, reason),
     onSuccess:  () => { toast.success('Revision requested.'); onSuccess(); },
-    onError:    (e: any) => toast.error(e?.response?.data?.message ?? 'Failed to revise'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to revise')),
   });
 
   const rejectMut = useMutation({
     mutationFn: () => approvalApi.reject(workflowId, user!.id, user!.fullName, reason),
     onSuccess:  () => { toast.success('Rejected.'); onSuccess(); },
-    onError:    (e: any) => toast.error(e?.response?.data?.message ?? 'Failed to reject'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to reject')),
   });
 
   const delegateMut = useMutation({
     mutationFn: () => approvalApi.delegate(workflowId, user!.id, user!.fullName, delegateUserId, delegateUserName),
     onSuccess:  () => { toast.success('Approval delegated.'); onSuccess(); },
-    onError:    (e: any) => toast.error(e?.response?.data?.message ?? 'Failed to delegate'),
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to delegate')),
   });
 
   if (!type) return null;

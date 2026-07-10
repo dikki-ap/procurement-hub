@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { useAuthStore } from '@/stores/authStore';
 import { uomApi, type UpdateUomRequest } from '../api/uomApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const schema = z.object({
   code: z.string().min(1).max(10),
@@ -66,7 +67,7 @@ export function UOMFormModal({ open, id, onClose }: Props) {
       toast.success('Unit of measure created', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Create failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Create failed')),
   });
 
   const updateMut = useMutation({
@@ -76,7 +77,7 @@ export function UOMFormModal({ open, id, onClose }: Props) {
       toast.success('Unit of measure updated', { duration: 3000 });
       onClose();
     },
-    onError: () => toast.error('Update failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Update failed')),
   });
 
   const isPending = createMut.isPending || updateMut.isPending;

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type InvoiceListDto, type InvoiceStatus } from '../api/fulfillmentApi';
+import { extractApiError } from '@/shared/lib/apiError';
 
 const statusColor: Record<InvoiceStatus, string> = {
   Submitted:   'bg-blue-50 text-blue-700',
@@ -41,7 +42,7 @@ export default function InvoiceListPage() {
       setReviewingId(null);
       setRejectReason('');
     },
-    onError: () => toast.error('Review failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Review failed')),
   });
 
   const payMut = useMutation({
@@ -53,7 +54,7 @@ export default function InvoiceListPage() {
       setPaymentId(null);
       setPayRef('');
     },
-    onError: () => toast.error('Payment confirmation failed'),
+    onError: (error: unknown) => toast.error(extractApiError(error, 'Payment confirmation failed')),
   });
 
   const columns: DataTableColumn<InvoiceListDto>[] = [
