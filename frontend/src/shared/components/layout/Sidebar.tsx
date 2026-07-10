@@ -35,7 +35,7 @@ const navCls = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>
     collapsed ? 'px-[18px] justify-center' : 'px-3'
   } ${
     isActive
-      ? 'border-l-2 border-blue-400 bg-blue-500/10 text-white pl-[10px]'
+      ? 'border-l-2 border-indigo-400 bg-indigo-500/10 text-white pl-[10px]'
       : 'border-l-2 border-transparent text-slate-400 hover:bg-white/8 hover:text-white'
   }`;
 
@@ -90,9 +90,7 @@ export const Sidebar = () => {
     >
       {/* Logo */}
       <div className="flex items-center gap-3 h-14 px-3 flex-shrink-0 border-b border-white/8">
-        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-xs font-bold tracking-wide">
-          PH
-        </div>
+        <img src="/favicon.svg" alt="Procurement Hub" className="flex-shrink-0 w-8 h-8 rounded-lg" />
         <span
           className="font-semibold text-sm text-white whitespace-nowrap transition-[opacity,width] duration-300 overflow-hidden"
           style={{ opacity: ec ? 0 : 1, width: ec ? 0 : 'auto' }}
