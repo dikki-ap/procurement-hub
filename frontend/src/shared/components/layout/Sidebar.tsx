@@ -19,8 +19,10 @@ import {
   Receipt,
   Building2,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
+import { approverMatrixApi } from '@/features/approval/api/approverMatrixApi';
 
 const masterDataLinks = [
   { to: '/app/master-data/materials', icon: Package, label: 'Materials' },
@@ -74,6 +76,14 @@ export const Sidebar = () => {
   const isPurchasing = user?.roles?.some(r => ['purchasing', 'super_admin'].includes(r)) ?? false;
   const isFinance    = user?.roles?.some(r => ['finance',    'super_admin'].includes(r)) ?? false;
   const isVendor     = user?.roles?.some(r => ['vendor_admin', 'vendor_staff'].includes(r)) ?? false;
+  const isAuthenticated = user !== null;
+
+  const { data: approverCheck } = useQuery({
+    queryKey: ['am-i-approver'],
+    queryFn: approverMatrixApi.amIApprover,
+    enabled: isAuthenticated && !isSuperAdmin && !isVendor,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const vendorMatch = location.pathname.match(/\/app\/vendor-portal\/([^/]+)/);
   const vendorId    = vendorMatch?.[1];
@@ -172,12 +182,14 @@ export const Sidebar = () => {
               </div>
             )}
 
-            <div className="pt-3">
-              <NavLink to="/app/approval/inbox" title="Approval Inbox" className={navCls(ec)}>
-                <Inbox className="h-4 w-4 flex-shrink-0" />
-                <NavLabel collapsed={ec}>Approval Inbox</NavLabel>
-              </NavLink>
-            </div>
+            {!isSuperAdmin && !isVendor && approverCheck?.isApprover && (
+              <div className="pt-3">
+                <NavLink to="/app/approval/inbox" title="Approval Inbox" className={navCls(ec)}>
+                  <Inbox className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Approval Inbox</NavLabel>
+                </NavLink>
+              </div>
+            )}
 
             <div className="pt-3">
               <NavLink to="/app/vendors" title="Vendors" className={navCls(ec)}>
@@ -192,6 +204,13 @@ export const Sidebar = () => {
                   <Shield className="h-4 w-4 flex-shrink-0" />
                   <NavLabel collapsed={ec}>Approval Policies</NavLabel>
                 </NavLink>
+
+                <div className="pt-1">
+                  <NavLink to="/app/approval/approver-matrix" title="Approver Matrix" className={navCls(ec)}>
+                    <Users className="h-4 w-4 flex-shrink-0" />
+                    <NavLabel collapsed={ec}>Approver Matrix</NavLabel>
+                  </NavLink>
+                </div>
 
                 <div
                   className="overflow-hidden transition-[max-height,opacity] duration-300 mt-3"

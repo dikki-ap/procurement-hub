@@ -22,6 +22,16 @@ public class ApprovalPolicyRepository : IApprovalPolicyRepository
     public Task<ApprovalPolicy?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => _db.Set<ApprovalPolicy>().FirstOrDefaultAsync(p => p.Id == id, ct);
 
+    public Task<ApprovalPolicy?> FindMatchingAsync(Guid companyId, string referenceType, decimal totalValue, CancellationToken ct = default)
+        => _db.Set<ApprovalPolicy>()
+              .Where(p => p.CompanyId == companyId
+                       && p.ReferenceType == referenceType
+                       && p.IsActive
+                       && p.MinValue <= totalValue
+                       && (p.MaxValue == null || p.MaxValue >= totalValue))
+              .OrderByDescending(p => p.MinValue)
+              .FirstOrDefaultAsync(ct);
+
     public Task<bool> ExistsAsync(Guid companyId, string referenceType, decimal minValue, CancellationToken ct = default)
         => _db.Set<ApprovalPolicy>()
               .AnyAsync(p => p.CompanyId == companyId

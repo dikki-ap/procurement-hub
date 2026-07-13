@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ProcureHub.Modules.ApprovalEngine.Application.Services;
 using ProcureHub.Modules.ApprovalEngine.Domain.Repositories;
 using ProcureHub.Modules.ApprovalEngine.Domain.Services;
 using ProcureHub.Modules.ApprovalEngine.Infrastructure.Jobs;
@@ -12,6 +13,8 @@ public static class ApprovalEngineModule
     {
         services.AddScoped<IApprovalWorkflowRepository, ApprovalWorkflowRepository>();
         services.AddScoped<IApprovalPolicyRepository,   ApprovalPolicyRepository>();
+        services.AddScoped<IApproverMatrixRepository,   ApproverMatrixRepository>();
+        services.AddScoped<IApproverMatrixService,      ApproverMatrixService>();
         services.AddScoped<ApprovalStateMachine>();
         services.AddScoped<ApprovalEscalationJob>();
 

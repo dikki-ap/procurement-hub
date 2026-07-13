@@ -73,6 +73,16 @@ export const router = createBrowserRouter([
                 path: 'policies',
                 lazy: () => import('@/features/approval/pages/ApprovalPoliciesPage').then(m => ({ Component: m.default })),
               },
+              {
+                path: 'approver-matrix',
+                element: <ProtectedRoute requiredRoles={['super_admin']} />,
+                children: [
+                  {
+                    path: '',
+                    lazy: () => import('@/features/approval/pages/ApproverMatrixPage').then(m => ({ Component: m.default })),
+                  },
+                ],
+              },
             ],
           },
           // ── Procurement ──────────────────────────────────────────────────
