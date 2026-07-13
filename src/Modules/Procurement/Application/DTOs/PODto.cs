@@ -11,7 +11,10 @@ public record POListDto(
     decimal   TotalAmount,
     DateTime? ExpectedDelivery,
     DateTime? IssuedAt,
-    DateTime  CreatedAt
+    DateTime  CreatedAt,
+    string?   CreatedByName,
+    string?   UpdatedByName,
+    DateTime  UpdatedAt
 );
 
 public record PODto(

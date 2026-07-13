@@ -28,6 +28,9 @@ export interface PRListDto {
   totalEstimatedValue: number;
   itemCount: number;
   createdAt: string;
+  createdByName: string | null;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface PRDto extends PRListDto {
@@ -67,6 +70,9 @@ export interface RFQListDto {
   itemCount: number;
   vendorCount: number;
   createdAt: string;
+  createdByName: string | null;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface RFQDto extends RFQListDto {

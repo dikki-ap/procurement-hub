@@ -30,6 +30,9 @@ export interface VendorDto {
   blacklistReason: string | null;
   approvedAt: string | null;
   createdAt: string;
+  createdByName: string | null;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface VendorContactDto {

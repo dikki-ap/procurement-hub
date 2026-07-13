@@ -6,6 +6,10 @@ export interface UomDto {
   code: string;
   name: string;
   isActive: boolean;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface CreateUomRequest {

@@ -9,6 +9,7 @@ import { procurementApi, type PRListDto, type PRStatus } from '../api/procuremen
 import { NewPRModal } from './NewPRModal';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -96,6 +97,16 @@ export default function PRListPage() {
           )}
         </div>
       ),
+    },
+    {
+      key: 'createdAt' as keyof PRListDto,
+      header: 'Created',
+      render: (v: PRListDto) => <AuditCell name={v.createdByName} at={v.createdAt} />,
+    },
+    {
+      key: 'updatedAt' as keyof PRListDto,
+      header: 'Last Modified',
+      render: (v: PRListDto) => <AuditCell name={v.updatedByName} at={v.updatedAt} />,
     },
   ];
 

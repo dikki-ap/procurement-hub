@@ -22,6 +22,9 @@ public class GetPOListQueryHandler : IQueryHandler<GetPOListQuery, List<POListDt
             p.TotalAmount,
             p.ExpectedDelivery,
             p.IssuedAt,
-            p.CreatedAt)).ToList();
+            p.CreatedAt,
+            p.CreatedBy?.FullName,
+            p.UpdatedBy?.FullName,
+            p.UpdatedAt)).ToList();
     }
 }

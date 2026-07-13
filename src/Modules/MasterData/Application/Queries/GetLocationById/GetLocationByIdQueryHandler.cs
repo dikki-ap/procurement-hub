@@ -26,7 +26,8 @@ public class GetLocationByIdQueryHandler : IQueryHandler<GetLocationByIdQuery, L
                     ?? throw new NotFoundException("Location", query.Id);
                 return new LocationDto(
                     loc.Id, loc.CompanyId, loc.Name, loc.Type,
-                    loc.Address, loc.City, loc.Province, loc.Country, loc.IsActive);
+                    loc.Address, loc.City, loc.Province, loc.Country, loc.IsActive,
+                    loc.CreatedBy?.FullName, loc.CreatedAt, loc.UpdatedBy?.FullName, loc.UpdatedAt);
             },
             CacheTTL.Locations);
 }

@@ -10,6 +10,10 @@ export interface LocationDto {
   province: string | null;
   country: string;
   isActive: boolean;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface CreateLocationRequest {

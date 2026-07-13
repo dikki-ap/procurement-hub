@@ -9,6 +9,7 @@ import { procurementApi, type RFQListDto, type RFQStatus } from '../api/procurem
 import { NewRFQModal } from './NewRFQModal';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -75,6 +76,16 @@ export default function RFQListPage() {
           )}
         </div>
       ),
+    },
+    {
+      key: 'createdAt' as keyof RFQListDto,
+      header: 'Created',
+      render: (v: RFQListDto) => <AuditCell name={v.createdByName} at={v.createdAt} />,
+    },
+    {
+      key: 'updatedAt' as keyof RFQListDto,
+      header: 'Last Modified',
+      render: (v: RFQListDto) => <AuditCell name={v.updatedByName} at={v.updatedAt} />,
     },
   ];
 

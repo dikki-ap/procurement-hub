@@ -7,6 +7,7 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type InvoiceListDto, type InvoiceStatus } from '../api/fulfillmentApi';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 const statusColor: Record<InvoiceStatus, string> = {
   Submitted:   'bg-blue-50 text-blue-700',
@@ -86,6 +87,16 @@ export default function InvoiceListPage() {
       key: 'submittedAt',
       header: 'Submitted',
       render: (row) => fmtDate(row.submittedAt),
+    },
+    {
+      key: 'createdAt',
+      header: 'Created',
+      render: (row) => <AuditCell name={row.createdByName} at={row.createdAt} />,
+    },
+    {
+      key: 'updatedAt',
+      header: 'Last Modified',
+      render: (row) => <AuditCell name={row.updatedByName} at={row.updatedAt} />,
     },
   ];
 

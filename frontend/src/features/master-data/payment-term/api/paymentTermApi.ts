@@ -8,6 +8,10 @@ export interface PaymentTermDto {
   days: number;
   description: string | null;
   isActive: boolean;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface CreatePaymentTermRequest {

@@ -42,5 +42,8 @@ public class GetVendorListQueryHandler : IQueryHandler<GetVendorListQuery, List<
         v.IsBlacklisted,
         v.BlacklistReason,
         v.ApprovedAt,
-        v.CreatedAt);
+        v.CreatedAt,
+        v.CreatedBy?.FullName,
+        v.UpdatedBy?.FullName,
+        v.UpdatedAt);
 }

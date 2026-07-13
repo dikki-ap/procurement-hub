@@ -26,6 +26,9 @@ export interface POListDto {
   expectedDelivery: string | null;
   issuedAt: string | null;
   createdAt: string;
+  createdByName: string | null;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface PODto extends POListDto {
@@ -86,6 +89,10 @@ export interface InvoiceListDto {
   totalAmount: number;
   dueAt: string | null;
   submittedAt: string;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface InvoiceDto extends InvoiceListDto {

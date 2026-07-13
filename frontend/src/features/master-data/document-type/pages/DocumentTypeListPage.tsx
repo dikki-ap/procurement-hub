@@ -8,6 +8,7 @@ import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { DocumentTypeFormModal } from './DocumentTypeFormModal';
 import { documentTypeApi, type DocumentTypeDto } from '../api/documentTypeApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 type ModalState = { mode: 'add' | 'edit'; id?: string } | null;
 
@@ -62,6 +63,16 @@ export default function DocumentTypeListPage() {
       key: 'isActive',
       header: 'Status',
       render: (row) => <StatusBadge active={row.isActive} />,
+    },
+    {
+      key: 'createdAt',
+      header: 'Created',
+      render: (row) => <AuditCell name={row.createdByName} at={row.createdAt} />,
+    },
+    {
+      key: 'updatedAt',
+      header: 'Last Modified',
+      render: (row) => <AuditCell name={row.updatedByName} at={row.updatedAt} />,
     },
   ];
 

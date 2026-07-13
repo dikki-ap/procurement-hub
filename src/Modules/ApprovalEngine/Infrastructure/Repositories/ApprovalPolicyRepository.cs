@@ -13,6 +13,8 @@ public class ApprovalPolicyRepository : IApprovalPolicyRepository
 
     public Task<List<ApprovalPolicy>> GetByCompanyAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<ApprovalPolicy>()
+              .Include(p => p.CreatedBy)
+              .Include(p => p.UpdatedBy)
               .Where(p => p.CompanyId == companyId)
               .OrderBy(p => p.ReferenceType).ThenBy(p => p.MinValue)
               .ToListAsync(ct);

@@ -8,6 +8,10 @@ export interface MaterialCategoryDto {
   parentId: string | null;
   isStrategic: boolean;
   isActive: boolean;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface CreateMaterialCategoryRequest {

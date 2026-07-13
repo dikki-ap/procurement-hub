@@ -34,6 +34,9 @@ public class GetRFQListQueryHandler : IQueryHandler<GetRFQListQuery, List<RFQLis
             ItemCount             = r.Items.Count,
             VendorCount           = r.Vendors.Count,
             CreatedAt             = r.CreatedAt,
+            CreatedByName         = r.CreatedBy?.FullName,
+            UpdatedByName         = r.UpdatedBy?.FullName,
+            UpdatedAt             = r.UpdatedAt,
         }).ToList();
 
         _cache.Set(cacheKey, dtos, CacheTTL.RFQList);

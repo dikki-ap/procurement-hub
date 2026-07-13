@@ -14,6 +14,8 @@ public class UnitOfMeasureRepository : IUnitOfMeasureRepository
     public Task<List<UnitOfMeasure>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<UnitOfMeasure>()
               .Where(e => e.CompanyId == companyId)
+              .Include(e => e.CreatedBy)
+              .Include(e => e.UpdatedBy)
               .OrderBy(e => e.Code)
               .ToListAsync(ct);
 

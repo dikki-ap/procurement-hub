@@ -13,4 +13,7 @@ public class PRListDto
     public decimal  TotalEstimatedValue { get; set; }
     public int      ItemCount           { get; set; }
     public DateTime CreatedAt           { get; set; }
+    public string?  CreatedByName       { get; init; }
+    public string?  UpdatedByName       { get; init; }
+    public DateTime UpdatedAt           { get; init; }
 }

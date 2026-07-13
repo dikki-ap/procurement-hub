@@ -32,5 +32,6 @@ public class GetMaterialListQueryHandler : IQueryHandler<GetMaterialListQuery, L
                m.Code, m.Name, m.Description,
                m.UomId, m.Uom?.Code ?? string.Empty,
                m.EstimatedPrice, m.CurrencyId, m.Currency?.Code,
-               m.IsStrategic, m.IsActive);
+               m.IsStrategic, m.IsActive,
+               m.CreatedBy?.FullName, m.CreatedAt, m.UpdatedBy?.FullName, m.UpdatedAt);
 }

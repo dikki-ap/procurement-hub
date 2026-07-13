@@ -16,6 +16,8 @@ public class MaterialRepository : IMaterialRepository
               .Include(e => e.Category)
               .Include(e => e.Uom)
               .Include(e => e.Currency)
+              .Include(e => e.CreatedBy)
+              .Include(e => e.UpdatedBy)
               .OrderBy(e => e.Code)
               .ToListAsync(ct);
 

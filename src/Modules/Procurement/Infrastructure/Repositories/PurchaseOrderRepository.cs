@@ -13,6 +13,8 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
 
     public Task<List<PurchaseOrder>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<PurchaseOrder>()
+              .Include(p => p.CreatedBy)
+              .Include(p => p.UpdatedBy)
               .Where(p => p.CompanyId == companyId)
               .OrderByDescending(p => p.CreatedAt)
               .ToListAsync(ct);

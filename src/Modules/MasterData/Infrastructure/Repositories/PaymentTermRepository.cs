@@ -14,6 +14,8 @@ public class PaymentTermRepository : IPaymentTermRepository
     public Task<List<PaymentTerm>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<PaymentTerm>()
               .Where(e => e.CompanyId == companyId)
+              .Include(e => e.CreatedBy)
+              .Include(e => e.UpdatedBy)
               .OrderBy(e => e.Code)
               .ToListAsync(ct);
 

@@ -7,6 +7,7 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { MaterialFormModal } from './MaterialFormModal';
 import { materialApi, type MaterialDto } from '../api/materialApi';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 type ModalState = { mode: 'add' | 'edit'; id?: string } | null;
 
@@ -75,6 +76,16 @@ export default function MaterialListPage() {
       key: 'isActive',
       header: 'Status',
       render: (row) => <StatusBadge active={row.isActive} />,
+    },
+    {
+      key: 'createdAt',
+      header: 'Created',
+      render: (row) => <AuditCell name={row.createdByName} at={row.createdAt} />,
+    },
+    {
+      key: 'updatedAt',
+      header: 'Last Modified',
+      render: (row) => <AuditCell name={row.updatedByName} at={row.updatedAt} />,
     },
   ];
 

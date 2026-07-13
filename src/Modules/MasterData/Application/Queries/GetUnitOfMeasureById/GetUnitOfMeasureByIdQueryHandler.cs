@@ -24,7 +24,9 @@ public class GetUnitOfMeasureByIdQueryHandler : IQueryHandler<GetUnitOfMeasureBy
             {
                 var uom = await _repo.GetByIdAsync(query.Id, ct)
                     ?? throw new NotFoundException("UnitOfMeasure", query.Id);
-                return new UnitOfMeasureDto(uom.Id, uom.CompanyId, uom.Code, uom.Name, uom.IsActive);
+                return new UnitOfMeasureDto(
+                    uom.Id, uom.CompanyId, uom.Code, uom.Name, uom.IsActive,
+                    uom.CreatedBy?.FullName, uom.CreatedAt, uom.UpdatedBy?.FullName, uom.UpdatedAt);
             },
             CacheTTL.UnitOfMeasures);
 }

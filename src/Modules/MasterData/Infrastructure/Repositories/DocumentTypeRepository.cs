@@ -13,6 +13,8 @@ public class DocumentTypeRepository : IDocumentTypeRepository
 
     public Task<List<DocumentType>> GetAllAsync(CancellationToken ct = default)
         => _db.Set<DocumentType>()
+              .Include(e => e.CreatedBy)
+              .Include(e => e.UpdatedBy)
               .OrderBy(e => e.Name)
               .ToListAsync(ct);
 

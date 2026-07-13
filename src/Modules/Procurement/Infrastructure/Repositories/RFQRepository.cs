@@ -16,6 +16,8 @@ public class RFQRepository : IRFQRepository
         => _db.Set<RFQ>()
               .Include(r => r.Items)
               .Include(r => r.Vendors)
+              .Include(r => r.CreatedBy)
+              .Include(r => r.UpdatedBy)
               .Where(r => r.CompanyId == companyId)
               .OrderByDescending(r => r.CreatedAt)
               .ToListAsync(ct);

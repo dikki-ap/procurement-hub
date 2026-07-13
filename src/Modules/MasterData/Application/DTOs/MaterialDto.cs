@@ -13,5 +13,9 @@ public record MaterialDto(
     Guid?    CurrencyId,
     string?  CurrencyCode,
     bool     IsStrategic,
-    bool     IsActive
+    bool     IsActive,
+    string?  CreatedByName,
+    DateTime CreatedAt,
+    string?  UpdatedByName,
+    DateTime UpdatedAt
 );

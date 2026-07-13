@@ -22,7 +22,9 @@ public class GetUnitOfMeasureListQueryHandler : IQueryHandler<GetUnitOfMeasureLi
             async () =>
             {
                 var list = await _repo.GetAllAsync(query.CompanyId, ct);
-                return list.Select(e => new UnitOfMeasureDto(e.Id, e.CompanyId, e.Code, e.Name, e.IsActive)).ToList();
+                return list.Select(e => new UnitOfMeasureDto(
+                    e.Id, e.CompanyId, e.Code, e.Name, e.IsActive,
+                    e.CreatedBy?.FullName, e.CreatedAt, e.UpdatedBy?.FullName, e.UpdatedAt)).ToList();
             },
             CacheTTL.UnitOfMeasures);
 }

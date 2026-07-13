@@ -23,7 +23,8 @@ public class GetPaymentTermListQueryHandler : IQueryHandler<GetPaymentTermListQu
             {
                 var list = await _repo.GetAllAsync(query.CompanyId, ct);
                 return list.Select(e => new PaymentTermDto(
-                    e.Id, e.CompanyId, e.Code, e.Name, e.Days, e.Description, e.IsActive)).ToList();
+                    e.Id, e.CompanyId, e.Code, e.Name, e.Days, e.Description, e.IsActive,
+                    e.CreatedBy?.FullName, e.CreatedAt, e.UpdatedBy?.FullName, e.UpdatedAt)).ToList();
             },
             CacheTTL.PaymentTerms);
 }

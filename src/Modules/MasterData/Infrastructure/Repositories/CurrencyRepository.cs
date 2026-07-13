@@ -12,7 +12,11 @@ public class CurrencyRepository : ICurrencyRepository
     public CurrencyRepository(ApplicationDbContext db) => _db = db;
 
     public Task<List<Currency>> GetAllAsync(CancellationToken ct = default)
-        => _db.Set<Currency>().OrderBy(e => e.Code).ToListAsync(ct);
+        => _db.Set<Currency>()
+              .Include(e => e.CreatedBy)
+              .Include(e => e.UpdatedBy)
+              .OrderBy(e => e.Code)
+              .ToListAsync(ct);
 
     public Task<Currency?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => _db.Set<Currency>().FirstOrDefaultAsync(e => e.Id == id, ct);

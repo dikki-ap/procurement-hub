@@ -34,6 +34,9 @@ public class GetPRListQueryHandler : IQueryHandler<GetPRListQuery, List<PRListDt
             TotalEstimatedValue = pr.TotalEstimatedValue,
             ItemCount           = pr.Items.Count,
             CreatedAt           = pr.CreatedAt,
+            CreatedByName       = pr.CreatedBy?.FullName,
+            UpdatedByName       = pr.UpdatedBy?.FullName,
+            UpdatedAt           = pr.UpdatedAt,
         }).ToList();
 
         _cache.Set(cacheKey, dtos, CacheTTL.PRList);

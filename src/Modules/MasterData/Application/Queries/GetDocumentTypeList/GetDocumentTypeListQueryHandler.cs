@@ -22,7 +22,9 @@ public class GetDocumentTypeListQueryHandler : IQueryHandler<GetDocumentTypeList
             async () =>
             {
                 var list = await _repo.GetAllAsync(ct);
-                return list.Select(e => new DocumentTypeDto(e.Id, e.Name, e.IsActive, e.AllowedExtensions, e.MaxFileSizeMb)).ToList();
+                return list.Select(e => new DocumentTypeDto(
+                    e.Id, e.Name, e.IsActive, e.AllowedExtensions, e.MaxFileSizeMb,
+                    e.CreatedBy?.FullName, e.CreatedAt, e.UpdatedBy?.FullName, e.UpdatedAt)).ToList();
             },
             CacheTTL.DocumentTypes);
 }

@@ -26,7 +26,8 @@ public class GetPaymentTermByIdQueryHandler : IQueryHandler<GetPaymentTermByIdQu
                     ?? throw new NotFoundException("PaymentTerm", query.Id);
                 return new PaymentTermDto(
                     term.Id, term.CompanyId, term.Code, term.Name,
-                    term.Days, term.Description, term.IsActive);
+                    term.Days, term.Description, term.IsActive,
+                    term.CreatedBy?.FullName, term.CreatedAt, term.UpdatedBy?.FullName, term.UpdatedAt);
             },
             CacheTTL.PaymentTerms);
 }

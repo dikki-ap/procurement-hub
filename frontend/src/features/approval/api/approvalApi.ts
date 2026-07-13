@@ -59,6 +59,10 @@ export interface ApprovalPolicyDto {
   isStrategicOverride: boolean;
   isSingleSourceOverride: boolean;
   isActive: boolean;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export const approvalApi = {

@@ -12,7 +12,11 @@ public class InvoiceRepository : IInvoiceRepository
     public InvoiceRepository(ApplicationDbContext db) => _db = db;
 
     public Task<List<Invoice>> GetAllAsync(CancellationToken ct = default)
-        => _db.Set<Invoice>().OrderByDescending(i => i.SubmittedAt).ToListAsync(ct);
+        => _db.Set<Invoice>()
+              .Include(i => i.CreatedBy)
+              .Include(i => i.UpdatedBy)
+              .OrderByDescending(i => i.SubmittedAt)
+              .ToListAsync(ct);
 
     public Task<List<Invoice>> GetByPOAsync(Guid poId, CancellationToken ct = default)
         => _db.Set<Invoice>().Where(i => i.POId == poId).ToListAsync(ct);

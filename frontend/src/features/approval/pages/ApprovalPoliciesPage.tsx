@@ -11,6 +11,7 @@ import { approvalApi, type ApprovalPolicyDto } from '../api/approvalApi';
 import { currencyApi } from '@/features/master-data/currency/api/currencyApi';
 import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/shared/lib/apiError';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -146,6 +147,16 @@ export default function ApprovalPoliciesPage() {
         </span>
       ) },
     { key: 'isActive', header: 'Status', render: (r) => <StatusBadge active={r.isActive} /> },
+    {
+      key: 'createdAt',
+      header: 'Created',
+      render: (r) => <AuditCell name={r.createdByName} at={r.createdAt} />,
+    },
+    {
+      key: 'updatedAt',
+      header: 'Last Modified',
+      render: (r) => <AuditCell name={r.updatedByName} at={r.updatedAt} />,
+    },
   ];
 
   return (

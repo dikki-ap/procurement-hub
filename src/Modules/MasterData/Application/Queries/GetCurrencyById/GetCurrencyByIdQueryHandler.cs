@@ -27,7 +27,8 @@ public class GetCurrencyByIdQueryHandler : IQueryHandler<GetCurrencyByIdQuery, C
                 return new CurrencyDto(
                     currency.Id, currency.Code, currency.Name,
                     currency.Symbol, currency.ExchangeRate, currency.IsBase, currency.IsActive,
-                    currency.RateUpdatedAt);
+                    currency.RateUpdatedAt,
+                    currency.CreatedBy?.FullName, currency.CreatedAt, currency.UpdatedBy?.FullName, currency.UpdatedAt);
             },
             CacheTTL.CurrencyById);
 }

@@ -10,6 +10,7 @@ import { VendorFormModal } from './VendorFormModal';
 import { TierBadge, ScoreBadge } from '../components/VendorBadges';
 import { SuspendModal, BlacklistModal, ReinstateModal } from '../components/VendorActionModals';
 import { extractApiError } from '@/shared/lib/apiError';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -96,6 +97,16 @@ export default function VendorListPage() {
       key: 'status',
       header: 'Status',
       render: (row) => <StatusBadge status={row.status} />,
+    },
+    {
+      key: 'createdAt',
+      header: 'Created',
+      render: (row) => <AuditCell name={row.createdByName} at={row.createdAt} />,
+    },
+    {
+      key: 'updatedAt',
+      header: 'Last Modified',
+      render: (row) => <AuditCell name={row.updatedByName} at={row.updatedAt} />,
     },
   ];
 

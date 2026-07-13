@@ -31,7 +31,7 @@ public class DocumentExpiryCheckJobTests
         var doc = new VendorDocument
         {
             VendorId     = Guid.NewGuid(),
-            DocumentType = DocumentType.Npwp,
+            DocumentType = nameof(DocumentType.Npwp),
             FileUrl      = "vendor-documents/test.pdf",
             Status       = DocumentStatus.Active,
             ExpiredAt    = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)), // already expired
@@ -51,7 +51,7 @@ public class DocumentExpiryCheckJobTests
         var doc = new VendorDocument
         {
             VendorId     = Guid.NewGuid(),
-            DocumentType = DocumentType.Siup,
+            DocumentType = nameof(DocumentType.Siup),
             FileUrl      = "vendor-documents/test.pdf",
             Status       = DocumentStatus.Active,
             ExpiredAt    = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15)), // expiring in 15 days

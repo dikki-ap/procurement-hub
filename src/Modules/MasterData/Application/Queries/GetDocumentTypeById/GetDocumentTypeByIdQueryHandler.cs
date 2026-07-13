@@ -16,6 +16,8 @@ public class GetDocumentTypeByIdQueryHandler : IQueryHandler<GetDocumentTypeById
         var entity = await _repo.GetByIdAsync(query.Id, ct)
             ?? throw new NotFoundException("DocumentType", query.Id);
 
-        return new DocumentTypeDto(entity.Id, entity.Name, entity.IsActive, entity.AllowedExtensions, entity.MaxFileSizeMb);
+        return new DocumentTypeDto(
+            entity.Id, entity.Name, entity.IsActive, entity.AllowedExtensions, entity.MaxFileSizeMb,
+            entity.CreatedBy?.FullName, entity.CreatedAt, entity.UpdatedBy?.FullName, entity.UpdatedAt);
     }
 }

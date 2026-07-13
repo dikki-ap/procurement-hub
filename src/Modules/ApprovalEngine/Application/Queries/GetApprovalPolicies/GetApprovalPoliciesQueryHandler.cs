@@ -19,6 +19,7 @@ public class GetApprovalPoliciesQueryHandler : IQueryHandler<GetApprovalPolicies
 
         return policies.Select(p => new ApprovalPolicyDto(
             p.Id, p.CompanyId, p.ReferenceType, p.Name, p.MinValue, p.MaxValue,
-            p.RequiredLevels, p.IsStrategicOverride, p.IsSingleSourceOverride, p.IsActive)).ToList();
+            p.RequiredLevels, p.IsStrategicOverride, p.IsSingleSourceOverride, p.IsActive,
+            p.CreatedAt, p.CreatedBy?.FullName, p.UpdatedBy?.FullName, p.UpdatedAt)).ToList();
     }
 }

@@ -12,7 +12,11 @@ public record InvoiceListDto(
     InvoiceStatus Status,
     decimal       TotalAmount,
     DateTime?     DueAt,
-    DateTime      SubmittedAt
+    DateTime      SubmittedAt,
+    DateTime      CreatedAt,
+    string?       CreatedByName,
+    string?       UpdatedByName,
+    DateTime      UpdatedAt
 );
 
 public record InvoiceDto(

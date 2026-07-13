@@ -25,7 +25,8 @@ public class GetMaterialCategoryByIdQueryHandler : IQueryHandler<GetMaterialCate
                 var cat = await _repo.GetByIdAsync(query.Id, ct)
                     ?? throw new NotFoundException("MaterialCategory", query.Id);
                 return new MaterialCategoryDto(
-                    cat.Id, cat.CompanyId, cat.Name, cat.Code, cat.ParentId, cat.IsStrategic, cat.IsActive);
+                    cat.Id, cat.CompanyId, cat.Name, cat.Code, cat.ParentId, cat.IsStrategic, cat.IsActive,
+                    cat.CreatedBy?.FullName, cat.CreatedAt, cat.UpdatedBy?.FullName, cat.UpdatedAt);
             },
             CacheTTL.MaterialCategories);
 }

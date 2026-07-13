@@ -6,6 +6,10 @@ export interface DocumentTypeDto {
   isActive: boolean;
   allowedExtensions: string | null;
   maxFileSizeMb: number;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface CreateDocumentTypeRequest {

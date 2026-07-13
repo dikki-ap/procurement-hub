@@ -8,6 +8,7 @@ import { fulfillmentApi, type POListDto, type POStatus } from '../api/fulfillmen
 import { useAuthStore } from '@/stores/authStore';
 import { NewPOModal } from './NewPOModal';
 import { fmtDate } from '@/shared/lib/date';
+import { AuditCell } from '@/shared/components/AuditCell';
 
 const statusColor: Record<POStatus, string> = {
   Draft:           'bg-gray-100 text-gray-600',
@@ -61,7 +62,12 @@ export default function POListPage() {
     {
       key: 'createdAt',
       header: 'Created',
-      render: (row) => fmtDate(row.createdAt),
+      render: (row) => <AuditCell name={row.createdByName} at={row.createdAt} />,
+    },
+    {
+      key: 'updatedAt',
+      header: 'Last Modified',
+      render: (row) => <AuditCell name={row.updatedByName} at={row.updatedAt} />,
     },
   ];
 

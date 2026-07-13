@@ -8,5 +8,9 @@ public record CurrencyDto(
     decimal   ExchangeRate,
     bool      IsBase,
     bool      IsActive,
-    DateTime? RateUpdatedAt
+    DateTime? RateUpdatedAt,
+    string?   CreatedByName,
+    DateTime  CreatedAt,
+    string?   UpdatedByName,
+    DateTime  UpdatedAt
 );

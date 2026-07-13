@@ -14,6 +14,8 @@ public class LocationRepository : ILocationRepository
     public Task<List<Location>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<Location>()
               .Where(e => e.CompanyId == companyId)
+              .Include(e => e.CreatedBy)
+              .Include(e => e.UpdatedBy)
               .OrderBy(e => e.Name)
               .ToListAsync(ct);
 

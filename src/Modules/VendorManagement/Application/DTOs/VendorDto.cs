@@ -18,7 +18,10 @@ public record VendorDto(
     bool         IsBlacklisted,
     string?      BlacklistReason,
     DateTime?    ApprovedAt,
-    DateTime     CreatedAt
+    DateTime     CreatedAt,
+    string?      CreatedByName,
+    string?      UpdatedByName,
+    DateTime     UpdatedAt
 );
 
 public record VendorDetailDto(

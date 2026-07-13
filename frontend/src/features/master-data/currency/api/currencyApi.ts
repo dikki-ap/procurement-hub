@@ -9,6 +9,10 @@ export interface CurrencyDto {
   isBase: boolean;
   isActive: boolean;
   rateUpdatedAt: string | null;
+  createdByName: string | null;
+  createdAt: string;
+  updatedByName: string | null;
+  updatedAt: string;
 }
 
 export interface CreateCurrencyRequest {

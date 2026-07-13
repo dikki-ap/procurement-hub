@@ -28,6 +28,10 @@ public class GetInvoiceListQueryHandler : IQueryHandler<GetInvoiceListQuery, Lis
             i.Status,
             i.TotalAmount,
             i.DueAt,
-            i.SubmittedAt)).ToList();
+            i.SubmittedAt,
+            i.CreatedAt,
+            i.CreatedBy?.FullName,
+            i.UpdatedBy?.FullName,
+            i.UpdatedAt)).ToList();
     }
 }

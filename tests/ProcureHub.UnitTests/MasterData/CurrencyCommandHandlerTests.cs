@@ -3,6 +3,7 @@ using Moq;
 using ProcureHub.Modules.MasterData.Application.Commands.CreateCurrency;
 using ProcureHub.Modules.MasterData.Application.Commands.UpdateCurrency;
 using ProcureHub.Modules.MasterData.Application.Queries.GetCurrencyList;
+using ProcureHub.Modules.MasterData.Application.Services;
 using ProcureHub.Modules.MasterData.Domain.Entities;
 using ProcureHub.Modules.MasterData.Domain.Repositories;
 using ProcureHub.SharedKernel.Caching;
@@ -12,9 +13,10 @@ namespace ProcureHub.UnitTests.MasterData;
 
 public class CurrencyCommandHandlerTests : IDisposable
 {
-    private readonly Mock<ICurrencyRepository> _repoMock = new();
-    private readonly MemoryCache               _memoryCache = new(new MemoryCacheOptions());
-    private readonly MemoryCacheService        _cache;
+    private readonly Mock<ICurrencyRepository>   _repoMock           = new();
+    private readonly Mock<IExchangeRateService>  _exchangeRateMock   = new();
+    private readonly MemoryCache                 _memoryCache        = new(new MemoryCacheOptions());
+    private readonly MemoryCacheService          _cache;
 
     public CurrencyCommandHandlerTests() => _cache = new MemoryCacheService(_memoryCache);
 
@@ -84,7 +86,7 @@ public class CurrencyCommandHandlerTests : IDisposable
         var id = Guid.NewGuid();
         _repoMock.Setup(r => r.GetByIdAsync(id, default)).ReturnsAsync((Currency?)null);
 
-        var handler = new UpdateCurrencyCommandHandler(_repoMock.Object, _cache);
+        var handler = new UpdateCurrencyCommandHandler(_repoMock.Object, _cache, _exchangeRateMock.Object);
         var command = new UpdateCurrencyCommand(id, "USD", "US Dollar", "$", 16000m, false, true);
 
         var act = () => handler.Handle(command, default);
@@ -101,7 +103,7 @@ public class CurrencyCommandHandlerTests : IDisposable
         _repoMock.Setup(r => r.GetByIdAsync(id, default)).ReturnsAsync(existing);
         _repoMock.Setup(r => r.ExistsByCodeAsync("USD", id, default)).ReturnsAsync(true);
 
-        var handler = new UpdateCurrencyCommandHandler(_repoMock.Object, _cache);
+        var handler = new UpdateCurrencyCommandHandler(_repoMock.Object, _cache, _exchangeRateMock.Object);
         var command = new UpdateCurrencyCommand(id, "USD", "US Dollar", "$", 16000m, false, true);
 
         var act = () => handler.Handle(command, default);
@@ -118,7 +120,7 @@ public class CurrencyCommandHandlerTests : IDisposable
         _repoMock.Setup(r => r.ExistsByCodeAsync(It.IsAny<string>(), id, default)).ReturnsAsync(false);
         _cache.Set(CacheKeys.Currencies.List, new object(), TimeSpan.FromMinutes(5));
 
-        var handler = new UpdateCurrencyCommandHandler(_repoMock.Object, _cache);
+        var handler = new UpdateCurrencyCommandHandler(_repoMock.Object, _cache, _exchangeRateMock.Object);
         await handler.Handle(new UpdateCurrencyCommand(id, "IDR", "Indonesian Rupiah", "Rp", 1m, true, true), default);
 
         _cache.Get<object>(CacheKeys.Currencies.List).Should().BeNull();

@@ -14,6 +14,8 @@ public class PurchaseRequisitionRepository : IPurchaseRequisitionRepository
     public Task<List<PurchaseRequisition>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<PurchaseRequisition>()
               .Include(pr => pr.Items)
+              .Include(pr => pr.CreatedBy)
+              .Include(pr => pr.UpdatedBy)
               .Where(pr => pr.CompanyId == companyId)
               .OrderByDescending(pr => pr.CreatedAt)
               .ToListAsync(ct);

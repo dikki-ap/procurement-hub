@@ -23,7 +23,8 @@ public class GetMaterialCategoryListQueryHandler : IQueryHandler<GetMaterialCate
             {
                 var list = await _repo.GetAllAsync(query.CompanyId, ct);
                 return list.Select(e => new MaterialCategoryDto(
-                    e.Id, e.CompanyId, e.Name, e.Code, e.ParentId, e.IsStrategic, e.IsActive)).ToList();
+                    e.Id, e.CompanyId, e.Name, e.Code, e.ParentId, e.IsStrategic, e.IsActive,
+                    e.CreatedBy?.FullName, e.CreatedAt, e.UpdatedBy?.FullName, e.UpdatedAt)).ToList();
             },
             CacheTTL.MaterialCategories);
 }

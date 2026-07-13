@@ -14,6 +14,8 @@ public class MaterialCategoryRepository : IMaterialCategoryRepository
     public Task<List<MaterialCategory>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<MaterialCategory>()
               .Where(e => e.CompanyId == companyId)
+              .Include(e => e.CreatedBy)
+              .Include(e => e.UpdatedBy)
               .OrderBy(e => e.Code)
               .ToListAsync(ct);
 

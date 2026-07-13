@@ -24,7 +24,8 @@ public class GetLocationListQueryHandler : IQueryHandler<GetLocationListQuery, L
                 var list = await _repo.GetAllAsync(query.CompanyId, ct);
                 return list.Select(e => new LocationDto(
                     e.Id, e.CompanyId, e.Name, e.Type,
-                    e.Address, e.City, e.Province, e.Country, e.IsActive)).ToList();
+                    e.Address, e.City, e.Province, e.Country, e.IsActive,
+                    e.CreatedBy?.FullName, e.CreatedAt, e.UpdatedBy?.FullName, e.UpdatedAt)).ToList();
             },
             CacheTTL.Locations);
 }
