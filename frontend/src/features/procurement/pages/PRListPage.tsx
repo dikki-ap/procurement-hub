@@ -76,6 +76,16 @@ export default function PRListPage() {
     },
     { key: 'itemCount', header: 'Items', sortable: false },
     {
+      key: 'createdAt' as keyof PRListDto,
+      header: 'Created',
+      render: (v: PRListDto) => <AuditCell name={v.createdByName} at={v.createdAt} />,
+    },
+    {
+      key: 'updatedAt' as keyof PRListDto,
+      header: 'Last Modified',
+      render: (v: PRListDto) => <AuditCell name={v.updatedByName} at={v.updatedAt} />,
+    },
+    {
       key:    'actions' as keyof PRListDto,
       header:  'Actions',
       sortable: false,
@@ -97,16 +107,6 @@ export default function PRListPage() {
           )}
         </div>
       ),
-    },
-    {
-      key: 'createdAt' as keyof PRListDto,
-      header: 'Created',
-      render: (v: PRListDto) => <AuditCell name={v.createdByName} at={v.createdAt} />,
-    },
-    {
-      key: 'updatedAt' as keyof PRListDto,
-      header: 'Last Modified',
-      render: (v: PRListDto) => <AuditCell name={v.updatedByName} at={v.updatedAt} />,
     },
   ];
 

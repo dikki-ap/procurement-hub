@@ -61,6 +61,16 @@ export default function RFQListPage() {
     { key: 'itemCount',   header: 'Items',   sortable: false },
     { key: 'vendorCount', header: 'Vendors', sortable: false },
     {
+      key: 'createdAt' as keyof RFQListDto,
+      header: 'Created',
+      render: (v: RFQListDto) => <AuditCell name={v.createdByName} at={v.createdAt} />,
+    },
+    {
+      key: 'updatedAt' as keyof RFQListDto,
+      header: 'Last Modified',
+      render: (v: RFQListDto) => <AuditCell name={v.updatedByName} at={v.updatedAt} />,
+    },
+    {
       key:    'actions' as keyof RFQListDto,
       header:  'Actions',
       sortable: false,
@@ -76,16 +86,6 @@ export default function RFQListPage() {
           )}
         </div>
       ),
-    },
-    {
-      key: 'createdAt' as keyof RFQListDto,
-      header: 'Created',
-      render: (v: RFQListDto) => <AuditCell name={v.createdByName} at={v.createdAt} />,
-    },
-    {
-      key: 'updatedAt' as keyof RFQListDto,
-      header: 'Last Modified',
-      render: (v: RFQListDto) => <AuditCell name={v.updatedByName} at={v.updatedAt} />,
     },
   ];
 
