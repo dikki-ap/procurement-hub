@@ -8,6 +8,7 @@ import { fulfillmentApi, type InvoiceListDto, type InvoiceStatus } from '../api/
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
 import { AuditCell } from '@/shared/components/AuditCell';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 
 const statusColor: Record<InvoiceStatus, string> = {
   Submitted:   'bg-blue-50 text-blue-700',
@@ -24,7 +25,9 @@ const inputCls =
   'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
 
 export default function InvoiceListPage() {
-  const qc = useQueryClient();
+  const qc  = useQueryClient();
+  const base = useBaseCurrency();
+  const sym  = base?.symbol ?? base?.code ?? '?';
   const [reviewingId, setReviewingId]   = useState<string | null>(null);
   const [paymentId, setPaymentId]       = useState<string | null>(null);
   const [payRef, setPayRef]             = useState('');
@@ -74,7 +77,7 @@ export default function InvoiceListPage() {
     },
     {
       key: 'totalAmount',
-      header: 'Total (Rp)',
+      header: `Total (${sym})`,
       render: (row) => fmt(row.totalAmount),
     },
     {

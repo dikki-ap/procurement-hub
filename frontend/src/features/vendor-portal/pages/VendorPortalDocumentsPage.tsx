@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 import { vendorPortalApi, type DocumentStatus, type DocumentTypeConfigDto } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
@@ -135,11 +136,11 @@ export default function VendorPortalDocumentsPage() {
     onError: (error: unknown) => toast.error(extractApiError(error, 'Delete failed')),
   });
 
-  const set = (key: keyof UploadForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+  const set = (key: keyof UploadForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }));
 
-  const onTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setForm(f => ({ ...f, documentType: e.target.value, file: null }));
+  const onTypeChange = (value: string) => {
+    setForm(f => ({ ...f, documentType: value, file: null }));
     setFileError(null);
     if (fileRef.current) fileRef.current.value = '';
   };
@@ -233,14 +234,12 @@ export default function VendorPortalDocumentsPage() {
           <div className="space-y-4 mt-2">
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-700">Document Type <span className="text-red-500">*</span></label>
-              <select
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              <SearchableSelect
+                options={activeTypes.map(t => ({ value: t.name, label: t.name }))}
                 value={form.documentType}
                 onChange={onTypeChange}
-              >
-                <option value="">Select a document type…</option>
-                {activeTypes.map(t => <option key={t.id} value={t.name}>{t.name}</option>)}
-              </select>
+                placeholder="Select a document type…"
+              />
             </div>
 
             {form.documentType && (

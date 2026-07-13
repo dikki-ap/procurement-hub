@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -17,6 +17,7 @@ import {
   type MaterialCategoryDto,
 } from '../api/materialCategoryApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 
 const schema = z.object({
   code: z.string().min(1).max(20),
@@ -51,6 +52,7 @@ export default function MaterialCategoryFormPage() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -140,17 +142,18 @@ export default function MaterialCategoryFormPage() {
             </div>
             <div>
               <Label>Parent Category (optional)</Label>
-              <select
-                {...register('parentId')}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="">— None —</option>
-                {parentOptions.map((c: MaterialCategoryDto) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="parentId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    options={[{ value: '', label: '— None —' }, ...parentOptions.map((c: MaterialCategoryDto) => ({ value: c.id, label: c.name }))]}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    placeholder="Select parent category..."
+                  />
+                )}
+              />
             </div>
             <div className="flex items-center gap-2">
               <input type="checkbox" id="isStrategic" {...register('isStrategic')} />

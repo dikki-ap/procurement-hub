@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { NewPOModal } from './NewPOModal';
 import { fmtDate } from '@/shared/lib/date';
 import { AuditCell } from '@/shared/components/AuditCell';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 
 const statusColor: Record<POStatus, string> = {
   Draft:           'bg-gray-100 text-gray-600',
@@ -28,6 +29,8 @@ export default function POListPage() {
   const navigate      = useNavigate();
   const { user }      = useAuthStore();
   const companyId     = user?.companyId ?? '';
+  const base          = useBaseCurrency();
+  const sym           = base?.symbol ?? base?.code ?? '?';
   const [showNew, setShowNew] = useState(false);
 
   const { data: pos = [], isLoading } = useQuery({
@@ -50,7 +53,7 @@ export default function POListPage() {
     },
     {
       key: 'totalAmount',
-      header: 'Total (Rp)',
+      header: `Total (${sym})`,
       render: (row) => fmt(row.totalAmount),
     },
     {

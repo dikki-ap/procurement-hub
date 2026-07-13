@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/authStore';
 import { materialApi, type UpdateMaterialRequest } from '../api/materialApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 import { materialCategoryApi, type MaterialCategoryDto } from '@/features/master-data/material-category/api/materialCategoryApi';
 import { uomApi, type UomDto } from '@/features/master-data/uom/api/uomApi';
 import { currencyApi, type CurrencyDto } from '@/features/master-data/currency/api/currencyApi';
@@ -65,6 +66,7 @@ export default function MaterialFormPage() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -144,17 +146,18 @@ export default function MaterialFormPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label>Category</Label>
-              <select
-                {...register('categoryId')}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="">— Select Category —</option>
-                {categories.map((c: MaterialCategoryDto) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="categoryId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    options={categories.map((c: MaterialCategoryDto) => ({ value: c.id, label: c.name }))}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    placeholder="Select category..."
+                  />
+                )}
+              />
               {errors.categoryId && (
                 <p className="text-sm text-destructive mt-1">{errors.categoryId.message}</p>
               )}
@@ -179,17 +182,18 @@ export default function MaterialFormPage() {
             </div>
             <div>
               <Label>Unit of Measure</Label>
-              <select
-                {...register('uomId')}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="">— Select UOM —</option>
-                {uoms.map((u: UomDto) => (
-                  <option key={u.id} value={u.id}>
-                    {u.code} — {u.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="uomId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    options={uoms.map((u: UomDto) => ({ value: u.id, label: `${u.code} — ${u.name}` }))}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    placeholder="Select UOM..."
+                  />
+                )}
+              />
               {errors.uomId && (
                 <p className="text-sm text-destructive mt-1">{errors.uomId.message}</p>
               )}
@@ -200,17 +204,18 @@ export default function MaterialFormPage() {
             </div>
             <div>
               <Label>Currency (optional)</Label>
-              <select
-                {...register('currencyId')}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="">— None —</option>
-                {currencies.map((c: CurrencyDto) => (
-                  <option key={c.id} value={c.id}>
-                    {c.code} — {c.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="currencyId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    options={[{ value: '', label: '— None —' }, ...currencies.map((c: CurrencyDto) => ({ value: c.id, label: `${c.code} (${c.symbol ?? c.code})` }))]}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    placeholder="Select currency..."
+                  />
+                )}
+              />
             </div>
             <div className="flex items-center gap-2">
               <input type="checkbox" id="isStrategic" {...register('isStrategic')} />

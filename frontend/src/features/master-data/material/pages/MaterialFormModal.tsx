@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -16,6 +16,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { materialApi, type UpdateMaterialRequest } from '../api/materialApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 import { materialCategoryApi, type MaterialCategoryDto } from '@/features/master-data/material-category/api/materialCategoryApi';
 import { uomApi, type UomDto } from '@/features/master-data/uom/api/uomApi';
 import { currencyApi, type CurrencyDto } from '@/features/master-data/currency/api/currencyApi';
@@ -73,7 +74,7 @@ export function MaterialFormModal({ open, id, onClose }: Props) {
     enabled: open,
   });
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: DEFAULTS,
   });
@@ -149,12 +150,18 @@ export function MaterialFormModal({ open, id, onClose }: Props) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
           <div>
             <Label>Category</Label>
-            <select {...register('categoryId')} className={SELECT_CLASS}>
-              <option value="">— Select Category —</option>
-              {(categories as MaterialCategoryDto[]).map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="categoryId"
+              render={({ field }) => (
+                <SearchableSelect
+                  options={(categories as MaterialCategoryDto[]).map((c) => ({ value: c.id, label: c.name }))}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  placeholder="Select category..."
+                />
+              )}
+            />
             {errors.categoryId && <p className="text-sm text-destructive mt-1">{errors.categoryId.message}</p>}
           </div>
           <div>
@@ -173,12 +180,18 @@ export function MaterialFormModal({ open, id, onClose }: Props) {
           </div>
           <div>
             <Label>Unit of Measure</Label>
-            <select {...register('uomId')} className={SELECT_CLASS}>
-              <option value="">— Select UOM —</option>
-              {(uoms as UomDto[]).map((u) => (
-                <option key={u.id} value={u.id}>{u.code} — {u.name}</option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="uomId"
+              render={({ field }) => (
+                <SearchableSelect
+                  options={(uoms as UomDto[]).map((u) => ({ value: u.id, label: `${u.code} — ${u.name}` }))}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  placeholder="Select UOM..."
+                />
+              )}
+            />
             {errors.uomId && <p className="text-sm text-destructive mt-1">{errors.uomId.message}</p>}
           </div>
           <div>
@@ -187,12 +200,18 @@ export function MaterialFormModal({ open, id, onClose }: Props) {
           </div>
           <div>
             <Label>Currency (optional)</Label>
-            <select {...register('currencyId')} className={SELECT_CLASS}>
-              <option value="">— None —</option>
-              {(currencies as CurrencyDto[]).map((c) => (
-                <option key={c.id} value={c.id}>{c.code} — {c.name}</option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="currencyId"
+              render={({ field }) => (
+                <SearchableSelect
+                  options={[{ value: '', label: '— None —' }, ...(currencies as CurrencyDto[]).map((c) => ({ value: c.id, label: `${c.code} (${c.symbol ?? c.code})` }))]}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  placeholder="Select currency..."
+                />
+              )}
+            />
           </div>
           <div className="flex items-center gap-2">
             <input type="checkbox" id="isStrategic" {...register('isStrategic')} />

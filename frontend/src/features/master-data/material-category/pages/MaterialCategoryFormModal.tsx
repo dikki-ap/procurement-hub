@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -20,6 +20,7 @@ import {
   type MaterialCategoryDto,
 } from '../api/materialCategoryApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 
 const schema = z.object({
   code: z.string().min(1).max(20),
@@ -58,7 +59,7 @@ export function MaterialCategoryFormModal({ open, id, onClose }: Props) {
     enabled: !!companyId && open,
   });
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: DEFAULTS,
   });
@@ -133,12 +134,18 @@ export function MaterialCategoryFormModal({ open, id, onClose }: Props) {
           </div>
           <div>
             <Label>Parent Category (optional)</Label>
-            <select {...register('parentId')} className={SELECT_CLASS}>
-              <option value="">— None —</option>
-              {parentOptions.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="parentId"
+              render={({ field }) => (
+                <SearchableSelect
+                  options={[{ value: '', label: '— None —' }, ...parentOptions.map((c) => ({ value: c.id, label: c.name }))]}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  placeholder="Select parent category..."
+                />
+              )}
+            />
           </div>
           <div className="flex items-center gap-2">
             <input type="checkbox" id="isStrategic" {...register('isStrategic')} />

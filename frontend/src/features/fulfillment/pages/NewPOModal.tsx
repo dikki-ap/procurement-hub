@@ -11,8 +11,10 @@ import {
 } from '@/components/ui/dialog';
 import { fulfillmentApi, type CreatePOPayload } from '../api/fulfillmentApi';
 import { vendorApi } from '@/features/vendors/api/vendorApi';
-import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/shared/lib/apiError';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
+
+const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
 const inputCls =
   'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
@@ -29,17 +31,17 @@ type Props = {
 };
 
 export function NewPOModal({ open, onClose }: Props) {
-  const qc        = useQueryClient();
-  const { user }  = useAuthStore();
-  const companyId = user?.companyId ?? '';
+  const qc   = useQueryClient();
+  const base = useBaseCurrency();
+  const sym       = base?.symbol ?? base?.code ?? '?';
 
   const [items, setItems] = useState<ItemRow[]>([emptyItem()]);
 
-  const { data: vendors = [] } = useQuery({
-    queryKey: ['vendors', companyId],
-    queryFn:  () => vendorApi.getAll(companyId),
-    enabled:  !!companyId && open,
+  const { data: allVendors = [] } = useQuery({
+    queryKey: ['vendors', COMPANY_ID],
+    queryFn:  () => vendorApi.getAll(COMPANY_ID),
   });
+  const vendors = allVendors.filter(v => v.status === 'Active');
 
   const mutation = useMutation({
     mutationFn: (payload: CreatePOPayload) => fulfillmentApi.createPO(payload),
@@ -63,7 +65,7 @@ export function NewPOModal({ open, onClose }: Props) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
-      companyId,
+      companyId:        COMPANY_ID,
       vendorId:         fd.get('vendorId') as string,
       expectedDelivery: (fd.get('expectedDelivery') as string) || undefined,
       notes:            (fd.get('notes') as string) || undefined,
@@ -139,7 +141,7 @@ export function NewPOModal({ open, onClose }: Props) {
                         onChange={e => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <label className="block text-xs font-medium mb-1">Unit Price (Rp) <span className="text-red-500">*</span></label>
+                      <label className="block text-xs font-medium mb-1">Unit Price ({sym}) <span className="text-red-500">*</span></label>
                       <input required type="number" min="0" step="1" className={inputCls}
                         value={item.unitPrice}
                         onChange={e => updateItem(idx, 'unitPrice', parseFloat(e.target.value) || 0)} />
@@ -155,7 +157,7 @@ export function NewPOModal({ open, onClose }: Props) {
               ))}
             </div>
             <div className="text-right text-sm font-semibold mt-2 text-slate-700">
-              Total: Rp {fmt(total)}
+              Total: {sym} {fmt(total)}
             </div>
           </div>
 

@@ -5,9 +5,11 @@ import { Receipt, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 import { fulfillmentApi, type InvoiceListDto, type InvoiceStatus } from '../api/fulfillmentApi';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 
 const statusColor: Record<InvoiceStatus, string> = {
   Submitted:   'bg-blue-50 text-blue-700',
@@ -26,7 +28,10 @@ const inputCls =
 export default function VendorInvoicesPage() {
   const { vendorId } = useParams<{ vendorId: string }>();
   const qc           = useQueryClient();
+  const base         = useBaseCurrency();
+  const sym          = base?.symbol ?? base?.code ?? '?';
   const [showForm, setShowForm] = useState(false);
+  const [selectedPoId, setSelectedPoId] = useState('');
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ['vendor-invoices', vendorId],
@@ -49,6 +54,7 @@ export default function VendorInvoicesPage() {
       qc.invalidateQueries({ queryKey: ['vendor-invoices', vendorId] });
       toast.success('Invoice submitted');
       setShowForm(false);
+      setSelectedPoId('');
     },
     onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to submit invoice')),
   });
@@ -80,7 +86,7 @@ export default function VendorInvoicesPage() {
     },
     {
       key: 'totalAmount',
-      header: 'Total (Rp)',
+      header: `Total (${sym})`,
       render: (row) => fmt(row.totalAmount),
     },
     {
@@ -122,7 +128,7 @@ export default function VendorInvoicesPage() {
       {showForm && (
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-          onClick={() => setShowForm(false)}
+          onClick={() => { setShowForm(false); setSelectedPoId(''); }}
         >
           <div
             className="bg-white rounded-xl p-6 w-[480px] space-y-4 shadow-xl"
@@ -132,20 +138,21 @@ export default function VendorInvoicesPage() {
             <form onSubmit={handleSubmit} className="space-y-3">
               <div>
                 <label className="block text-sm font-medium mb-1">Purchase Order *</label>
-                <select name="poId" required className={inputCls}>
-                  <option value="">Select PO...</option>
-                  {eligiblePOs.map(p => (
-                    <option key={p.id} value={p.id}>{p.poNumber}</option>
-                  ))}
-                </select>
+                <input type="hidden" name="poId" value={selectedPoId} />
+                <SearchableSelect
+                  options={eligiblePOs.map(p => ({ value: p.id, label: p.poNumber }))}
+                  value={selectedPoId}
+                  onChange={setSelectedPoId}
+                  placeholder="Select PO..."
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Amount (Rp) *</label>
+                  <label className="block text-sm font-medium mb-1">Amount ({sym}) *</label>
                   <input name="amount" type="number" required min="1" className={inputCls} placeholder="0" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Tax Amount (Rp)</label>
+                  <label className="block text-sm font-medium mb-1">Tax Amount ({sym})</label>
                   <input name="taxAmount" type="number" min="0" className={inputCls} placeholder="0" />
                 </div>
               </div>
@@ -158,7 +165,7 @@ export default function VendorInvoicesPage() {
                 <textarea name="notes" rows={2} className={inputCls} placeholder="Optional notes" />
               </div>
               <div className="flex gap-2 justify-end pt-2">
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                <Button type="button" variant="outline" onClick={() => { setShowForm(false); setSelectedPoId(''); }}>Cancel</Button>
                 <Button type="submit" disabled={submitMut.isPending}>
                   {submitMut.isPending ? 'Submitting...' : 'Submit Invoice'}
                 </Button>

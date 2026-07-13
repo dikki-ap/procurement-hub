@@ -6,8 +6,10 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { fulfillmentApi, type CreatePOPayload } from '../api/fulfillmentApi';
 import { vendorApi } from '@/features/vendors/api/vendorApi';
-import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/shared/lib/apiError';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
+
+const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
 const inputCls =
   'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
@@ -21,16 +23,16 @@ const fmt = (n: number) =>
 export default function NewPOPage() {
   const navigate  = useNavigate();
   const qc        = useQueryClient();
-  const { user }  = useAuthStore();
-  const companyId = user?.companyId ?? '';
+  const base      = useBaseCurrency();
+  const sym       = base?.symbol ?? base?.code ?? '?';
 
   const [items, setItems] = useState<ItemRow[]>([emptyItem()]);
 
-  const { data: vendors = [] } = useQuery({
-    queryKey: ['vendors', companyId],
-    queryFn:  () => vendorApi.getAll(companyId),
-    enabled:  !!companyId,
+  const { data: allVendors = [] } = useQuery({
+    queryKey: ['vendors', COMPANY_ID],
+    queryFn:  () => vendorApi.getAll(COMPANY_ID),
   });
+  const vendors = allVendors.filter(v => v.status === 'Active');
 
   const mutation = useMutation({
     mutationFn: (payload: CreatePOPayload) => fulfillmentApi.createPO(payload),
@@ -46,7 +48,7 @@ export default function NewPOPage() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
-      companyId,
+      companyId:        COMPANY_ID,
       vendorId:         fd.get('vendorId') as string,
       expectedDelivery: (fd.get('expectedDelivery') as string) || undefined,
       notes:            (fd.get('notes') as string) || undefined,
@@ -127,7 +129,7 @@ export default function NewPOPage() {
                     onChange={e => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)} />
                 </div>
                 <div className="col-span-3">
-                  <label className="block text-xs font-medium mb-1">Unit Price (Rp) *</label>
+                  <label className="block text-xs font-medium mb-1">Unit Price ({sym}) *</label>
                   <input required type="number" min="0" step="1" className={inputCls}
                     value={item.unitPrice}
                     onChange={e => updateItem(idx, 'unitPrice', parseFloat(e.target.value) || 0)} />
@@ -142,7 +144,7 @@ export default function NewPOPage() {
             ))}
           </div>
           <div className="text-right text-sm font-semibold mt-2">
-            Total: Rp {fmt(total)}
+            Total: {sym} {fmt(total)}
           </div>
         </div>
 
