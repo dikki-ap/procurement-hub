@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { approvalApi, type ApprovalPolicyDto } from '../api/approvalApi';
+import { currencyApi } from '@/features/master-data/currency/api/currencyApi';
 import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/shared/lib/apiError';
 
@@ -48,6 +49,12 @@ export default function ApprovalPoliciesPage() {
     queryFn:  () => approvalApi.getPolicies(companyId),
     enabled:  !!companyId,
   });
+
+  const { data: currencies = [] } = useQuery({
+    queryKey: ['currencies'],
+    queryFn:  currencyApi.getAll,
+  });
+  const currSymbol = currencies.find(c => c.isBase)?.symbol ?? '?';
 
   const openAdd = () => { setForm(EMPTY_FORM); setModal({ mode: 'add' }); };
   const openEdit = (p: ApprovalPolicyDto) => {
@@ -126,9 +133,9 @@ export default function ApprovalPoliciesPage() {
     { key: 'referenceType', header: 'Type', sortable: true,
       render: (r) => <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">{r.referenceType}</span> },
     { key: 'minValue',      header: 'Min Value',
-      render: (r) => <span className="text-xs text-slate-600">Rp {fmt(r.minValue)}</span> },
+      render: (r) => <span className="text-xs text-slate-600">{currSymbol} {fmt(r.minValue)}</span> },
     { key: 'maxValue',      header: 'Max Value',
-      render: (r) => <span className="text-xs text-slate-600">{r.maxValue != null ? `Rp ${fmt(r.maxValue)}` : '∞'}</span> },
+      render: (r) => <span className="text-xs text-slate-600">{r.maxValue != null ? `${currSymbol} ${fmt(r.maxValue)}` : '∞'}</span> },
     { key: 'requiredLevels', header: 'Levels',
       render: (r) => <span className="font-medium text-center block">{r.requiredLevels}</span> },
     { key: 'isStrategicOverride', header: 'Overrides',
@@ -201,11 +208,11 @@ export default function ApprovalPoliciesPage() {
                 <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Small Purchase" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Min Value (Rp)</label>
+                <label className="text-xs font-medium text-muted-foreground">Min Value ({currSymbol})</label>
                 <Input type="number" min={0} value={form.minValue} onChange={e => setForm(p => ({ ...p, minValue: e.target.value }))} />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Max Value (blank = unlimited)</label>
+                <label className="text-xs font-medium text-muted-foreground">Max Value ({currSymbol}, blank = unlimited)</label>
                 <Input type="number" min={0} value={form.maxValue} onChange={e => setForm(p => ({ ...p, maxValue: e.target.value }))} placeholder="Unlimited" />
               </div>
               <div className="space-y-1">

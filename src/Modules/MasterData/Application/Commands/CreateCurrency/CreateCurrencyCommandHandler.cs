@@ -22,6 +22,9 @@ public class CreateCurrencyCommandHandler : ICommandHandler<CreateCurrencyComman
         if (await _repo.ExistsByCodeAsync(command.Code, null, ct))
             throw new ConflictException("Currency", "Code", command.Code);
 
+        if (command.IsBase)
+            await _repo.ClearAllBaseAsync(null, ct);
+
         var currency = new Currency
         {
             Code         = command.Code.ToUpperInvariant(),

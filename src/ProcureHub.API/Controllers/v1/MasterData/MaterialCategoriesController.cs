@@ -10,10 +10,10 @@ using ProcureHub.SharedKernel.Common;
 
 namespace ProcureHub.API.Controllers.v1.MasterData;
 
-/// <summary>Material Category master data management.</summary>
+/// <summary>Material Category master data — readable by all internal users, writable by super_admin only.</summary>
 [ApiController]
 [Route("api/v1/master-data/material-categories")]
-[Authorize(Policy = "RequireMasterData")]
+[Authorize(Policy = "RequireInternal")]
 public class MaterialCategoriesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,7 +22,6 @@ public class MaterialCategoriesController : ControllerBase
 
     /// <summary>Get all material categories for a company.</summary>
     [HttpGet]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetList(
         [FromQuery] Guid companyId, CancellationToken ct)
     {
@@ -32,7 +31,6 @@ public class MaterialCategoriesController : ControllerBase
 
     /// <summary>Get material category by ID.</summary>
     [HttpGet("{id:guid}")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetById(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetMaterialCategoryByIdQuery(id), ct);
@@ -41,6 +39,7 @@ public class MaterialCategoriesController : ControllerBase
 
     /// <summary>Create a new material category.</summary>
     [HttpPost]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Create(
         [FromBody] CreateMaterialCategoryCommand command, CancellationToken ct)
     {
@@ -50,6 +49,7 @@ public class MaterialCategoriesController : ControllerBase
 
     /// <summary>Update a material category.</summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Update(
         Guid id, [FromBody] UpdateMaterialCategoryCommand command, CancellationToken ct)
     {
@@ -59,6 +59,7 @@ public class MaterialCategoriesController : ControllerBase
 
     /// <summary>Delete a material category.</summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken ct)
     {
         await _mediator.Send(new DeleteMaterialCategoryCommand(id), ct);

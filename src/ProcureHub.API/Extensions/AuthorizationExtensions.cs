@@ -109,6 +109,7 @@ public static class AuthorizationExtensions
             options.AddPolicy("RequireMasterData",    p => p.RequireRole(Roles.CanManageMasterData));
             options.AddPolicy("RequireCreatePR",      p => p.RequireRole(Roles.CanCreatePR));
             options.AddPolicy("RequireVendorUser",    p => p.RequireRole(Roles.AllVendor));
+            options.AddPolicy("RequireVendor",        p => p.RequireRole(Roles.AllVendor));
             options.AddPolicy("RequireVendorAdmin",   p => p.RequireRole(Roles.VendorAdmin));
             options.AddPolicy("RequireAuthenticated", p => p.RequireAuthenticatedUser());
         });

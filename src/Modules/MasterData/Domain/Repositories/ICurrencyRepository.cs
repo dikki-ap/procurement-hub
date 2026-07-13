@@ -7,6 +7,7 @@ public interface ICurrencyRepository
     Task<List<Currency>> GetAllAsync(CancellationToken ct = default);
     Task<Currency?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<bool> ExistsByCodeAsync(string code, Guid? excludeId = null, CancellationToken ct = default);
+    Task ClearAllBaseAsync(Guid? exceptId, CancellationToken ct = default);
     void Add(Currency entity);
     void Update(Currency entity);
     void Remove(Currency entity);

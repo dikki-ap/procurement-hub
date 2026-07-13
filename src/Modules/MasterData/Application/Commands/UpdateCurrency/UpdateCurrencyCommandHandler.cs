@@ -25,6 +25,9 @@ public class UpdateCurrencyCommandHandler : ICommandHandler<UpdateCurrencyComman
         if (await _repo.ExistsByCodeAsync(command.Code, command.Id, ct))
             throw new ConflictException("Currency", "Code", command.Code);
 
+        if (command.IsBase)
+            await _repo.ClearAllBaseAsync(command.Id, ct);
+
         currency.Code         = command.Code.ToUpperInvariant();
         currency.Name         = command.Name;
         currency.Symbol       = command.Symbol;

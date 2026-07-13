@@ -10,10 +10,10 @@ using ProcureHub.SharedKernel.Common;
 
 namespace ProcureHub.API.Controllers.v1.MasterData;
 
-/// <summary>Material master data management.</summary>
+/// <summary>Material master data — readable by all internal users, writable by super_admin only.</summary>
 [ApiController]
 [Route("api/v1/master-data/materials")]
-[Authorize(Policy = "RequireMasterData")]
+[Authorize(Policy = "RequireInternal")]
 public class MaterialsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,7 +22,6 @@ public class MaterialsController : ControllerBase
 
     /// <summary>Get all materials.</summary>
     [HttpGet]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetList(CancellationToken ct)
     {
         var result = await _mediator.Send(new GetMaterialListQuery(), ct);
@@ -31,7 +30,6 @@ public class MaterialsController : ControllerBase
 
     /// <summary>Get material by ID.</summary>
     [HttpGet("{id:guid}")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetById(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetMaterialByIdQuery(id), ct);
@@ -40,6 +38,7 @@ public class MaterialsController : ControllerBase
 
     /// <summary>Create a new material.</summary>
     [HttpPost]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Create(
         [FromBody] CreateMaterialCommand command, CancellationToken ct)
     {
@@ -49,6 +48,7 @@ public class MaterialsController : ControllerBase
 
     /// <summary>Update a material.</summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Update(
         Guid id, [FromBody] UpdateMaterialCommand command, CancellationToken ct)
     {
@@ -58,6 +58,7 @@ public class MaterialsController : ControllerBase
 
     /// <summary>Delete a material (soft delete).</summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken ct)
     {
         await _mediator.Send(new DeleteMaterialCommand(id), ct);

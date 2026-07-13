@@ -10,10 +10,10 @@ using ProcureHub.SharedKernel.Common;
 
 namespace ProcureHub.API.Controllers.v1.MasterData;
 
-/// <summary>Location master data management.</summary>
+/// <summary>Location master data — readable by all internal users, writable by super_admin only.</summary>
 [ApiController]
 [Route("api/v1/master-data/locations")]
-[Authorize(Policy = "RequireMasterData")]
+[Authorize(Policy = "RequireInternal")]
 public class LocationsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,7 +22,6 @@ public class LocationsController : ControllerBase
 
     /// <summary>Get all locations for a company.</summary>
     [HttpGet]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetList(
         [FromQuery] Guid companyId, CancellationToken ct)
     {
@@ -32,7 +31,6 @@ public class LocationsController : ControllerBase
 
     /// <summary>Get location by ID.</summary>
     [HttpGet("{id:guid}")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetById(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetLocationByIdQuery(id), ct);
@@ -41,6 +39,7 @@ public class LocationsController : ControllerBase
 
     /// <summary>Create a new location.</summary>
     [HttpPost]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Create(
         [FromBody] CreateLocationCommand command, CancellationToken ct)
     {
@@ -50,6 +49,7 @@ public class LocationsController : ControllerBase
 
     /// <summary>Update a location.</summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Update(
         Guid id, [FromBody] UpdateLocationCommand command, CancellationToken ct)
     {
@@ -59,6 +59,7 @@ public class LocationsController : ControllerBase
 
     /// <summary>Delete a location.</summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken ct)
     {
         await _mediator.Send(new DeleteLocationCommand(id), ct);

@@ -21,6 +21,11 @@ public class CurrencyRepository : ICurrencyRepository
         => _db.Set<Currency>()
               .AnyAsync(e => e.Code == code && (excludeId == null || e.Id != excludeId), ct);
 
+    public Task ClearAllBaseAsync(Guid? exceptId, CancellationToken ct = default)
+        => _db.Set<Currency>()
+              .Where(c => c.IsBase && (exceptId == null || c.Id != exceptId))
+              .ExecuteUpdateAsync(s => s.SetProperty(c => c.IsBase, false), ct);
+
     public void Add(Currency entity)    => _db.Set<Currency>().Add(entity);
     public void Update(Currency entity) => _db.Set<Currency>().Update(entity);
     public void Remove(Currency entity) => _db.Set<Currency>().Remove(entity);

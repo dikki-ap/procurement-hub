@@ -10,10 +10,10 @@ using ProcureHub.SharedKernel.Common;
 
 namespace ProcureHub.API.Controllers.v1.MasterData;
 
-/// <summary>Unit of Measure master data management.</summary>
+/// <summary>Unit of Measure master data — readable by all internal users, writable by super_admin only.</summary>
 [ApiController]
 [Route("api/v1/master-data/unit-of-measures")]
-[Authorize(Policy = "RequireMasterData")]
+[Authorize(Policy = "RequireInternal")]
 public class UnitOfMeasuresController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,7 +22,6 @@ public class UnitOfMeasuresController : ControllerBase
 
     /// <summary>Get all units of measure for a company.</summary>
     [HttpGet]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetList(
         [FromQuery] Guid companyId, CancellationToken ct)
     {
@@ -32,7 +31,6 @@ public class UnitOfMeasuresController : ControllerBase
 
     /// <summary>Get unit of measure by ID.</summary>
     [HttpGet("{id:guid}")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetById(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetUnitOfMeasureByIdQuery(id), ct);
@@ -41,6 +39,7 @@ public class UnitOfMeasuresController : ControllerBase
 
     /// <summary>Create a new unit of measure.</summary>
     [HttpPost]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Create(
         [FromBody] CreateUnitOfMeasureCommand command, CancellationToken ct)
     {
@@ -50,6 +49,7 @@ public class UnitOfMeasuresController : ControllerBase
 
     /// <summary>Update a unit of measure.</summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Update(
         Guid id, [FromBody] UpdateUnitOfMeasureCommand command, CancellationToken ct)
     {
@@ -59,6 +59,7 @@ public class UnitOfMeasuresController : ControllerBase
 
     /// <summary>Delete a unit of measure.</summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken ct)
     {
         await _mediator.Send(new DeleteUnitOfMeasureCommand(id), ct);

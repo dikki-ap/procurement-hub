@@ -10,10 +10,10 @@ using ProcureHub.SharedKernel.Common;
 
 namespace ProcureHub.API.Controllers.v1.MasterData;
 
-/// <summary>Currency master data management.</summary>
+/// <summary>Currency master data — readable by all internal users, writable by super_admin only.</summary>
 [ApiController]
 [Route("api/v1/master-data/currencies")]
-[Authorize(Policy = "RequireMasterData")]
+[Authorize(Policy = "RequireInternal")]
 public class CurrenciesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,7 +22,6 @@ public class CurrenciesController : ControllerBase
 
     /// <summary>Get all currencies.</summary>
     [HttpGet]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetList(CancellationToken ct)
     {
         var result = await _mediator.Send(new GetCurrencyListQuery(), ct);
@@ -31,7 +30,6 @@ public class CurrenciesController : ControllerBase
 
     /// <summary>Get currency by ID.</summary>
     [HttpGet("{id:guid}")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<ActionResult<ApiResponse<object>>> GetById(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetCurrencyByIdQuery(id), ct);
@@ -40,6 +38,7 @@ public class CurrenciesController : ControllerBase
 
     /// <summary>Create a new currency.</summary>
     [HttpPost]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Create(
         [FromBody] CreateCurrencyCommand command, CancellationToken ct)
     {
@@ -49,6 +48,7 @@ public class CurrenciesController : ControllerBase
 
     /// <summary>Update a currency.</summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Update(
         Guid id, [FromBody] UpdateCurrencyCommand command, CancellationToken ct)
     {
@@ -58,6 +58,7 @@ public class CurrenciesController : ControllerBase
 
     /// <summary>Delete a currency.</summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken ct)
     {
         await _mediator.Send(new DeleteCurrencyCommand(id), ct);
