@@ -31,7 +31,7 @@ public class UpdateCurrencyCommandHandler : ICommandHandler<UpdateCurrencyComman
         currency.Code         = command.Code.ToUpperInvariant();
         currency.Name         = command.Name;
         currency.Symbol       = command.Symbol;
-        currency.ExchangeRate = command.ExchangeRate;
+        currency.ExchangeRate = command.IsBase ? 1m : command.ExchangeRate;
         currency.IsBase       = command.IsBase;
         currency.IsActive     = command.IsActive;
 

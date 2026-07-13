@@ -30,7 +30,7 @@ public class CreateCurrencyCommandHandler : ICommandHandler<CreateCurrencyComman
             Code         = command.Code.ToUpperInvariant(),
             Name         = command.Name,
             Symbol       = command.Symbol,
-            ExchangeRate = command.ExchangeRate,
+            ExchangeRate = command.IsBase ? 1m : command.ExchangeRate,
             IsBase       = command.IsBase,
         };
 

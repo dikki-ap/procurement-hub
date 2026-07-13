@@ -79,6 +79,11 @@ public class ExchangeRateService : IExchangeRateService
             var now     = DateTime.UtcNow;
             var updated = 0;
 
+            // Base currency is always 1 by definition (1 base = 1 base)
+            base_.ExchangeRate  = 1m;
+            base_.RateUpdatedAt = now;
+            _repo.Update(base_);
+
             foreach (var currency in nonBase)
             {
                 if (!rates.TryGetValue(currency.Code.ToLower(), out var rate) || rate <= 0)
