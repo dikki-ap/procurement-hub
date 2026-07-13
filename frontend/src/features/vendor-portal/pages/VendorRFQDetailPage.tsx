@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { procurementApi, type SubmitQuotationItemRequest } from '@/features/procurement/api/procurementApi';
 import { useAuthStore } from '@/stores/authStore';
+import { fmtDate, fmtDateTime } from '@/shared/lib/date';
 
 export default function VendorRFQDetailPage() {
   const { id, vendorId } = useParams<{ id: string; vendorId: string }>();
@@ -82,8 +83,8 @@ export default function VendorRFQDetailPage() {
           ${isUrgent ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-800 border border-blue-200'}`}>
           <Clock className="h-4 w-4" />
           {isUrgent
-            ? `Bid deadline in less than 24 hours: ${new Date(rfq.bidDeadline).toLocaleString('id-ID')}`
-            : `Bid deadline: ${new Date(rfq.bidDeadline).toLocaleString('id-ID')}`}
+            ? `Bid deadline in less than 24 hours: ${fmtDateTime(rfq.bidDeadline)}`
+            : `Bid deadline: ${fmtDateTime(rfq.bidDeadline)}`}
         </div>
       )}
 
@@ -107,8 +108,8 @@ export default function VendorRFQDetailPage() {
         {[
           { label: 'Status',        value: rfq.status },
           { label: 'Items',         value: rfq.itemCount },
-          { label: 'Delivery Date', value: rfq.deliveryDate ? new Date(rfq.deliveryDate).toLocaleDateString('id-ID') : '—' },
-          { label: 'Published',     value: new Date(rfq.createdAt).toLocaleDateString('id-ID') },
+          { label: 'Delivery Date', value: fmtDate(rfq.deliveryDate) },
+          { label: 'Published',     value: fmtDate(rfq.createdAt) },
         ].map(({ label, value }) => (
           <div key={label}>
             <dt className="text-muted-foreground font-medium">{label}</dt>

@@ -8,6 +8,7 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type PRListDto, type PRStatus } from '../api/procurementApi';
 import { NewPRModal } from './NewPRModal';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate } from '@/shared/lib/date';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -58,7 +59,7 @@ export default function PRListPage() {
       key:    'requiredDate',
       header:  'Required Date',
       sortable: true,
-      render: (v: PRListDto) => new Date(v.requiredDate).toLocaleDateString('id-ID'),
+      render: (v: PRListDto) => fmtDate(v.requiredDate),
     },
     {
       key:    'status',

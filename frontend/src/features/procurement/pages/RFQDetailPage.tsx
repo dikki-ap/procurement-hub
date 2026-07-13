@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type RFQStatus, type RFQVendorStatus } from '../api/procurementApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate, fmtDateTime } from '@/shared/lib/date';
 
 const StatusBadge = ({ status }: { status: RFQStatus }) => {
   const cfg: Record<RFQStatus, string> = {
@@ -91,12 +92,12 @@ export default function RFQDetailPage() {
       {/* Info Grid */}
       <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
-          { label: 'Bid Deadline',  value: new Date(rfq.bidDeadline).toLocaleString('id-ID') },
-          { label: 'Delivery Date', value: rfq.deliveryDate ? new Date(rfq.deliveryDate).toLocaleDateString('id-ID') : '—' },
+          { label: 'Bid Deadline',  value: fmtDateTime(rfq.bidDeadline) },
+          { label: 'Delivery Date', value: fmtDate(rfq.deliveryDate) },
           { label: 'Items',         value: rfq.itemCount },
           { label: 'Vendors',       value: rfq.vendorCount },
-          { label: 'Created',       value: new Date(rfq.createdAt).toLocaleDateString('id-ID') },
-          { label: 'Last Updated',  value: new Date(rfq.updatedAt).toLocaleDateString('id-ID') },
+          { label: 'Created',       value: fmtDate(rfq.createdAt) },
+          { label: 'Last Updated',  value: fmtDate(rfq.updatedAt) },
         ].map(({ label, value }) => (
           <div key={label}>
             <dt className="text-muted-foreground font-medium">{label}</dt>
@@ -150,7 +151,7 @@ export default function RFQDetailPage() {
                 {rfq.vendors.map(v => (
                   <tr key={v.id} className="border-t">
                     <td className="px-3 py-2 font-mono text-xs">{v.vendorId.slice(0, 8)}…</td>
-                    <td className="px-3 py-2">{new Date(v.invitedAt).toLocaleDateString('id-ID')}</td>
+                    <td className="px-3 py-2">{fmtDate(v.invitedAt)}</td>
                     <td className="px-3 py-2"><VendorStatusBadge status={v.status} /></td>
                     <td className="px-3 py-2 text-muted-foreground">{v.declinedReason ?? '—'}</td>
                   </tr>

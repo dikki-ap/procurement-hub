@@ -5,6 +5,7 @@ import { Bell } from 'lucide-react';
 import { toast } from 'sonner';
 import { notificationsApi, type NotificationDto } from '../api/notificationsApi';
 import { useSignalR } from '@/hooks/useSignalR';
+import { fmtDateTime } from '@/shared/lib/date';
 
 export function NotificationPanel() {
   const [open, setOpen]     = useState(false);
@@ -86,7 +87,7 @@ export function NotificationPanel() {
                         <p className="text-sm font-medium leading-snug">{n.title}</p>
                         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
                         <p className="text-xs text-slate-400 mt-1">
-                          {new Date(n.createdAt).toLocaleString('id-ID')}
+                          {fmtDateTime(n.createdAt)}
                         </p>
                       </div>
                     </div>

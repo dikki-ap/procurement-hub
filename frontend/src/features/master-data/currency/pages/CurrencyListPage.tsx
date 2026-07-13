@@ -10,6 +10,7 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { CurrencyFormModal } from './CurrencyFormModal';
 import { currencyApi, type CurrencyDto } from '../api/currencyApi';
+import { fmtDateTimeSec } from '@/shared/lib/date';
 
 type ModalState = { mode: 'add' | 'edit'; id?: string } | null;
 
@@ -29,21 +30,9 @@ const formatRate = (rate: number): string => {
   return rate.toLocaleString('id-ID', { maximumSignificantDigits: 4 });
 };
 
-// Parse UTC string safely (ensure Z suffix so JS treats it as UTC, not local)
-const parseUtc = (value: string) =>
-  new Date(value.endsWith('Z') ? value : value + 'Z');
-
 const formatRateDate = (value: string | null) => {
   if (!value) return <span className="text-muted-foreground text-xs">—</span>;
-  const d = parseUtc(value);
-  return (
-    <span className="text-xs text-muted-foreground">
-      {d.toLocaleString(undefined, {
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-      })}
-    </span>
-  );
+  return <span className="text-xs text-muted-foreground">{fmtDateTimeSec(value)}</span>;
 };
 
 // Convert 09:05 UTC (Hangfire schedule) to user's local time for display

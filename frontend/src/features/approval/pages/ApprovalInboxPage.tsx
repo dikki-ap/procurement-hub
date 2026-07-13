@@ -4,6 +4,7 @@ import { Inbox, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { approvalApi, type WorkflowStatus } from '../api/approvalApi';
 import { useAuthStore } from '@/stores/authStore';
+import { fmtDate } from '@/shared/lib/date';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -80,7 +81,7 @@ export default function ApprovalInboxPage() {
                     <span className="text-xs font-medium">{item.currentLevel}/{item.maxLevel}</span>
                   </td>
                   <td className="px-3 py-2 text-muted-foreground">
-                    {new Date(item.createdAt).toLocaleDateString('id-ID')}
+                    {fmtDate(item.createdAt)}
                   </td>
                   <td className="px-3 py-2"><StatusBadge status={item.status} /></td>
                   <td className="px-3 py-2">

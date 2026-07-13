@@ -8,6 +8,7 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type RFQListDto, type RFQStatus } from '../api/procurementApi';
 import { NewRFQModal } from './NewRFQModal';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate } from '@/shared/lib/date';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -48,7 +49,7 @@ export default function RFQListPage() {
       key:    'bidDeadline',
       header:  'Bid Deadline',
       sortable: true,
-      render: (v: RFQListDto) => new Date(v.bidDeadline).toLocaleDateString('id-ID'),
+      render: (v: RFQListDto) => fmtDate(v.bidDeadline),
     },
     {
       key:    'status',

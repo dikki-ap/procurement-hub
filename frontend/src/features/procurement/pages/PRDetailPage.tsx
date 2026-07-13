@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type PRStatus } from '../api/procurementApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate } from '@/shared/lib/date';
 
 const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
@@ -81,11 +82,11 @@ export default function PRDetailPage() {
       <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
           { label: 'Department',       value: pr.department },
-          { label: 'Required Date',    value: new Date(pr.requiredDate).toLocaleDateString('id-ID') },
+          { label: 'Required Date',    value: fmtDate(pr.requiredDate) },
           { label: 'Delivery Location', value: pr.deliveryLocation ?? '—' },
           { label: 'Total Est. Value', value: fmt.format(pr.totalEstimatedValue) },
-          { label: 'Created',          value: new Date(pr.createdAt).toLocaleDateString('id-ID') },
-          { label: 'Last Updated',     value: new Date(pr.updatedAt).toLocaleDateString('id-ID') },
+          { label: 'Created',          value: fmtDate(pr.createdAt) },
+          { label: 'Last Updated',     value: fmtDate(pr.updatedAt) },
         ].map(({ label, value }) => (
           <div key={label}>
             <dt className="text-muted-foreground font-medium">{label}</dt>

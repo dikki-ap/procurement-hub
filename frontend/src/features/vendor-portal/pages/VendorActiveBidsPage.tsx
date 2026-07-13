@@ -4,6 +4,7 @@ import { Eye, Clock, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type RFQListDto, type RFQStatus } from '@/features/procurement/api/procurementApi';
+import { fmtDateTime } from '@/shared/lib/date';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -23,7 +24,7 @@ const DeadlineCell = ({ deadline }: { deadline: string }) => {
   return (
     <span className={`flex items-center gap-1 text-sm ${urgent ? 'text-amber-600 font-semibold' : ''}`}>
       {urgent && <Clock className="h-3.5 w-3.5" />}
-      {new Date(deadline).toLocaleString('id-ID')}
+      {fmtDateTime(deadline)}
     </span>
   );
 };

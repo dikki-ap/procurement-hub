@@ -8,6 +8,7 @@ import { approvalApi, type ApprovalActionType, type WorkflowStatus } from '../ap
 import { useAuthStore } from '@/stores/authStore';
 import ApprovalActionModal from './ApprovalActionModal';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate, fmtDateTime } from '@/shared/lib/date';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -89,8 +90,8 @@ export default function ApprovalDetailPage() {
           { label: 'Total Value', value: `Rp ${fmt(workflow.totalValue)}` },
           { label: 'Level',       value: `${workflow.currentLevel} / ${workflow.maxLevel}` },
           { label: 'Iteration',   value: workflow.iteration },
-          { label: 'Submitted',   value: new Date(workflow.createdAt).toLocaleDateString('id-ID') },
-          { label: 'Completed',   value: workflow.completedAt ? new Date(workflow.completedAt).toLocaleDateString('id-ID') : '—' },
+          { label: 'Submitted',   value: fmtDate(workflow.createdAt) },
+          { label: 'Completed',   value: fmtDate(workflow.completedAt) },
         ].map(({ label, value }) => (
           <div key={label}>
             <dt className="text-muted-foreground font-medium">{label}</dt>
@@ -151,7 +152,7 @@ export default function ApprovalDetailPage() {
                     <span className="text-sm font-medium">{h.actorName}</span>
                     <span className="text-xs text-muted-foreground">{h.action} (Level {h.level})</span>
                     <span className="ml-auto text-xs text-muted-foreground">
-                      {new Date(h.actedAt).toLocaleString('id-ID')}
+                      {fmtDateTime(h.actedAt)}
                     </span>
                   </div>
                   {h.reason && (

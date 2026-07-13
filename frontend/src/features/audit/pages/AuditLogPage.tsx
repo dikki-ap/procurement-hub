@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ScrollText } from 'lucide-react';
 import { auditApi, type AuditLogDto, type AuditLogFilter } from '../api/auditApi';
+import { fmtDateTime } from '@/shared/lib/date';
 
 const ACTION_COLORS: Record<string, string> = {
   Created: 'text-emerald-600 bg-emerald-50',
@@ -183,7 +184,7 @@ export default function AuditLogPage() {
             {data?.items.map((row: AuditLogDto) => (
               <tr key={row.id} className="border-b border-slate-50 hover:bg-slate-50">
                 <td className="px-4 py-2 whitespace-nowrap text-xs text-muted-foreground">
-                  {new Date(row.createdAt).toLocaleString('id-ID')}
+                  {fmtDateTime(row.createdAt)}
                 </td>
                 <td className="px-4 py-2 font-medium">{row.entityType}</td>
                 <td className="px-4 py-2 text-xs font-mono text-slate-500 truncate max-w-[120px]">

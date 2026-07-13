@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { fulfillmentApi, type POStatus, type GRNStatus } from '../api/fulfillmentApi';
 import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate } from '@/shared/lib/date';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -112,10 +113,10 @@ export default function PODetailPage() {
           { label: 'Currency',          value: po.currencyCode ?? 'IDR' },
           { label: 'Payment Terms',     value: po.paymentTermName ?? '—' },
           { label: 'Delivery Location', value: po.deliveryLocation ?? '—' },
-          { label: 'Expected Delivery', value: po.expectedDelivery ? new Date(po.expectedDelivery).toLocaleDateString('id-ID') : '—' },
-          { label: 'Actual Delivery',   value: po.actualDelivery   ? new Date(po.actualDelivery).toLocaleDateString('id-ID')   : '—' },
-          { label: 'Issued At',         value: po.issuedAt         ? new Date(po.issuedAt).toLocaleDateString('id-ID')         : '—' },
-          { label: 'Created',           value: new Date(po.createdAt).toLocaleDateString('id-ID') },
+          { label: 'Expected Delivery', value: fmtDate(po.expectedDelivery) },
+          { label: 'Actual Delivery',   value: fmtDate(po.actualDelivery) },
+          { label: 'Issued At',         value: fmtDate(po.issuedAt) },
+          { label: 'Created',           value: fmtDate(po.createdAt) },
         ].map(({ label, value }) => (
           <div key={label}>
             <dt className="text-muted-foreground font-medium">{label}</dt>
@@ -203,10 +204,10 @@ export default function PODetailPage() {
                       </span>
                     </td>
                     <td className="px-3 py-2">
-                      {grn.receivedAt ? new Date(grn.receivedAt).toLocaleDateString('id-ID') : '—'}
+                      {fmtDate(grn.receivedAt)}
                     </td>
                     <td className="px-3 py-2">
-                      {new Date(grn.createdAt).toLocaleDateString('id-ID')}
+                      {fmtDate(grn.createdAt)}
                     </td>
                   </tr>
                 ))}

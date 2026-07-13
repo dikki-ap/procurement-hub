@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type POListDto, type POStatus } from '../api/fulfillmentApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate } from '@/shared/lib/date';
 
 const statusColor: Record<POStatus, string> = {
   Draft:           'bg-gray-100 text-gray-600',
@@ -60,13 +61,13 @@ export default function VendorOrdersPage() {
       key: 'expectedDelivery',
       header: 'Expected Delivery',
       render: (row) =>
-        row.expectedDelivery ? new Date(row.expectedDelivery).toLocaleDateString('id-ID') : '—',
+        fmtDate(row.expectedDelivery),
     },
     {
       key: 'issuedAt',
       header: 'Issued At',
       render: (row) =>
-        row.issuedAt ? new Date(row.issuedAt).toLocaleDateString('id-ID') : '—',
+        fmtDate(row.issuedAt),
     },
   ];
 

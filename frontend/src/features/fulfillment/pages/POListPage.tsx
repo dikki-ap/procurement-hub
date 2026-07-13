@@ -7,6 +7,7 @@ import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type POListDto, type POStatus } from '../api/fulfillmentApi';
 import { useAuthStore } from '@/stores/authStore';
 import { NewPOModal } from './NewPOModal';
+import { fmtDate } from '@/shared/lib/date';
 
 const statusColor: Record<POStatus, string> = {
   Draft:           'bg-gray-100 text-gray-600',
@@ -55,12 +56,12 @@ export default function POListPage() {
       key: 'expectedDelivery',
       header: 'Expected Delivery',
       render: (row) =>
-        row.expectedDelivery ? new Date(row.expectedDelivery).toLocaleDateString('id-ID') : '—',
+        fmtDate(row.expectedDelivery),
     },
     {
       key: 'createdAt',
       header: 'Created',
-      render: (row) => new Date(row.createdAt).toLocaleDateString('id-ID'),
+      render: (row) => fmtDate(row.createdAt),
     },
   ];
 

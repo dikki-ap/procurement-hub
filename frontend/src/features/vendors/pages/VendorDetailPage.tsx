@@ -5,6 +5,7 @@ import { ArrowLeft, FileText, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { vendorApi, type VendorStatus, type DocumentStatus } from '../api/vendorApi';
 import { TierBadge, ScoreDisplay } from '../components/VendorBadges';
+import { fmtDate, fmtDateTime } from '@/shared/lib/date';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
   const cfg: Record<VendorStatus, string> = {
@@ -86,14 +87,7 @@ export default function VendorDetailPage() {
         <div className="bg-white rounded-xl border border-slate-100 p-4">
           <p className="text-xs text-slate-500 mb-1.5">Approved</p>
           <p className="text-sm font-semibold text-slate-900">
-            {vendor.approvedAt
-              ? new Date(
-                  vendor.approvedAt.endsWith('Z') ? vendor.approvedAt : vendor.approvedAt + 'Z'
-                ).toLocaleString('en-GB', {
-                  day: 'numeric', month: 'long', year: 'numeric',
-                  hour: '2-digit', minute: '2-digit', hour12: false,
-                })
-              : '—'}
+            {fmtDateTime(vendor.approvedAt)}
           </p>
         </div>
       </div>
@@ -187,7 +181,7 @@ export default function VendorDetailPage() {
                   <DocStatusBadge status={d.status} />
                   {d.expiredAt && (
                     <p className="text-xs text-slate-400 mt-1">
-                      Exp: {new Date(d.expiredAt).toLocaleDateString()}
+                      Exp: {fmtDate(d.expiredAt)}
                     </p>
                   )}
                 </div>

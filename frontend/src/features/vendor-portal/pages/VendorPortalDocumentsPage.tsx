@@ -14,6 +14,7 @@ import {
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { vendorPortalApi, type DocumentStatus, type DocumentTypeConfigDto } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate } from '@/shared/lib/date';
 
 const GLOBAL_ALLOWED_LABEL = 'PDF, JPG, PNG, XLSX';
 const GLOBAL_ALLOWED_EXTS  = ['.pdf', '.jpg', '.jpeg', '.png', '.xlsx', '.xls'];
@@ -204,7 +205,7 @@ export default function VendorPortalDocumentsPage() {
                   <StatusBadge status={d.status} />
                   {d.expiredAt && (
                     <p className="text-xs text-slate-400 mt-1">
-                      Exp: {new Date(d.expiredAt + 'Z').toLocaleDateString()}
+                      Exp: {fmtDate(d.expiredAt)}
                     </p>
                   )}
                 </div>

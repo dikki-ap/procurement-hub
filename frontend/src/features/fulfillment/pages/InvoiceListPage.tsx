@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type InvoiceListDto, type InvoiceStatus } from '../api/fulfillmentApi';
 import { extractApiError } from '@/shared/lib/apiError';
+import { fmtDate } from '@/shared/lib/date';
 
 const statusColor: Record<InvoiceStatus, string> = {
   Submitted:   'bg-blue-50 text-blue-700',
@@ -79,12 +80,12 @@ export default function InvoiceListPage() {
       key: 'dueAt',
       header: 'Due Date',
       render: (row) =>
-        row.dueAt ? new Date(row.dueAt).toLocaleDateString('id-ID') : '—',
+        fmtDate(row.dueAt),
     },
     {
       key: 'submittedAt',
       header: 'Submitted',
-      render: (row) => new Date(row.submittedAt).toLocaleDateString('id-ID'),
+      render: (row) => fmtDate(row.submittedAt),
     },
   ];
 
