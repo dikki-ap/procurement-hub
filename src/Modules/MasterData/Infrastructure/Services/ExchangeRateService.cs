@@ -8,8 +8,10 @@ using ProcureHub.SharedKernel.Caching;
 namespace ProcureHub.Modules.MasterData.Infrastructure.Services;
 
 /// <summary>
-/// Fetches live exchange rates from fawazahmed0/exchange-api (jsDelivr CDN).
-/// Source: 170+ currencies including IDR, updated daily, no API key required.
+/// Fetches live exchange rates from fawazahmed0/currency-api.
+/// Primary:  jsDelivr CDN  — https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{base}.json
+/// Fallback: Cloudflare    — https://latest.currency-api.pages.dev/v1/currencies/{base}.json
+/// 170+ currencies including IDR, updated daily, no API key required.
 /// ExchangeRate semantics: "1 unit of this currency = ExchangeRate units of base currency".
 /// API returns 1 base = X other, so we store 1/rate (inverse).
 /// </summary>
@@ -44,12 +46,22 @@ public class ExchangeRateService : IExchangeRateService
             return;
         }
 
-        var baseCode = base_.Code.ToLower();
-        var url      = $"{baseCode}.json";
+        var baseCode    = base_.Code.ToLower();
+        var relativeUrl = $"{baseCode}.json";
+        var fallbackUrl = $"https://latest.currency-api.pages.dev/v1/currencies/{relativeUrl}";
 
         try
         {
-            var root = await _http.GetFromJsonAsync<JsonDocument>(url, ct);
+            JsonDocument? root;
+            try
+            {
+                root = await _http.GetFromJsonAsync<JsonDocument>(relativeUrl, ct);
+            }
+            catch (HttpRequestException)
+            {
+                _logger.LogWarning("Primary CDN failed, retrying with Cloudflare fallback.");
+                root = await _http.GetFromJsonAsync<JsonDocument>(fallbackUrl, ct);
+            }
             if (root is null || !root.RootElement.TryGetProperty(baseCode, out var ratesElement))
             {
                 _logger.LogWarning("Exchange rate sync: unexpected response format from provider.");
