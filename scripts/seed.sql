@@ -125,24 +125,46 @@ INSERT IGNORE INTO document_types (id, name, is_active, allowed_extensions, max_
 -- ── Materials ─────────────────────────────────────────────────────────────────
 -- Prefix aa = valid hex (a=10, a=10)
 -- Covers: various categories, UoMs, currencies, strategic/non-strategic, active/inactive
+--
+-- Re-declare @now here so this section works even when run standalone.
+-- Look up category/uom/currency IDs by code — robust against prior partial runs.
+SET @now        = UTC_TIMESTAMP(6);
+SET @company_id = (SELECT id FROM companies WHERE code = 'PRCH' LIMIT 1);
+
+SET @cat_rm    = (SELECT id FROM material_categories WHERE code = 'RM'    AND company_id = @company_id LIMIT 1);
+SET @cat_sp    = (SELECT id FROM material_categories WHERE code = 'SP'    AND company_id = @company_id LIMIT 1);
+SET @cat_mro   = (SELECT id FROM material_categories WHERE code = 'MRO'   AND company_id = @company_id LIMIT 1);
+SET @cat_capex = (SELECT id FROM material_categories WHERE code = 'CAPEX' AND company_id = @company_id LIMIT 1);
+SET @cat_pkg   = (SELECT id FROM material_categories WHERE code = 'PKG'   AND company_id = @company_id LIMIT 1);
+SET @cat_cons  = (SELECT id FROM material_categories WHERE code = 'CONS'  AND company_id = @company_id LIMIT 1);
+
+SET @uom_kg   = (SELECT id FROM unit_of_measures WHERE code = 'KG'   AND company_id = @company_id LIMIT 1);
+SET @uom_pcs  = (SELECT id FROM unit_of_measures WHERE code = 'PCS'  AND company_id = @company_id LIMIT 1);
+SET @uom_ltr  = (SELECT id FROM unit_of_measures WHERE code = 'LTR'  AND company_id = @company_id LIMIT 1);
+SET @uom_mtr  = (SELECT id FROM unit_of_measures WHERE code = 'MTR'  AND company_id = @company_id LIMIT 1);
+SET @uom_unit = (SELECT id FROM unit_of_measures WHERE code = 'UNIT' AND company_id = @company_id LIMIT 1);
+
+SET @cur_idr  = (SELECT id FROM currencies WHERE code = 'IDR' LIMIT 1);
+SET @cur_usd  = (SELECT id FROM currencies WHERE code = 'USD' LIMIT 1);
+
 DELETE FROM materials WHERE id LIKE 'aa%';
 INSERT IGNORE INTO materials (id, category_id, code, name, description, uom_id, estimated_price, currency_id, is_strategic, is_active, is_deleted, created_at, updated_at) VALUES
 -- Raw Materials (strategic)
-('aa000000-0000-0000-0000-000000000001', 'bc000000-0000-0000-0000-000000000001', 'STL-001', 'Steel Sheet 2mm',         'Cold-rolled steel sheet thickness 2mm',        'ee000000-0000-0000-0000-000000000001', 18500.00,    'cc000000-0000-0000-0000-000000000001', 1, 1, 0, @now, @now),
-('aa000000-0000-0000-0000-000000000002', 'bc000000-0000-0000-0000-000000000001', 'ALM-001', 'Aluminum Ingot 6061',     'Aluminum alloy 6061-T6 ingot',                 'ee000000-0000-0000-0000-000000000001', 2.85,        'cc000000-0000-0000-0000-000000000002', 1, 1, 0, @now, @now),
-('aa000000-0000-0000-0000-000000000003', 'bc000000-0000-0000-0000-000000000001', 'CST-001', 'Carbon Steel Rod 20mm',  'Carbon steel round bar diameter 20mm',         'ee000000-0000-0000-0000-000000000005', 42000.00,    'cc000000-0000-0000-0000-000000000001', 1, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000001', @cat_rm,    'STL-001', 'Steel Sheet 2mm',          'Cold-rolled steel sheet thickness 2mm',         @uom_kg,   18500.00,  @cur_idr, 1, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000002', @cat_rm,    'ALM-001', 'Aluminum Ingot 6061',      'Aluminum alloy 6061-T6 ingot',                  @uom_kg,    2.85,     @cur_usd, 1, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000003', @cat_rm,    'CST-001', 'Carbon Steel Rod 20mm',   'Carbon steel round bar diameter 20mm',           @uom_mtr,  42000.00,  @cur_idr, 1, 1, 0, @now, @now),
 -- Spare Parts (non-strategic)
-('aa000000-0000-0000-0000-000000000004', 'bc000000-0000-0000-0000-000000000002', 'BRN-001', 'Bearing SKF 6205-2RS',   'Deep groove ball bearing, sealed both sides',  'ee000000-0000-0000-0000-000000000003', 85000.00,    'cc000000-0000-0000-0000-000000000001', 0, 1, 0, @now, @now),
-('aa000000-0000-0000-0000-000000000005', 'bc000000-0000-0000-0000-000000000002', 'VBL-001', 'V-Belt A-50',            'Classical V-belt section A length 50 inch',    'ee000000-0000-0000-0000-000000000003', 35000.00,    'cc000000-0000-0000-0000-000000000001', 0, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000004', @cat_sp,    'BRN-001', 'Bearing SKF 6205-2RS',    'Deep groove ball bearing, sealed both sides',    @uom_pcs,  85000.00,  @cur_idr, 0, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000005', @cat_sp,    'VBL-001', 'V-Belt A-50',             'Classical V-belt section A length 50 inch',      @uom_pcs,  35000.00,  @cur_idr, 0, 1, 0, @now, @now),
 -- MRO (non-strategic)
-('aa000000-0000-0000-0000-000000000006', 'bc000000-0000-0000-0000-000000000003', 'LUB-001', 'Lubricant Oil SAE 40',   'Engine lubricant oil SAE 40 grade',            'ee000000-0000-0000-0000-000000000004', 45000.00,    'cc000000-0000-0000-0000-000000000001', 0, 1, 0, @now, @now),
-('aa000000-0000-0000-0000-000000000007', 'bc000000-0000-0000-0000-000000000003', 'WLD-001', 'Welding Electrode E6013', 'Mild steel welding electrode 3.2mm x 350mm',   'ee000000-0000-0000-0000-000000000001', 28000.00,    'cc000000-0000-0000-0000-000000000001', 0, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000006', @cat_mro,   'LUB-001', 'Lubricant Oil SAE 40',    'Engine lubricant oil SAE 40 grade',               @uom_ltr,  45000.00,  @cur_idr, 0, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000007', @cat_mro,   'WLD-001', 'Welding Electrode E6013', 'Mild steel welding electrode 3.2mm x 350mm',      @uom_kg,   28000.00,  @cur_idr, 0, 1, 0, @now, @now),
 -- CAPEX (strategic)
-('aa000000-0000-0000-0000-000000000008', 'bc000000-0000-0000-0000-000000000004', 'CNC-001', 'CNC Milling Machine',   '3-axis CNC vertical machining center',         'ee000000-0000-0000-0000-000000000008', 45000.00,    'cc000000-0000-0000-0000-000000000002', 1, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000008', @cat_capex, 'CNC-001', 'CNC Milling Machine',     '3-axis CNC vertical machining center',            @uom_unit, 45000.00,  @cur_usd, 1, 1, 0, @now, @now),
 -- Packaging (non-strategic)
-('aa000000-0000-0000-0000-000000000009', 'bc000000-0000-0000-0000-000000000005', 'BOX-001', 'Cardboard Box 40x30x20', 'Single-wall corrugated box 40×30×20 cm',       'ee000000-0000-0000-0000-000000000003', 3500.00,     'cc000000-0000-0000-0000-000000000001', 0, 1, 0, @now, @now),
+('aa000000-0000-0000-0000-000000000009', @cat_pkg,   'BOX-001', 'Cardboard Box 40x30x20',  'Single-wall corrugated box 40x30x20 cm',          @uom_pcs,   3500.00,  @cur_idr, 0, 1, 0, @now, @now),
 -- Consumables (inactive — for testing inactive filter)
-('aa000000-0000-0000-0000-000000000010', 'bc000000-0000-0000-0000-000000000006', 'HMR-001', 'Hammer 500g',            'Steel claw hammer 500g with fiberglass handle', 'ee000000-0000-0000-0000-000000000003', 75000.00,    'cc000000-0000-0000-0000-000000000001', 0, 0, 0, @now, @now);
+('aa000000-0000-0000-0000-000000000010', @cat_cons,  'HMR-001', 'Hammer 500g',             'Steel claw hammer 500g with fiberglass handle',   @uom_pcs,  75000.00,  @cur_idr, 0, 0, 0, @now, @now);
 
 -- ── Done ──────────────────────────────────────────────────────────────────────
 SELECT 'Seed completed.' AS status;
