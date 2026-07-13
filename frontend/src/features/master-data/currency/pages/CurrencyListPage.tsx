@@ -23,11 +23,21 @@ const StatusBadge = ({ active }: { active: boolean }) => (
   </span>
 );
 
+const formatRate = (rate: number): string => {
+  if (rate === 1) return '1';
+  if (rate >= 1) return rate.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return rate.toLocaleString('id-ID', { maximumSignificantDigits: 4 });
+};
+
 const formatRateDate = (value: string | null) => {
   if (!value) return <span className="text-muted-foreground text-xs">—</span>;
+  const d = new Date(value);
   return (
     <span className="text-xs text-muted-foreground">
-      {new Date(value).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+      {d.toLocaleString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      })}
     </span>
   );
 };
@@ -97,7 +107,7 @@ export default function CurrencyListPage() {
       key: 'exchangeRate',
       header: 'Rate',
       sortable: true,
-      render: (row) => row.exchangeRate.toLocaleString('id-ID', { maximumFractionDigits: 6 }),
+      render: (row) => formatRate(row.exchangeRate),
     },
     {
       key: 'rateUpdatedAt',
