@@ -156,6 +156,11 @@ export const vendorPortalApi = {
   deleteDocument: (vendorId: string, documentId: string) =>
     apiClient.delete(`/vendor-portal/${vendorId}/documents/${documentId}`),
 
+  getDocumentDownloadUrl: (vendorId: string, documentId: string) =>
+    apiClient
+      .get<{ data: { url: string } }>(`/vendor-portal/${vendorId}/documents/${documentId}/download`)
+      .then((r) => r.data.data.url),
+
   getDocumentTypes: (vendorId: string) =>
     apiClient.get<{ data: DocumentTypeConfigDto[] }>(`/vendor-portal/${vendorId}/document-types`).then((r) => r.data.data),
 };

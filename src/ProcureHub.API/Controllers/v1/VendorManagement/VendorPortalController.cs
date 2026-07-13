@@ -7,6 +7,7 @@ using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocum
 using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetMyVendorId;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
+using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocumentDownloadUrl;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocuments;
 using ProcureHub.SharedKernel.Abstractions;
 using ProcureHub.SharedKernel.Common;
@@ -134,6 +135,16 @@ public class VendorPortalController : ControllerBase
         var deletedById = _currentUser.UserId ?? Guid.Empty;
         await _mediator.Send(new DeleteVendorDocumentCommand(documentId, deletedById), ct);
         return Ok(ApiResponse.Ok("Document deleted."));
+    }
+
+    /// <summary>Get a presigned download URL for own vendor document (valid 15 min).</summary>
+    [HttpGet("{vendorId:guid}/documents/{documentId:guid}/download")]
+    public async Task<ActionResult<ApiResponse<object>>> GetDocumentDownloadUrl(
+        Guid vendorId, Guid documentId, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        var url = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(vendorId, documentId), ct);
+        return Ok(ApiResponse.Ok(new { url }));
     }
 
     /// <summary>Get active document types available for upload.</summary>

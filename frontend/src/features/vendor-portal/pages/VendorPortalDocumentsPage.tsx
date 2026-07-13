@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FileText, Trash2, Upload, AlertTriangle } from 'lucide-react';
+import { FileText, Trash2, Upload, AlertTriangle, Eye, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,6 +75,8 @@ export default function VendorPortalDocumentsPage() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [previewUrl, setPreviewUrl]   = useState<string | null>(null);
+  const [previewName, setPreviewName] = useState<string | null>(null);
 
   const { data: docs = [], isLoading } = useQuery({
     queryKey: ['vendor-portal', 'documents', vendorId],
@@ -135,6 +137,27 @@ export default function VendorPortalDocumentsPage() {
     },
     onError: (error: unknown) => toast.error(extractApiError(error, 'Delete failed')),
   });
+
+  const handleDownload = async (docId: string) => {
+    try {
+      const url = await vendorPortalApi.getDocumentDownloadUrl(vendorId!, docId);
+      window.open(url, '_blank');
+    } catch {
+      toast.error('Failed to get download link');
+    }
+  };
+
+  const handlePreview = async (docId: string, fileName: string | null) => {
+    try {
+      const url = await vendorPortalApi.getDocumentDownloadUrl(vendorId!, docId);
+      setPreviewName(fileName);
+      setPreviewUrl(url);
+    } catch {
+      toast.error('Failed to get preview link');
+    }
+  };
+
+  const isPdf = (name: string | null) => name?.toLowerCase().endsWith('.pdf') ?? false;
 
   const set = (key: keyof UploadForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }));
@@ -201,8 +224,8 @@ export default function VendorPortalDocumentsPage() {
                 {d.documentNumber && <p className="text-xs text-slate-500">#{d.documentNumber}</p>}
                 <p className="text-xs text-slate-400 mt-0.5">{d.fileName ?? 'Unknown file'}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
+              <div className="flex items-center gap-2">
+                <div className="text-right mr-1">
                   <StatusBadge status={d.status} />
                   {d.expiredAt && (
                     <p className="text-xs text-slate-400 mt-1">
@@ -210,6 +233,20 @@ export default function VendorPortalDocumentsPage() {
                     </p>
                   )}
                 </div>
+                <Button
+                  variant="ghost" size="sm"
+                  className="text-slate-500 hover:text-blue-600 h-8 px-2"
+                  onClick={() => handlePreview(d.id, d.fileName)}
+                >
+                  <Eye className="h-3.5 w-3.5 mr-1" /> Preview
+                </Button>
+                <Button
+                  variant="ghost" size="sm"
+                  className="text-slate-500 hover:text-emerald-600 h-8 px-2"
+                  onClick={() => handleDownload(d.id)}
+                >
+                  <Download className="h-3.5 w-3.5 mr-1" /> Download
+                </Button>
                 <Button
                   variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:text-red-600"
                   onClick={() => setDeleteTarget(d.id)}
@@ -331,6 +368,24 @@ export default function VendorPortalDocumentsPage() {
               <Upload className="h-4 w-4" />
               {uploadMut.isPending ? `Uploading ${uploadProgress}%` : 'Upload'}
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Document Preview Modal */}
+      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { setPreviewUrl(null); setPreviewName(null); } }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{previewName ?? 'Document Preview'}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden rounded-md border border-slate-200 min-h-[60vh]">
+            {previewUrl && isPdf(previewName) ? (
+              <iframe src={previewUrl} className="w-full h-full" style={{ minHeight: '60vh' }} title="document preview" />
+            ) : previewUrl ? (
+              <div className="flex items-center justify-center h-full p-4">
+                <img src={previewUrl} alt={previewName ?? 'document'} className="max-w-full max-h-[65vh] object-contain rounded" />
+              </div>
+            ) : null}
           </div>
         </DialogContent>
       </Dialog>
