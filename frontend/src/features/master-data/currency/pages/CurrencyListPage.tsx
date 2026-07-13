@@ -29,17 +29,30 @@ const formatRate = (rate: number): string => {
   return rate.toLocaleString('id-ID', { maximumSignificantDigits: 4 });
 };
 
+// Parse UTC string safely (ensure Z suffix so JS treats it as UTC, not local)
+const parseUtc = (value: string) =>
+  new Date(value.endsWith('Z') ? value : value + 'Z');
+
 const formatRateDate = (value: string | null) => {
   if (!value) return <span className="text-muted-foreground text-xs">—</span>;
-  const d = new Date(value);
+  const d = parseUtc(value);
   return (
     <span className="text-xs text-muted-foreground">
-      {d.toLocaleString('en-GB', {
+      {d.toLocaleString(undefined, {
         day: '2-digit', month: 'short', year: 'numeric',
         hour: '2-digit', minute: '2-digit', second: '2-digit',
       })}
     </span>
   );
+};
+
+// Convert 09:05 UTC (Hangfire schedule) to user's local time for display
+const getLocalSyncLabel = () => {
+  const d = new Date();
+  d.setUTCHours(9, 5, 0, 0);
+  const time = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const tz   = d.toLocaleTimeString(undefined, { timeZoneName: 'short' }).split(' ').at(-1) ?? '';
+  return `Daily ${time} ${tz}`;
 };
 
 export default function CurrencyListPage() {
@@ -153,7 +166,7 @@ export default function CurrencyListPage() {
               Auto Sync
             </Label>
             <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${autoSync ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-              {autoSync ? 'Daily 09:05 UTC' : 'Manual'}
+              {autoSync ? getLocalSyncLabel() : 'Manual'}
             </span>
           </div>
           <Button
