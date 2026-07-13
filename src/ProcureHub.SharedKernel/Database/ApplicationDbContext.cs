@@ -184,7 +184,7 @@ public class ApplicationDbContext : DbContext
                     if (entry.Entity is BaseSoftDeleteEntity sd)
                     {
                         entry.State = EntityState.Modified;
-                        sd.SoftDelete(userId ?? Guid.Empty);
+                        sd.SoftDelete(userId); // null when no internal user (e.g. vendor self-service) — FK allows null
                         entry.Entity.UpdatedAt   = now;
                         entry.Entity.UpdatedById = userId;
                     }

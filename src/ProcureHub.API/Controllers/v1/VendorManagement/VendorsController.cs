@@ -174,13 +174,15 @@ public class VendorsController : ControllerBase
         return Ok(ApiResponse.Ok("Document deleted."));
     }
 
-    /// <summary>Get a presigned download URL for a vendor document (valid 15 min).</summary>
+    /// <summary>Stream a vendor document file. Use ?inline=true for browser preview.</summary>
     [HttpGet("{id:guid}/documents/{documentId:guid}/download")]
-    public async Task<ActionResult<ApiResponse<object>>> GetDocumentDownloadUrl(
-        Guid id, Guid documentId, CancellationToken ct)
+    public async Task<IActionResult> DownloadDocument(
+        Guid id, Guid documentId, [FromQuery] bool inline, CancellationToken ct)
     {
-        var url = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(id, documentId), ct);
-        return Ok(ApiResponse.Ok(new { url }));
+        var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(id, documentId), ct);
+        var disposition = inline ? "inline" : $"attachment; filename=\"{result.FileName ?? "document"}\"";
+        Response.Headers["Content-Disposition"] = disposition;
+        return File(result.Content, result.ContentType);
     }
 
     /// <summary>Add a capability (approved supply category) to a vendor.</summary>

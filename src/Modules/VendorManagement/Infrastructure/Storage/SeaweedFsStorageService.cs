@@ -38,6 +38,13 @@ public class SeaweedFsStorageService : IStorageService
         return objectKey;
     }
 
+    public async Task<(Stream Content, string ContentType)> DownloadAsync(string bucket, string objectKey, CancellationToken ct = default)
+    {
+        var request  = new GetObjectRequest { BucketName = bucket, Key = objectKey };
+        var response = await _s3.GetObjectAsync(request, ct);
+        return (response.ResponseStream, response.Headers.ContentType ?? "application/octet-stream");
+    }
+
     public Task<string> GetPresignedUrlAsync(string bucket, string objectKey, TimeSpan expiry, CancellationToken ct = default)
     {
         var request = new GetPreSignedUrlRequest

@@ -137,14 +137,16 @@ public class VendorPortalController : ControllerBase
         return Ok(ApiResponse.Ok("Document deleted."));
     }
 
-    /// <summary>Get a presigned download URL for own vendor document (valid 15 min).</summary>
+    /// <summary>Stream own vendor document file. Use ?inline=true for browser preview.</summary>
     [HttpGet("{vendorId:guid}/documents/{documentId:guid}/download")]
-    public async Task<ActionResult<ApiResponse<object>>> GetDocumentDownloadUrl(
-        Guid vendorId, Guid documentId, CancellationToken ct)
+    public async Task<IActionResult> DownloadDocument(
+        Guid vendorId, Guid documentId, [FromQuery] bool inline, CancellationToken ct)
     {
         await VerifyOwnershipAsync(vendorId, ct);
-        var url = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(vendorId, documentId), ct);
-        return Ok(ApiResponse.Ok(new { url }));
+        var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(vendorId, documentId), ct);
+        var disposition = inline ? "inline" : $"attachment; filename=\"{result.FileName ?? "document"}\"";
+        Response.Headers["Content-Disposition"] = disposition;
+        return File(result.Content, result.ContentType);
     }
 
     /// <summary>Get active document types available for upload.</summary>

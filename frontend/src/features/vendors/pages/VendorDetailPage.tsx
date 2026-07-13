@@ -147,22 +147,30 @@ export default function VendorDetailPage() {
 
   // ── document actions ─────────────────────────────────────────────────────────
 
-  const handleDownload = async (docId: string) => {
+  const handleDownload = async (docId: string, fileName: string | null) => {
     try {
-      const url = await vendorApi.getDocumentDownloadUrl(id!, docId);
-      window.open(url, '_blank');
+      const blob = await vendorApi.downloadDocument(id!, docId, false);
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = fileName ?? 'document';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch {
-      toast.error('Failed to get download link');
+      toast.error('Failed to download file');
     }
   };
 
   const handlePreview = async (docId: string, fileName: string | null) => {
     try {
-      const url = await vendorApi.getDocumentDownloadUrl(id!, docId);
+      const blob = await vendorApi.downloadDocument(id!, docId, true);
+      const url  = URL.createObjectURL(blob);
       setPreviewName(fileName);
       setPreviewUrl(url);
     } catch {
-      toast.error('Failed to get preview link');
+      toast.error('Failed to load preview');
     }
   };
 
@@ -358,7 +366,7 @@ export default function VendorDetailPage() {
                   <Button
                     variant="ghost" size="sm"
                     className="text-slate-500 hover:text-emerald-600"
-                    onClick={() => handleDownload(d.id)}
+                    onClick={() => handleDownload(d.id, d.fileName)}
                   >
                     <Download className="h-3.5 w-3.5 mr-1" /> Download
                   </Button>
@@ -426,7 +434,7 @@ export default function VendorDetailPage() {
       )}
 
       {/* ── Document Preview Modal ── */}
-      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { setPreviewUrl(null); setPreviewName(null); } }}>
+      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); setPreviewName(null); } }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{previewName ?? 'Document Preview'}</DialogTitle>

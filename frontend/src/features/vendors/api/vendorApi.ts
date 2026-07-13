@@ -110,10 +110,13 @@ export const vendorApi = {
   deleteDocument: (vendorId: string, documentId: string) =>
     apiClient.delete(`${BASE}/${vendorId}/documents/${documentId}`),
 
-  getDocumentDownloadUrl: (vendorId: string, documentId: string) =>
+  downloadDocument: (vendorId: string, documentId: string, inline = false) =>
     apiClient
-      .get<{ data: { url: string } }>(`${BASE}/${vendorId}/documents/${documentId}/download`)
-      .then((r) => r.data.data.url),
+      .get<Blob>(`${BASE}/${vendorId}/documents/${documentId}/download`, {
+        params: inline ? { inline: 'true' } : undefined,
+        responseType: 'blob',
+      })
+      .then((r) => r.data),
 
   addCapability: (
     vendorId: string,
@@ -156,10 +159,13 @@ export const vendorPortalApi = {
   deleteDocument: (vendorId: string, documentId: string) =>
     apiClient.delete(`/vendor-portal/${vendorId}/documents/${documentId}`),
 
-  getDocumentDownloadUrl: (vendorId: string, documentId: string) =>
+  downloadDocument: (vendorId: string, documentId: string, inline = false) =>
     apiClient
-      .get<{ data: { url: string } }>(`/vendor-portal/${vendorId}/documents/${documentId}/download`)
-      .then((r) => r.data.data.url),
+      .get<Blob>(`/vendor-portal/${vendorId}/documents/${documentId}/download`, {
+        params: inline ? { inline: 'true' } : undefined,
+        responseType: 'blob',
+      })
+      .then((r) => r.data),
 
   getDocumentTypes: (vendorId: string) =>
     apiClient.get<{ data: DocumentTypeConfigDto[] }>(`/vendor-portal/${vendorId}/document-types`).then((r) => r.data.data),

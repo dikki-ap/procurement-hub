@@ -17,7 +17,7 @@ public abstract class BaseSoftDeleteEntity : BaseAuditableEntity
 
     public User? DeletedBy { get; set; }
 
-    public void SoftDelete(Guid deletedByUserId)
+    public void SoftDelete(Guid? deletedByUserId = null)
     {
         IsDeleted   = true;
         DeletedAt   = DateTime.UtcNow;

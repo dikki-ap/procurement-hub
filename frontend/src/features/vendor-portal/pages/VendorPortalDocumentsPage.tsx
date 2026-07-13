@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FileText, Trash2, Upload, AlertTriangle, Eye, Download } from 'lucide-react';
+import { FileText, Trash2, Upload, AlertTriangle, Eye, Download, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,6 +73,7 @@ export default function VendorPortalDocumentsPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [form, setForm] = useState<UploadForm>(EMPTY_FORM);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [replaceTarget, setReplaceTarget] = useState<{ id: string; documentType: string } | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [previewUrl, setPreviewUrl]   = useState<string | null>(null);
@@ -101,10 +102,17 @@ export default function VendorPortalDocumentsPage() {
 
   const resetUpload = () => {
     setShowUpload(false);
+    setReplaceTarget(null);
     setForm(EMPTY_FORM);
     setFileError(null);
     setUploadProgress(0);
     if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const openReplace = (doc: { id: string; documentType: string }) => {
+    setReplaceTarget(doc);
+    setForm({ ...EMPTY_FORM, documentType: doc.documentType });
+    setShowUpload(true);
   };
 
   const uploadMut = useMutation({
@@ -120,9 +128,12 @@ export default function VendorPortalDocumentsPage() {
       setUploadProgress(0);
       return vendorPortalApi.uploadDocument(vendorId!, data, setUploadProgress);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      if (replaceTarget) {
+        await vendorPortalApi.deleteDocument(vendorId!, replaceTarget.id).catch(() => {});
+      }
       qc.invalidateQueries({ queryKey: ['vendor-portal', 'documents', vendorId] });
-      toast.success('Document uploaded');
+      toast.success(replaceTarget ? 'Document replaced' : 'Document uploaded');
       resetUpload();
     },
     onError: (error: unknown) => toast.error(extractApiError(error, 'Upload failed')),
@@ -138,22 +149,30 @@ export default function VendorPortalDocumentsPage() {
     onError: (error: unknown) => toast.error(extractApiError(error, 'Delete failed')),
   });
 
-  const handleDownload = async (docId: string) => {
+  const handleDownload = async (docId: string, fileName: string | null) => {
     try {
-      const url = await vendorPortalApi.getDocumentDownloadUrl(vendorId!, docId);
-      window.open(url, '_blank');
+      const blob = await vendorPortalApi.downloadDocument(vendorId!, docId, false);
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = fileName ?? 'document';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch {
-      toast.error('Failed to get download link');
+      toast.error('Failed to download file');
     }
   };
 
   const handlePreview = async (docId: string, fileName: string | null) => {
     try {
-      const url = await vendorPortalApi.getDocumentDownloadUrl(vendorId!, docId);
+      const blob = await vendorPortalApi.downloadDocument(vendorId!, docId, true);
+      const url  = URL.createObjectURL(blob);
       setPreviewName(fileName);
       setPreviewUrl(url);
     } catch {
-      toast.error('Failed to get preview link');
+      toast.error('Failed to load preview');
     }
   };
 
@@ -242,8 +261,15 @@ export default function VendorPortalDocumentsPage() {
                 </Button>
                 <Button
                   variant="ghost" size="sm"
+                  className="text-slate-500 hover:text-amber-600 h-8 px-2"
+                  onClick={() => openReplace({ id: d.id, documentType: d.documentType })}
+                >
+                  <RefreshCw className="h-3.5 w-3.5 mr-1" /> Update
+                </Button>
+                <Button
+                  variant="ghost" size="sm"
                   className="text-slate-500 hover:text-emerald-600 h-8 px-2"
-                  onClick={() => handleDownload(d.id)}
+                  onClick={() => handleDownload(d.id, d.fileName)}
                 >
                   <Download className="h-3.5 w-3.5 mr-1" /> Download
                 </Button>
@@ -264,19 +290,27 @@ export default function VendorPortalDocumentsPage() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Upload className="h-4 w-4" /> Upload Document
+              {replaceTarget
+                ? <><RefreshCw className="h-4 w-4" /> Replace Document</>
+                : <><Upload className="h-4 w-4" /> Upload Document</>}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 mt-2">
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-700">Document Type <span className="text-red-500">*</span></label>
-              <SearchableSelect
-                options={activeTypes.map(t => ({ value: t.name, label: t.name }))}
-                value={form.documentType}
-                onChange={onTypeChange}
-                placeholder="Select a document type…"
-              />
+              {replaceTarget ? (
+                <div className="rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-slate-600">
+                  {form.documentType}
+                </div>
+              ) : (
+                <SearchableSelect
+                  options={activeTypes.map(t => ({ value: t.name, label: t.name }))}
+                  value={form.documentType}
+                  onChange={onTypeChange}
+                  placeholder="Select a document type…"
+                />
+              )}
             </div>
 
             {form.documentType && (
@@ -365,15 +399,17 @@ export default function VendorPortalDocumentsPage() {
               disabled={uploadMut.isPending || !form.file || !!fileError || !form.documentType}
               className="gap-1"
             >
-              <Upload className="h-4 w-4" />
-              {uploadMut.isPending ? `Uploading ${uploadProgress}%` : 'Upload'}
+              {replaceTarget ? <RefreshCw className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+              {uploadMut.isPending
+                ? `Uploading ${uploadProgress}%`
+                : replaceTarget ? 'Replace' : 'Upload'}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Document Preview Modal */}
-      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { setPreviewUrl(null); setPreviewName(null); } }}>
+      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); setPreviewName(null); } }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{previewName ?? 'Document Preview'}</DialogTitle>
