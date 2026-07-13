@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, DollarSign } from 'lucide-react';
+import { Plus, Pencil, Trash2, DollarSign, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,15 @@ const StatusBadge = ({ active }: { active: boolean }) => (
     {active ? 'Active' : 'Inactive'}
   </span>
 );
+
+const formatRateDate = (value: string | null) => {
+  if (!value) return <span className="text-muted-foreground text-xs">—</span>;
+  return (
+    <span className="text-xs text-muted-foreground">
+      {new Date(value).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+    </span>
+  );
+};
 
 export default function CurrencyListPage() {
   const qc = useQueryClient();
@@ -44,6 +53,15 @@ export default function CurrencyListPage() {
     },
   });
 
+  const syncRatesMut = useMutation({
+    mutationFn: currencyApi.syncRates,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['currencies'] });
+      toast.success('Exchange rates refreshed', { duration: 3000 });
+    },
+    onError: () => toast.error('Rate sync failed — check connection or try again.'),
+  });
+
   const columns: DataTableColumn<CurrencyDto>[] = [
     {
       key: 'code',
@@ -59,9 +77,14 @@ export default function CurrencyListPage() {
     },
     {
       key: 'exchangeRate',
-      header: 'Rate (IDR)',
+      header: 'Rate',
       sortable: true,
-      render: (row) => row.exchangeRate.toLocaleString('id-ID'),
+      render: (row) => row.exchangeRate.toLocaleString('id-ID', { maximumFractionDigits: 6 }),
+    },
+    {
+      key: 'rateUpdatedAt',
+      header: 'Rate Updated',
+      render: (row) => formatRateDate(row.rateUpdatedAt),
     },
     {
       key: 'isBase',
@@ -90,9 +113,21 @@ export default function CurrencyListPage() {
             <p className="text-sm text-muted-foreground hidden sm:block">Manage exchange rates and base currency</p>
           </div>
         </div>
-        <Button size="sm" onClick={() => setModal({ mode: 'add' })} className="gap-1">
-          <Plus className="h-4 w-4" /> Add Currency
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1"
+            disabled={syncRatesMut.isPending}
+            onClick={() => syncRatesMut.mutate()}
+          >
+            <RefreshCw className={`h-4 w-4 ${syncRatesMut.isPending ? 'animate-spin' : ''}`} />
+            {syncRatesMut.isPending ? 'Refreshing...' : 'Refresh Rates'}
+          </Button>
+          <Button size="sm" onClick={() => setModal({ mode: 'add' })} className="gap-1">
+            <Plus className="h-4 w-4" /> Add Currency
+          </Button>
+        </div>
       </div>
 
       <DataTable
