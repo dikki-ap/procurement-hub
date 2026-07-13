@@ -21,10 +21,12 @@ public static class MasterDataModule
 
         services.AddHttpClient<IExchangeRateService, ExchangeRateService>(client =>
         {
-            client.BaseAddress = new Uri("https://api.frankfurter.app/");
+            client.BaseAddress = new Uri("https://cdn.jsdelivr.net/npm/@fawazahmed0/exchange-api@latest/v1/currencies/");
             client.Timeout     = TimeSpan.FromSeconds(15);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
         });
+        services.AddScoped<IExchangeRateConfigRepository, ExchangeRateConfigRepository>();
+        services.AddScoped<IExchangeRateConfigService,    ExchangeRateConfigService>();
         services.AddScoped<ExchangeRateJob>();
 
         return services;

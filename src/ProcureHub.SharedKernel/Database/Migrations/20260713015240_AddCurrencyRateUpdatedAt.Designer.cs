@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProcureHub.SharedKernel.Database;
 
@@ -11,9 +12,11 @@ using ProcureHub.SharedKernel.Database;
 namespace ProcureHub.SharedKernel.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260713015240_AddCurrencyRateUpdatedAt")]
+    partial class AddCurrencyRateUpdatedAt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -493,22 +496,6 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasDatabaseName("ix_document_types_updated_by_id");
 
                     b.ToTable("document_types", (string)null);
-                });
-
-            modelBuilder.Entity("ProcureHub.Modules.MasterData.Domain.Entities.ExchangeRateConfig", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("CHAR(36)")
-                        .HasColumnName("id");
-
-                    b.Property<bool>("AutoSync")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("auto_sync");
-
-                    b.HasKey("Id")
-                        .HasName("pk_exchange_rate_config");
-
-                    b.ToTable("exchange_rate_config", (string)null);
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.MasterData.Domain.Entities.Location", b =>

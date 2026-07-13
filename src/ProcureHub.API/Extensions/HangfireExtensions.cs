@@ -3,6 +3,8 @@ using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.MySql;
 using ProcureHub.Modules.ApprovalEngine.Infrastructure.Jobs;
+using ProcureHub.Modules.MasterData.Domain.Repositories;
+using ProcureHub.Modules.MasterData.Infrastructure.Jobs;
 using ProcureHub.Modules.Procurement.Infrastructure.Jobs;
 using ProcureHub.Modules.VendorManagement.Infrastructure.Jobs;
 
@@ -39,7 +41,7 @@ public static class HangfireExtensions
         return services;
     }
 
-    public static void RegisterHangfireJobs(this WebApplication app)
+    public static async Task RegisterHangfireJobsAsync(this WebApplication app)
     {
         RecurringJob.AddOrUpdate<DocumentExpiryCheckJob>(
             "document-expiry-check",
@@ -58,6 +60,18 @@ public static class HangfireExtensions
             job => job.ExecuteAsync(CancellationToken.None),
             "0 */2 * * *",
             new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
+
+        // Register daily exchange rate sync only if auto-sync is enabled in DB settings
+        using var scope     = app.Services.CreateScope();
+        var       configRepo = scope.ServiceProvider.GetRequiredService<IExchangeRateConfigRepository>();
+        var       config     = await configRepo.GetAsync();
+
+        if (config.AutoSync)
+            RecurringJob.AddOrUpdate<ExchangeRateJob>(
+                "exchange-rate-sync",
+                job => job.ExecuteAsync(CancellationToken.None),
+                "5 9 * * *",
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
     }
 }
 

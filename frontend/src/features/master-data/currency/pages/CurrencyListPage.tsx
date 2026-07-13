@@ -4,6 +4,8 @@ import { Plus, Pencil, Trash2, DollarSign, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { CurrencyFormModal } from './CurrencyFormModal';
@@ -40,6 +42,11 @@ export default function CurrencyListPage() {
     queryFn: currencyApi.getAll,
   });
 
+  const { data: settings } = useQuery({
+    queryKey: ['exchange-rate-settings'],
+    queryFn: currencyApi.getExchangeRateSettings,
+  });
+
   const deleteMut = useMutation({
     mutationFn: currencyApi.delete,
     onSuccess: () => {
@@ -61,6 +68,17 @@ export default function CurrencyListPage() {
     },
     onError: () => toast.error('Rate sync failed — check connection or try again.'),
   });
+
+  const settingsMut = useMutation({
+    mutationFn: currencyApi.updateExchangeRateSettings,
+    onSuccess: (_, autoSync) => {
+      qc.invalidateQueries({ queryKey: ['exchange-rate-settings'] });
+      toast.success(autoSync ? 'Auto sync enabled — daily job scheduled.' : 'Manual mode enabled — daily job removed.', { duration: 3000 });
+    },
+    onError: () => toast.error('Failed to update sync settings.'),
+  });
+
+  const autoSync = settings?.autoSync ?? true;
 
   const columns: DataTableColumn<CurrencyDto>[] = [
     {
@@ -113,7 +131,21 @@ export default function CurrencyListPage() {
             <p className="text-sm text-muted-foreground hidden sm:block">Manage exchange rates and base currency</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 border rounded-md px-3 py-1.5">
+            <Switch
+              id="auto-sync"
+              checked={autoSync}
+              disabled={settingsMut.isPending}
+              onCheckedChange={(checked) => settingsMut.mutate(checked)}
+            />
+            <Label htmlFor="auto-sync" className="text-sm cursor-pointer select-none">
+              Auto Sync
+            </Label>
+            <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${autoSync ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+              {autoSync ? 'Daily 09:05 UTC' : 'Manual'}
+            </span>
+          </div>
           <Button
             size="sm"
             variant="outline"

@@ -26,7 +26,8 @@ public class GetCurrencyByIdQueryHandler : IQueryHandler<GetCurrencyByIdQuery, C
                     ?? throw new NotFoundException("Currency", query.Id);
                 return new CurrencyDto(
                     currency.Id, currency.Code, currency.Name,
-                    currency.Symbol, currency.ExchangeRate, currency.IsBase, currency.IsActive);
+                    currency.Symbol, currency.ExchangeRate, currency.IsBase, currency.IsActive,
+                    currency.RateUpdatedAt);
             },
             CacheTTL.CurrencyById);
 }

@@ -27,5 +27,5 @@ public class GetCurrencyListQueryHandler : IQueryHandler<GetCurrencyListQuery, L
             CacheTTL.CurrencyList);
 
     private static CurrencyDto ToDto(ProcureHub.Modules.MasterData.Domain.Entities.Currency c)
-        => new(c.Id, c.Code, c.Name, c.Symbol, c.ExchangeRate, c.IsBase, c.IsActive);
+        => new(c.Id, c.Code, c.Name, c.Symbol, c.ExchangeRate, c.IsBase, c.IsActive, c.RateUpdatedAt);
 }

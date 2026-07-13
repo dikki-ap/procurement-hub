@@ -8,6 +8,7 @@ export interface CurrencyDto {
   exchangeRate: number;
   isBase: boolean;
   isActive: boolean;
+  rateUpdatedAt: string | null;
 }
 
 export interface CreateCurrencyRequest {
@@ -33,4 +34,9 @@ export const currencyApi = {
   update: (id: string, data: UpdateCurrencyRequest) =>
     apiClient.put(`${BASE}/${id}`, { id, ...data }),
   delete: (id: string) => apiClient.delete(`${BASE}/${id}`),
+  syncRates: () => apiClient.post(`${BASE}/fetch-rates`),
+  getExchangeRateSettings: () =>
+    apiClient.get<{ data: { autoSync: boolean } }>(`${BASE}/exchange-rate-settings`).then((r) => r.data.data),
+  updateExchangeRateSettings: (autoSync: boolean) =>
+    apiClient.put(`${BASE}/exchange-rate-settings`, { autoSync }),
 };

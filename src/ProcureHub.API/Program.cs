@@ -135,7 +135,7 @@ try
 
     await app.ApplyMigrationsAsync();
     await app.SeedMasterDataAsync();
-    app.RegisterHangfireJobs();
+    await app.RegisterHangfireJobsAsync();
 
     await app.RunAsync();
 }
