@@ -109,6 +109,25 @@ export const vendorApi = {
 
   deleteDocument: (vendorId: string, documentId: string) =>
     apiClient.delete(`${BASE}/${vendorId}/documents/${documentId}`),
+
+  getDocumentDownloadUrl: (vendorId: string, documentId: string) =>
+    apiClient
+      .get<{ data: { url: string } }>(`${BASE}/${vendorId}/documents/${documentId}/download`)
+      .then((r) => r.data.data.url),
+
+  addCapability: (
+    vendorId: string,
+    payload: { materialCategoryId: string; minOrderQty?: number | null; leadTimeDays?: number | null; notes?: string | null }
+  ) => apiClient.post(`${BASE}/${vendorId}/capabilities`, payload),
+
+  updateCapability: (
+    vendorId: string,
+    capabilityId: string,
+    payload: { minOrderQty?: number | null; leadTimeDays?: number | null; notes?: string | null }
+  ) => apiClient.put(`${BASE}/${vendorId}/capabilities/${capabilityId}`, payload),
+
+  deleteCapability: (vendorId: string, capabilityId: string) =>
+    apiClient.delete(`${BASE}/${vendorId}/capabilities/${capabilityId}`),
 };
 
 export const vendorRegistrationApi = {

@@ -3,13 +3,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub.API.Security;
 using ProcureHub.Modules.MasterData.Application.Queries.GetDocumentTypeList;
+using ProcureHub.Modules.VendorManagement.Application.Commands.AddVendorCapability;
 using ProcureHub.Modules.VendorManagement.Application.Commands.ApproveVendor;
 using ProcureHub.Modules.VendorManagement.Application.Commands.BlacklistVendor;
+using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorCapability;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Commands.ReinstateVendor;
 using ProcureHub.Modules.VendorManagement.Application.Commands.SuspendVendor;
+using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendorCapability;
 using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
+using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocumentDownloadUrl;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocuments;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorList;
 using ProcureHub.SharedKernel.Abstractions;
@@ -169,9 +173,61 @@ public class VendorsController : ControllerBase
         await _mediator.Send(new DeleteVendorDocumentCommand(documentId, deletedById), ct);
         return Ok(ApiResponse.Ok("Document deleted."));
     }
+
+    /// <summary>Get a presigned download URL for a vendor document (valid 15 min).</summary>
+    [HttpGet("{id:guid}/documents/{documentId:guid}/download")]
+    public async Task<ActionResult<ApiResponse<object>>> GetDocumentDownloadUrl(
+        Guid id, Guid documentId, CancellationToken ct)
+    {
+        var url = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(id, documentId), ct);
+        return Ok(ApiResponse.Ok(new { url }));
+    }
+
+    /// <summary>Add a capability (approved supply category) to a vendor.</summary>
+    [HttpPost("{id:guid}/capabilities")]
+    [Authorize(Policy = "RequireMasterData")]
+    public async Task<ActionResult<ApiResponse<object>>> AddCapability(
+        Guid id, [FromBody] AddCapabilityRequest request, CancellationToken ct)
+    {
+        var capId = await _mediator.Send(new AddVendorCapabilityCommand(
+            id, request.MaterialCategoryId, request.MinOrderQty, request.LeadTimeDays, request.Notes), ct);
+        return CreatedAtAction(nameof(GetById), new { id }, ApiResponse.Ok(new { id = capId }));
+    }
+
+    /// <summary>Update a vendor capability's operational details.</summary>
+    [HttpPut("{id:guid}/capabilities/{capabilityId:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
+    public async Task<ActionResult<ApiResponse<object>>> UpdateCapability(
+        Guid id, Guid capabilityId, [FromBody] UpdateCapabilityRequest request, CancellationToken ct)
+    {
+        await _mediator.Send(new UpdateVendorCapabilityCommand(
+            capabilityId, request.MinOrderQty, request.LeadTimeDays, request.Notes), ct);
+        return Ok(ApiResponse.Ok("Capability updated."));
+    }
+
+    /// <summary>Remove a capability from a vendor.</summary>
+    [HttpDelete("{id:guid}/capabilities/{capabilityId:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteCapability(
+        Guid id, Guid capabilityId, CancellationToken ct)
+    {
+        await _mediator.Send(new DeleteVendorCapabilityCommand(capabilityId), ct);
+        return Ok(ApiResponse.Ok("Capability removed."));
+    }
 }
 
 public record BlacklistRequest(string Reason);
+
+public record AddCapabilityRequest(
+    Guid     MaterialCategoryId,
+    decimal? MinOrderQty,
+    int?     LeadTimeDays,
+    string?  Notes);
+
+public record UpdateCapabilityRequest(
+    decimal? MinOrderQty,
+    int?     LeadTimeDays,
+    string?  Notes);
 
 public class UploadDocumentRequest
 {

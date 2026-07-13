@@ -10,9 +10,10 @@ public static class VendorManagementModule
 {
     public static IServiceCollection AddVendorManagementServices(this IServiceCollection services)
     {
-        services.AddScoped<IVendorRepository,         VendorRepository>();
-        services.AddScoped<IVendorDocumentRepository, VendorDocumentRepository>();
-        services.AddScoped<IVendorScoreRepository,    VendorScoreRepository>();
+        services.AddScoped<IVendorRepository,           VendorRepository>();
+        services.AddScoped<IVendorDocumentRepository,   VendorDocumentRepository>();
+        services.AddScoped<IVendorCapabilityRepository, VendorCapabilityRepository>();
+        services.AddScoped<IVendorScoreRepository,      VendorScoreRepository>();
 
         services.AddScoped<IStorageService,           SeaweedFsStorageService>();
 
