@@ -182,13 +182,19 @@ export function CurrencyFormModal({ open, id, onClose }: Props) {
               {' '}to{' '}
               <span className="font-semibold text-foreground">{newBaseCode}</span>.
             </p>
+            <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+              <p className="font-medium">Will update automatically:</p>
+              <ul className="list-disc list-inside mt-1 space-y-0.5 text-emerald-700">
+                <li>All exchange rates will be re-synced to the new base</li>
+              </ul>
+            </div>
             <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 space-y-1">
-              <p className="font-medium">Things that will NOT update automatically:</p>
+              <p className="font-medium">Will NOT update automatically:</p>
               <ul className="list-disc list-inside space-y-0.5 text-amber-700">
                 <li>Approval policy thresholds (min/max values)</li>
                 <li>Existing purchase orders and contracts</li>
               </ul>
-              <p className="mt-2">You must manually review and update approval policy amounts after this change.</p>
+              <p className="mt-2">Manually review and update approval policy amounts after this change.</p>
             </div>
             <div className="flex justify-end gap-2 pt-1">
               <Button
