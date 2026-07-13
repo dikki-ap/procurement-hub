@@ -13,6 +13,7 @@ import { fulfillmentApi, type CreatePOPayload } from '../api/fulfillmentApi';
 import { vendorApi } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
 import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -35,7 +36,8 @@ export function NewPOModal({ open, onClose }: Props) {
   const base = useBaseCurrency();
   const sym       = base?.symbol ?? base?.code ?? '?';
 
-  const [items, setItems] = useState<ItemRow[]>([emptyItem()]);
+  const [items, setItems]       = useState<ItemRow[]>([emptyItem()]);
+  const [vendorId, setVendorId] = useState('');
 
   const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors', COMPANY_ID],
@@ -49,6 +51,7 @@ export function NewPOModal({ open, onClose }: Props) {
       qc.invalidateQueries({ queryKey: ['purchase-orders'] });
       toast.success('Purchase Order created', { duration: 3000 });
       setItems([emptyItem()]);
+      setVendorId('');
       onClose();
     },
     onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to create PO')),
@@ -81,7 +84,7 @@ export function NewPOModal({ open, onClose }: Props) {
   const isPending = mutation.isPending;
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v && !isPending) { setItems([emptyItem()]); onClose(); } }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v && !isPending) { setItems([emptyItem()]); setVendorId(''); onClose(); } }}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New Purchase Order</DialogTitle>
@@ -91,14 +94,14 @@ export function NewPOModal({ open, onClose }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="col-span-1 sm:col-span-2">
               <label className="block text-sm font-medium mb-1">Vendor <span className="text-red-500">*</span></label>
-              <select name="vendorId" required className={inputCls}>
-                <option value="">Select vendor...</option>
-                {vendors.map(v => (
-                  <option key={v.id} value={v.id}>
-                    {v.tradeName ?? v.legalName} ({v.vendorCode})
-                  </option>
-                ))}
-              </select>
+              <input type="hidden" name="vendorId" value={vendorId} />
+              <SearchableSelect
+                options={vendors.map(v => ({ value: v.id, label: `${v.tradeName ?? v.legalName} (${v.vendorCode})` }))}
+                value={vendorId}
+                onChange={setVendorId}
+                placeholder="Select vendor..."
+                className={inputCls}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Expected Delivery</label>

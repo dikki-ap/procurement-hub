@@ -7,6 +7,7 @@ import {
 import { LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { analyticsApi, type DashboardWidgets, type VendorDashboardWidgets } from '../api/analyticsApi';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -34,6 +35,8 @@ export default function AnalyticsDashboardPage() {
   const { user } = useAuthStore();
   const isVendor = user?.roles?.includes('vendor') ?? false;
   const companyId = user?.companyId ?? '';
+  const base = useBaseCurrency();
+  const sym  = base?.symbol ?? base?.code ?? '?';
 
   const { data: widgets } = useQuery({
     queryKey: ['analytics-widgets', companyId],
@@ -104,7 +107,7 @@ export default function AnalyticsDashboardPage() {
 
       {/* Widget row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard label="Spend This Month"   value={`Rp ${fmt(w?.spendThisMonth ?? 0)}`} />
+        <StatCard label="Spend This Month"   value={`${sym} ${fmt(w?.spendThisMonth ?? 0)}`} />
         <StatCard label="Pending Approvals"  value={String(w?.pendingApprovals ?? 0)} />
         <StatCard label="Active POs"         value={String(w?.activePOs ?? 0)} />
         <StatCard label="Pending Invoices"   value={String(w?.pendingInvoices ?? 0)} />
@@ -117,10 +120,10 @@ export default function AnalyticsDashboardPage() {
       {spend && (
         <div className="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-base">Monthly Spend (Rp)</h2>
+            <h2 className="font-semibold text-base">Monthly Spend ({sym})</h2>
             <div className="text-xs text-muted-foreground space-x-4">
-              <span>This year: <strong>Rp {fmt(spend.totalThisYear)}</strong></span>
-              <span>Last year: <strong>Rp {fmt(spend.totalLastYear)}</strong></span>
+              <span>This year: <strong>{sym} {fmt(spend.totalThisYear)}</strong></span>
+              <span>Last year: <strong>{sym} {fmt(spend.totalLastYear)}</strong></span>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={240}>
@@ -134,7 +137,7 @@ export default function AnalyticsDashboardPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `${(v / 1_000_000).toFixed(0)}M`} />
-              <Tooltip formatter={(v: number) => `Rp ${fmt(v)}`} />
+              <Tooltip formatter={(v: number) => `${sym} ${fmt(v)}`} />
               <Area type="monotone" dataKey="amount" stroke="#3b82f6" fill="url(#spendGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
@@ -217,7 +220,7 @@ export default function AnalyticsDashboardPage() {
                     <td className="py-2 pr-4">{v.totalScore.toFixed(1)}</td>
                     <td className="py-2 pr-4">{v.deliveryScore.toFixed(0)}</td>
                     <td className="py-2 pr-4">{v.qualityScore.toFixed(0)}</td>
-                    <td className="py-2 pr-4">Rp {fmt(v.totalSpend)}</td>
+                    <td className="py-2 pr-4">{sym} {fmt(v.totalSpend)}</td>
                     <td className="py-2">{v.pOCount}</td>
                   </tr>
                 ))}

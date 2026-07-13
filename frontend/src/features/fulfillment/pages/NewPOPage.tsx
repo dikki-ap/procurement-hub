@@ -8,6 +8,7 @@ import { fulfillmentApi, type CreatePOPayload } from '../api/fulfillmentApi';
 import { vendorApi } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
 import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
+import { SearchableSelect } from '@/shared/components/SearchableSelect';
 
 const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -26,7 +27,8 @@ export default function NewPOPage() {
   const base      = useBaseCurrency();
   const sym       = base?.symbol ?? base?.code ?? '?';
 
-  const [items, setItems] = useState<ItemRow[]>([emptyItem()]);
+  const [items, setItems]       = useState<ItemRow[]>([emptyItem()]);
+  const [vendorId, setVendorId] = useState('');
 
   const { data: allVendors = [] } = useQuery({
     queryKey: ['vendors', COMPANY_ID],
@@ -81,14 +83,14 @@ export default function NewPOPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-1">Vendor *</label>
-            <select name="vendorId" required className={inputCls}>
-              <option value="">Select vendor...</option>
-              {vendors.map(v => (
-                <option key={v.id} value={v.id}>
-                  {v.tradeName ?? v.legalName} ({v.vendorCode})
-                </option>
-              ))}
-            </select>
+            <input type="hidden" name="vendorId" value={vendorId} />
+            <SearchableSelect
+              options={vendors.map(v => ({ value: v.id, label: `${v.tradeName ?? v.legalName} (${v.vendorCode})` }))}
+              value={vendorId}
+              onChange={setVendorId}
+              placeholder="Select vendor..."
+              className={inputCls}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Expected Delivery</label>
