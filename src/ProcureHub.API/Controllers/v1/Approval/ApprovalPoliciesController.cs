@@ -2,6 +2,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub.Modules.ApprovalEngine.Application.Commands.CreateApprovalPolicy;
+using ProcureHub.Modules.ApprovalEngine.Application.Commands.DeleteApprovalPolicy;
+using ProcureHub.Modules.ApprovalEngine.Application.Commands.UpdateApprovalPolicy;
 using ProcureHub.Modules.ApprovalEngine.Application.Queries.GetApprovalPolicies;
 using ProcureHub.SharedKernel.Common;
 
@@ -33,5 +35,22 @@ public class ApprovalPoliciesController : ControllerBase
     {
         var id = await _mediator.Send(command, ct);
         return Ok(ApiResponse.Ok(id));
+    }
+
+    /// <summary>Update an existing approval policy.</summary>
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> Update(
+        Guid id, [FromBody] UpdateApprovalPolicyCommand command, CancellationToken ct)
+    {
+        await _mediator.Send(command with { Id = id }, ct);
+        return Ok(ApiResponse.Ok("Policy updated."));
+    }
+
+    /// <summary>Delete an approval policy.</summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken ct)
+    {
+        await _mediator.Send(new DeleteApprovalPolicyCommand(id), ct);
+        return Ok(ApiResponse.Ok("Policy deleted."));
     }
 }

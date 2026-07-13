@@ -91,5 +91,13 @@ export const approvalApi = {
     companyId: string; referenceType: string; name: string;
     minValue: number; maxValue?: number; requiredLevels: number;
     isStrategicOverride: boolean; isSingleSourceOverride: boolean;
-  }) => apiClient.post<string>('/approval-policies', data),
+  }) => apiClient.post('/approval-policies', data),
+
+  updatePolicy: (id: string, data: {
+    name: string; referenceType: string;
+    minValue: number; maxValue?: number; requiredLevels: number;
+    isStrategicOverride: boolean; isSingleSourceOverride: boolean; isActive: boolean;
+  }) => apiClient.put(`/approval-policies/${id}`, { id, ...data }),
+
+  deletePolicy: (id: string) => apiClient.delete(`/approval-policies/${id}`),
 };

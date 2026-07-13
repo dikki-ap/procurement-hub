@@ -1,16 +1,13 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Shield, Plus } from 'lucide-react';
+import { Shield, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { approvalApi } from '../api/approvalApi';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
+import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
+import { approvalApi, type ApprovalPolicyDto } from '../api/approvalApi';
 import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/shared/lib/apiError';
 
@@ -25,21 +22,48 @@ const EMPTY_FORM = {
   requiredLevels: '1',
   isStrategicOverride: false,
   isSingleSourceOverride: false,
+  isActive: true,
 };
+
+type FormState = typeof EMPTY_FORM;
+type ModalState = { mode: 'add' } | { mode: 'edit'; policy: ApprovalPolicyDto } | null;
+
+const StatusBadge = ({ active }: { active: boolean }) => (
+  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+    {active ? 'Active' : 'Inactive'}
+  </span>
+);
 
 export default function ApprovalPoliciesPage() {
   const queryClient = useQueryClient();
   const { user }    = useAuthStore();
   const companyId   = user?.companyId ?? '';
 
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [modal, setModal]             = useState<ModalState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ApprovalPolicyDto | null>(null);
+  const [form, setForm]               = useState<FormState>(EMPTY_FORM);
 
   const { data: policies = [], isLoading } = useQuery({
     queryKey: ['approval-policies', companyId],
     queryFn:  () => approvalApi.getPolicies(companyId),
     enabled:  !!companyId,
   });
+
+  const openAdd = () => { setForm(EMPTY_FORM); setModal({ mode: 'add' }); };
+  const openEdit = (p: ApprovalPolicyDto) => {
+    setForm({
+      referenceType:          p.referenceType,
+      name:                   p.name,
+      minValue:               String(p.minValue),
+      maxValue:               p.maxValue != null ? String(p.maxValue) : '',
+      requiredLevels:         String(p.requiredLevels),
+      isStrategicOverride:    p.isStrategicOverride,
+      isSingleSourceOverride: p.isSingleSourceOverride,
+      isActive:               p.isActive,
+    });
+    setModal({ mode: 'edit', policy: p });
+  };
+  const closeModal = () => setModal(null);
 
   const createMut = useMutation({
     mutationFn: () => approvalApi.createPolicy({
@@ -54,18 +78,72 @@ export default function ApprovalPoliciesPage() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['approval-policies', companyId] });
-      toast.success('Policy created.', { duration: 3000 });
-      setShowModal(false);
-      setForm(EMPTY_FORM);
+      toast.success('Policy created.');
+      closeModal();
     },
-    onError: (error: unknown) => toast.error(extractApiError(error, 'Failed to create policy')),
+    onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to create policy')),
   });
 
-  if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;
+  const updateMut = useMutation({
+    mutationFn: () => {
+      const p = (modal as { mode: 'edit'; policy: ApprovalPolicyDto }).policy;
+      return approvalApi.updatePolicy(p.id, {
+        referenceType:          form.referenceType,
+        name:                   form.name,
+        minValue:               parseFloat(form.minValue),
+        maxValue:               form.maxValue ? parseFloat(form.maxValue) : undefined,
+        requiredLevels:         parseInt(form.requiredLevels),
+        isStrategicOverride:    form.isStrategicOverride,
+        isSingleSourceOverride: form.isSingleSourceOverride,
+        isActive:               form.isActive,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['approval-policies', companyId] });
+      toast.success('Policy updated.');
+      closeModal();
+    },
+    onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to update policy')),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: (id: string) => approvalApi.deletePolicy(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['approval-policies', companyId] });
+      toast.success('Policy deleted.');
+      setDeleteTarget(null);
+    },
+    onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to delete policy')),
+  });
+
+  const isEdit    = modal?.mode === 'edit';
+  const isPending = createMut.isPending || updateMut.isPending;
+  const onSubmit  = () => isEdit ? updateMut.mutate() : createMut.mutate();
+
+  const columns: DataTableColumn<ApprovalPolicyDto>[] = [
+    { key: 'name',          header: 'Policy Name', sortable: true,
+      render: (r) => <span className="font-medium">{r.name}</span> },
+    { key: 'referenceType', header: 'Type', sortable: true,
+      render: (r) => <span className="text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">{r.referenceType}</span> },
+    { key: 'minValue',      header: 'Min Value',
+      render: (r) => <span className="text-xs text-slate-600">Rp {fmt(r.minValue)}</span> },
+    { key: 'maxValue',      header: 'Max Value',
+      render: (r) => <span className="text-xs text-slate-600">{r.maxValue != null ? `Rp ${fmt(r.maxValue)}` : '∞'}</span> },
+    { key: 'requiredLevels', header: 'Levels',
+      render: (r) => <span className="font-medium text-center block">{r.requiredLevels}</span> },
+    { key: 'isStrategicOverride', header: 'Overrides',
+      render: (r) => (
+        <span className="text-xs text-slate-500">
+          {[r.isStrategicOverride && 'Strategic', r.isSingleSourceOverride && 'Single Source']
+            .filter(Boolean).join(', ') || '—'}
+        </span>
+      ) },
+    { key: 'isActive', header: 'Status', render: (r) => <StatusBadge active={r.isActive} /> },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           <div>
@@ -73,50 +151,38 @@ export default function ApprovalPoliciesPage() {
             <p className="text-sm text-muted-foreground hidden sm:block">Configure multi-level approval rules</p>
           </div>
         </div>
-        <Button size="sm" onClick={() => setShowModal(true)}>
-          <Plus className="h-4 w-4 mr-1" /> Add Policy
+        <Button size="sm" onClick={openAdd} className="gap-1">
+          <Plus className="h-4 w-4" /> Add Policy
         </Button>
       </div>
 
-      {policies.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No policies configured yet. Add one to enable multi-level approvals.</p>
-      ) : (
-        <div className="rounded-md border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                {['Policy Name', 'Type', 'Min Value', 'Max Value', 'Levels', 'Overrides', 'Active'].map(h => (
-                  <th key={h} className="px-3 py-2 text-left font-medium text-muted-foreground">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {policies.map(p => (
-                <tr key={p.id} className="border-t">
-                  <td className="px-3 py-2 font-medium">{p.name}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{p.referenceType}</td>
-                  <td className="px-3 py-2">Rp {fmt(p.minValue)}</td>
-                  <td className="px-3 py-2">{p.maxValue ? `Rp ${fmt(p.maxValue)}` : '∞'}</td>
-                  <td className="px-3 py-2 text-center font-medium">{p.requiredLevels}</td>
-                  <td className="px-3 py-2 text-xs text-muted-foreground">
-                    {[p.isStrategicOverride && 'Strategic', p.isSingleSourceOverride && 'SingleSource'].filter(Boolean).join(', ') || '—'}
-                  </td>
-                  <td className="px-3 py-2">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${p.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {p.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        data={policies as unknown as Record<string, unknown>[]}
+        columns={columns as DataTableColumn<Record<string, unknown>>[]}
+        isLoading={isLoading}
+        searchPlaceholder="Search policies..."
+        emptyMessage="No approval policies configured yet."
+        rowActions={(row) => {
+          const p = row as unknown as ApprovalPolicyDto;
+          return (
+            <>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600"
+                onClick={() => setDeleteTarget(p)}>
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </>
+          );
+        }}
+      />
 
-      <Dialog open={showModal} onOpenChange={(v) => { if (!v && !createMut.isPending) { setShowModal(false); setForm(EMPTY_FORM); } }}>
+      {/* Add / Edit modal */}
+      <Dialog open={modal !== null} onOpenChange={(v) => { if (!v && !isPending) closeModal(); }}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Add Approval Policy</DialogTitle>
+            <DialogTitle>{isEdit ? 'Edit Approval Policy' : 'Add Approval Policy'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -162,17 +228,31 @@ export default function ApprovalPoliciesPage() {
                 </div>
               </div>
             </div>
+            {isEdit && (
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="isActive" checked={form.isActive}
+                  onChange={e => setForm(p => ({ ...p, isActive: e.target.checked }))} />
+                <label htmlFor="isActive" className="text-sm cursor-pointer">Active</label>
+              </div>
+            )}
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => { setShowModal(false); setForm(EMPTY_FORM); }} disabled={createMut.isPending}>
-                Cancel
-              </Button>
-              <Button onClick={() => createMut.mutate()} disabled={createMut.isPending || !form.name}>
-                {createMut.isPending ? 'Saving…' : 'Save Policy'}
+              <Button variant="outline" onClick={closeModal} disabled={isPending}>Cancel</Button>
+              <Button onClick={onSubmit} disabled={isPending || !form.name}>
+                {isPending ? 'Saving…' : isEdit ? 'Update' : 'Save Policy'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteModal
+        open={deleteTarget !== null}
+        title="Delete Approval Policy"
+        description={`Delete "${deleteTarget?.name}"? This cannot be undone.`}
+        isPending={deleteMut.isPending}
+        onConfirm={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

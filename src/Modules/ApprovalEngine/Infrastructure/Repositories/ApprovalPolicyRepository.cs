@@ -28,5 +28,6 @@ public class ApprovalPolicyRepository : IApprovalPolicyRepository
 
     public void Add(ApprovalPolicy policy)    => _db.Set<ApprovalPolicy>().Add(policy);
     public void Update(ApprovalPolicy policy) => _db.Set<ApprovalPolicy>().Update(policy);
+    public void Remove(ApprovalPolicy policy) => _db.Set<ApprovalPolicy>().Remove(policy);
     public Task<int> SaveChangesAsync(CancellationToken ct = default) => _db.SaveChangesAsync(ct);
 }
