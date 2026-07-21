@@ -14,6 +14,7 @@ public class VendorCapabilityConfiguration : BaseAuditableEntityConfiguration<Ve
         builder.ToTable("vendor_capabilities");
 
         builder.Property(e => e.MinOrderQty).HasColumnType("DECIMAL(18,4)");
+        builder.Property(e => e.MaxOrderQty).HasColumnType("DECIMAL(18,4)");
         builder.Property(e => e.Uom).HasMaxLength(20);
         builder.Property(e => e.Notes).HasColumnType("TEXT");
 

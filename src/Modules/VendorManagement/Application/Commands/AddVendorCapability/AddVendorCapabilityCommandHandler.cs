@@ -36,8 +36,11 @@ public class AddVendorCapabilityCommandHandler : ICommandHandler<AddVendorCapabi
             VendorId           = vendor.Id,
             MaterialCategoryId = command.MaterialCategoryId,
             MinOrderQty        = command.MinOrderQty,
+            MaxOrderQty        = command.MaxOrderQty,
             Uom                = command.Uom,
             LeadTimeDays       = command.LeadTimeDays,
+            EffectiveDate      = command.EffectiveDate,
+            ExpiryDate         = command.ExpiryDate,
             Notes              = command.Notes,
         };
 

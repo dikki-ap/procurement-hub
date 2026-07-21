@@ -25,24 +25,32 @@ public record VendorDto(
 );
 
 public record VendorDetailDto(
-    Guid                       Id,
-    string                     VendorCode,
-    string                     LegalName,
-    string?                    TradeName,
-    string?                    Npwp,
-    string?                    Siup,
-    string?                    Nib,
-    VendorType                 VendorType,
-    VendorStatus               Status,
-    VendorTier                 Tier,
-    decimal                    Score,
-    bool                       IsBlacklisted,
-    string?                    BlacklistReason,
-    DateTime?                  ApprovedAt,
-    DateTime                   CreatedAt,
-    List<VendorContactDto>     Contacts,
-    List<VendorDocumentDto>    Documents,
-    List<VendorCapabilityDto>  Capabilities
+    Guid                          Id,
+    string                        VendorCode,
+    string                        LegalName,
+    string?                       TradeName,
+    string?                       Npwp,
+    string?                       Siup,
+    string?                       Nib,
+    string?                       Address,
+    string?                       City,
+    string?                       Province,
+    string?                       PostalCode,
+    string?                       Country,
+    Guid?                         DefaultPaymentTermId,
+    Guid?                         DefaultCurrencyId,
+    VendorType                    VendorType,
+    VendorStatus                  Status,
+    VendorTier                    Tier,
+    decimal                       Score,
+    bool                          IsBlacklisted,
+    string?                       BlacklistReason,
+    DateTime?                     ApprovedAt,
+    DateTime                      CreatedAt,
+    List<VendorContactDto>        Contacts,
+    List<VendorDocumentDto>       Documents,
+    List<VendorCapabilityDto>     Capabilities,
+    List<VendorBankAccountDto>    BankAccounts
 );
 
 public record VendorContactDto(
@@ -68,10 +76,25 @@ public record VendorDocumentDto(
 );
 
 public record VendorCapabilityDto(
-    Guid     Id,
-    Guid     MaterialCategoryId,
-    decimal? MinOrderQty,
-    string?  Uom,
-    int?     LeadTimeDays,
-    string?  Notes
+    Guid      Id,
+    Guid      MaterialCategoryId,
+    decimal?  MinOrderQty,
+    decimal?  MaxOrderQty,
+    string?   Uom,
+    int?      LeadTimeDays,
+    DateOnly? EffectiveDate,
+    DateOnly? ExpiryDate,
+    bool      IsExpired,
+    string?   Notes
+);
+
+public record VendorBankAccountDto(
+    Guid    Id,
+    string  BankName,
+    string  AccountNumber,
+    string  AccountName,
+    string? BranchName,
+    string  Currency,
+    bool    IsDefault,
+    string? Notes
 );

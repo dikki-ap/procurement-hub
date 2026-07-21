@@ -28,6 +28,7 @@ public class VendorRepository : IVendorRepository
               .Include(v => v.Contacts)
               .Include(v => v.Documents)
               .Include(v => v.Capabilities)
+              .Include(v => v.BankAccounts)
               .FirstOrDefaultAsync(v => v.Id == id, ct);
 
     public Task<List<Vendor>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)

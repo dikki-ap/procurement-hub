@@ -24,6 +24,14 @@ public class VendorCapabilityRepository : IVendorCapabilityRepository
         => _db.Set<VendorCapability>()
               .AnyAsync(c => c.VendorId == vendorId && c.MaterialCategoryId == materialCategoryId, ct);
 
+    public Task<List<VendorCapability>> GetExpiredAsync(CancellationToken ct = default)
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        return _db.Set<VendorCapability>()
+                  .Where(c => c.ExpiryDate.HasValue && c.ExpiryDate.Value < today && !c.IsExpired)
+                  .ToListAsync(ct);
+    }
+
     public void Add(VendorCapability capability)    => _db.Set<VendorCapability>().Add(capability);
     public void Update(VendorCapability capability) => _db.Set<VendorCapability>().Update(capability);
     public void Remove(VendorCapability capability) => _db.Set<VendorCapability>().Remove(capability);

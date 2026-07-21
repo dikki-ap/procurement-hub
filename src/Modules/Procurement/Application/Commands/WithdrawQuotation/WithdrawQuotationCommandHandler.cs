@@ -16,9 +16,13 @@ public class WithdrawQuotationCommandHandler : ICommandHandler<WithdrawQuotation
         var quotation = await _repo.GetByIdWithItemsAsync(command.QuotationId, ct)
                         ?? throw new NotFoundException("VendorQuotation", command.QuotationId);
 
+        if (quotation.VendorId != command.RequestingVendorId)
+            throw new ForbiddenException("You are not authorised to withdraw this quotation.");
+
         quotation.Withdraw();
         _repo.Update(quotation);
         await _repo.SaveChangesAsync(ct);
+
         return Unit.Value;
     }
 }

@@ -49,6 +49,12 @@ public static class HangfireExtensions
             "0 0 * * *",
             new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
 
+        RecurringJob.AddOrUpdate<CapabilityExpiryCheckJob>(
+            "capability-expiry-check",
+            job => job.ExecuteAsync(CancellationToken.None),
+            "5 0 * * *",
+            new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
+
         RecurringJob.AddOrUpdate<BidDeadlineReminderJob>(
             "bid-deadline-reminder",
             job => job.ExecuteAsync(CancellationToken.None),

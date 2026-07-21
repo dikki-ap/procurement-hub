@@ -1,10 +1,10 @@
 using ProcureHub.Modules.VendorManagement.Domain.Enums;
 using ProcureHub.SharedKernel.CQRS;
 
-namespace ProcureHub.Modules.VendorManagement.Application.Commands.RegisterVendor;
+namespace ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendor;
 
-public record RegisterVendorCommand(
-    Guid       CompanyId,
+public record UpdateVendorCommand(
+    Guid       VendorId,
     string     LegalName,
     string?    TradeName,
     VendorType VendorType,
@@ -16,8 +16,5 @@ public record RegisterVendorCommand(
     string?    Province,
     string?    PostalCode,
     string?    Country,
-    string     ContactName,
-    string?    ContactPosition,
-    string     ContactEmail,
-    string?    ContactPhone
-) : ICommand<Guid>;
+    Guid?      DefaultPaymentTermId,
+    Guid?      DefaultCurrencyId) : ICommand;

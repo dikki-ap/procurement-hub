@@ -19,6 +19,14 @@ public class VendorConfiguration : BaseSoftDeleteEntityConfiguration<Vendor>
         builder.Property(e => e.Npwp).HasMaxLength(30);
         builder.Property(e => e.Siup).HasMaxLength(50);
         builder.Property(e => e.Nib).HasMaxLength(30);
+        builder.Property(e => e.Address).HasColumnType("TEXT");
+        builder.Property(e => e.City).HasMaxLength(100);
+        builder.Property(e => e.Province).HasMaxLength(100);
+        builder.Property(e => e.PostalCode).HasMaxLength(10);
+        builder.Property(e => e.Country).HasMaxLength(100);
+        // Cross-module FK columns — no EF navigation, resolved by application layer
+        builder.Property(e => e.DefaultPaymentTermId);
+        builder.Property(e => e.DefaultCurrencyId);
         builder.Property(e => e.VendorType).HasConversion<string>().HasMaxLength(30);
         builder.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
         builder.Property(e => e.Tier).HasConversion<string>().HasMaxLength(20);
@@ -49,6 +57,11 @@ public class VendorConfiguration : BaseSoftDeleteEntityConfiguration<Vendor>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(e => e.Users)
+            .WithOne(e => e.Vendor)
+            .HasForeignKey(e => e.VendorId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(e => e.BankAccounts)
             .WithOne(e => e.Vendor)
             .HasForeignKey(e => e.VendorId)
             .OnDelete(DeleteBehavior.Cascade);

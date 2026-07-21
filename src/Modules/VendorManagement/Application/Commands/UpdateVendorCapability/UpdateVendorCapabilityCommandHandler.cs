@@ -23,8 +23,11 @@ public class UpdateVendorCapabilityCommandHandler : ICommandHandler<UpdateVendor
             ?? throw new NotFoundException("VendorCapability", command.CapabilityId);
 
         capability.MinOrderQty  = command.MinOrderQty;
+        capability.MaxOrderQty  = command.MaxOrderQty;
         capability.Uom          = command.Uom;
         capability.LeadTimeDays = command.LeadTimeDays;
+        capability.EffectiveDate = command.EffectiveDate;
+        capability.ExpiryDate   = command.ExpiryDate;
         capability.Notes        = command.Notes;
 
         _capRepo.Update(capability);

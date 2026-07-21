@@ -14,7 +14,14 @@ public class Vendor : AggregateRoot
     public string?      Npwp             { get; set; }
     public string?      Siup             { get; set; }
     public string?      Nib              { get; set; }
-    public VendorType   VendorType       { get; set; }
+    public string?      Address          { get; set; }
+    public string?      City             { get; set; }
+    public string?      Province         { get; set; }
+    public string?      PostalCode       { get; set; }
+    public string?      Country              { get; set; }
+    public Guid?        DefaultPaymentTermId { get; set; }
+    public Guid?        DefaultCurrencyId    { get; set; }
+    public VendorType   VendorType           { get; set; }
     public VendorStatus Status           { get; set; } = VendorStatus.Pending;
     public VendorTier   Tier             { get; set; } = VendorTier.Bronze;
     public decimal      Score            { get; set; } = 0;
@@ -27,11 +34,12 @@ public class Vendor : AggregateRoot
     public string?      KeycloakGroupId  { get; set; }
 
     // Navigation
-    public ICollection<VendorContact>    Contacts     { get; set; } = [];
-    public ICollection<VendorDocument>   Documents    { get; set; } = [];
-    public ICollection<VendorCapability> Capabilities { get; set; } = [];
-    public ICollection<VendorScore>      Scores       { get; set; } = [];
-    public ICollection<VendorUser>       Users        { get; set; } = [];
+    public ICollection<VendorContact>     Contacts     { get; set; } = [];
+    public ICollection<VendorDocument>    Documents    { get; set; } = [];
+    public ICollection<VendorCapability>  Capabilities { get; set; } = [];
+    public ICollection<VendorScore>       Scores       { get; set; } = [];
+    public ICollection<VendorUser>        Users        { get; set; } = [];
+    public ICollection<VendorBankAccount> BankAccounts { get; set; } = [];
 
     // ── Domain methods ──────────────────────────────────────────────────────
 

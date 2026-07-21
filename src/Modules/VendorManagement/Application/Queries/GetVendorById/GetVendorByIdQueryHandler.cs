@@ -37,6 +37,13 @@ public class GetVendorByIdQueryHandler : IQueryHandler<GetVendorByIdQuery, Vendo
         v.Npwp,
         v.Siup,
         v.Nib,
+        v.Address,
+        v.City,
+        v.Province,
+        v.PostalCode,
+        v.Country,
+        v.DefaultPaymentTermId,
+        v.DefaultCurrencyId,
         v.VendorType,
         v.Status,
         v.Tier,
@@ -51,5 +58,8 @@ public class GetVendorByIdQueryHandler : IQueryHandler<GetVendorByIdQuery, Vendo
             d.Id, d.DocumentType, d.DocumentNumber, d.FileUrl, d.FileName,
             d.FileSize, d.ExpiredAt, d.IssuedAt, d.Status, d.Notes)).ToList(),
         v.Capabilities.Select(cap => new VendorCapabilityDto(
-            cap.Id, cap.MaterialCategoryId, cap.MinOrderQty, cap.Uom, cap.LeadTimeDays, cap.Notes)).ToList());
+            cap.Id, cap.MaterialCategoryId, cap.MinOrderQty, cap.MaxOrderQty, cap.Uom,
+            cap.LeadTimeDays, cap.EffectiveDate, cap.ExpiryDate, cap.IsExpired, cap.Notes)).ToList(),
+        v.BankAccounts.Select(b => new VendorBankAccountDto(
+            b.Id, b.BankName, b.AccountNumber, b.AccountName, b.BranchName, b.Currency, b.IsDefault, b.Notes)).ToList());
 }

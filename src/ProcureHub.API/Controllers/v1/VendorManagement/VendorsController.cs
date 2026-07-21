@@ -2,9 +2,14 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub.API.Security;
+using ProcureHub.Modules.VendorManagement.Domain.Enums;
 using ProcureHub.Modules.MasterData.Application.Queries.GetDocumentTypeList;
+using ProcureHub.Modules.VendorManagement.Application.Commands.AddVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.AddVendorCapability;
 using ProcureHub.Modules.VendorManagement.Application.Commands.ApproveVendor;
+using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendor;
+using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorBankAccount;
+using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.BlacklistVendor;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorCapability;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocument;
@@ -60,6 +65,20 @@ public class VendorsController : ControllerBase
     {
         var result = await _mediator.Send(new GetVendorDocumentsQuery(id), ct);
         return Ok(ApiResponse.Ok(result));
+    }
+
+    /// <summary>Update vendor basic information.</summary>
+    [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
+    public async Task<ActionResult<ApiResponse<object>>> Update(
+        Guid id, [FromBody] UpdateVendorRequest request, CancellationToken ct)
+    {
+        await _mediator.Send(new UpdateVendorCommand(
+            id, request.LegalName, request.TradeName, request.VendorType,
+            request.Npwp, request.Siup, request.Nib,
+            request.Address, request.City, request.Province, request.PostalCode, request.Country,
+            request.DefaultPaymentTermId, request.DefaultCurrencyId), ct);
+        return Ok(ApiResponse.Ok("Vendor updated."));
     }
 
     /// <summary>Approve a pending vendor.</summary>
@@ -192,7 +211,8 @@ public class VendorsController : ControllerBase
         Guid id, [FromBody] AddCapabilityRequest request, CancellationToken ct)
     {
         var capId = await _mediator.Send(new AddVendorCapabilityCommand(
-            id, request.MaterialCategoryId, request.MinOrderQty, request.Uom, request.LeadTimeDays, request.Notes), ct);
+            id, request.MaterialCategoryId, request.MinOrderQty, request.MaxOrderQty,
+            request.Uom, request.LeadTimeDays, request.EffectiveDate, request.ExpiryDate, request.Notes), ct);
         return CreatedAtAction(nameof(GetById), new { id }, ApiResponse.Ok(new { id = capId }));
     }
 
@@ -203,7 +223,8 @@ public class VendorsController : ControllerBase
         Guid id, Guid capabilityId, [FromBody] UpdateCapabilityRequest request, CancellationToken ct)
     {
         await _mediator.Send(new UpdateVendorCapabilityCommand(
-            capabilityId, request.MinOrderQty, request.Uom, request.LeadTimeDays, request.Notes), ct);
+            capabilityId, request.MinOrderQty, request.MaxOrderQty,
+            request.Uom, request.LeadTimeDays, request.EffectiveDate, request.ExpiryDate, request.Notes), ct);
         return Ok(ApiResponse.Ok("Capability updated."));
     }
 
@@ -216,22 +237,86 @@ public class VendorsController : ControllerBase
         await _mediator.Send(new DeleteVendorCapabilityCommand(capabilityId), ct);
         return Ok(ApiResponse.Ok("Capability removed."));
     }
+
+    /// <summary>Add a bank account to a vendor.</summary>
+    [HttpPost("{id:guid}/bank-accounts")]
+    [Authorize(Policy = "RequireMasterData")]
+    public async Task<ActionResult<ApiResponse<object>>> AddBankAccount(
+        Guid id, [FromBody] BankAccountRequest request, CancellationToken ct)
+    {
+        var bankId = await _mediator.Send(new AddVendorBankAccountCommand(
+            id, request.BankName, request.AccountNumber, request.AccountName,
+            request.BranchName, request.Currency, request.IsDefault, request.Notes), ct);
+        return CreatedAtAction(nameof(GetById), new { id }, ApiResponse.Ok(new { id = bankId }));
+    }
+
+    /// <summary>Update a vendor bank account.</summary>
+    [HttpPut("{id:guid}/bank-accounts/{bankAccountId:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
+    public async Task<ActionResult<ApiResponse<object>>> UpdateBankAccount(
+        Guid id, Guid bankAccountId, [FromBody] BankAccountRequest request, CancellationToken ct)
+    {
+        await _mediator.Send(new UpdateVendorBankAccountCommand(
+            bankAccountId, id, request.BankName, request.AccountNumber, request.AccountName,
+            request.BranchName, request.Currency, request.IsDefault, request.Notes), ct);
+        return Ok(ApiResponse.Ok("Bank account updated."));
+    }
+
+    /// <summary>Delete a vendor bank account.</summary>
+    [HttpDelete("{id:guid}/bank-accounts/{bankAccountId:guid}")]
+    [Authorize(Policy = "RequireMasterData")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteBankAccount(
+        Guid id, Guid bankAccountId, CancellationToken ct)
+    {
+        await _mediator.Send(new DeleteVendorBankAccountCommand(bankAccountId, id), ct);
+        return Ok(ApiResponse.Ok("Bank account removed."));
+    }
 }
 
 public record BlacklistRequest(string Reason);
 
+public record UpdateVendorRequest(
+    string     LegalName,
+    string?    TradeName,
+    VendorType VendorType,
+    string?    Npwp,
+    string?    Siup,
+    string?    Nib,
+    string?    Address,
+    string?    City,
+    string?    Province,
+    string?    PostalCode,
+    string?    Country,
+    Guid?      DefaultPaymentTermId,
+    Guid?      DefaultCurrencyId);
+
 public record AddCapabilityRequest(
-    Guid     MaterialCategoryId,
-    decimal? MinOrderQty,
-    string?  Uom,
-    int?     LeadTimeDays,
-    string?  Notes);
+    Guid      MaterialCategoryId,
+    decimal?  MinOrderQty,
+    decimal?  MaxOrderQty,
+    string?   Uom,
+    int?      LeadTimeDays,
+    DateOnly? EffectiveDate,
+    DateOnly? ExpiryDate,
+    string?   Notes);
 
 public record UpdateCapabilityRequest(
-    decimal? MinOrderQty,
-    string?  Uom,
-    int?     LeadTimeDays,
-    string?  Notes);
+    decimal?  MinOrderQty,
+    decimal?  MaxOrderQty,
+    string?   Uom,
+    int?      LeadTimeDays,
+    DateOnly? EffectiveDate,
+    DateOnly? ExpiryDate,
+    string?   Notes);
+
+public record BankAccountRequest(
+    string  BankName,
+    string  AccountNumber,
+    string  AccountName,
+    string? BranchName,
+    string  Currency,
+    bool    IsDefault,
+    string? Notes);
 
 public class UploadDocumentRequest
 {

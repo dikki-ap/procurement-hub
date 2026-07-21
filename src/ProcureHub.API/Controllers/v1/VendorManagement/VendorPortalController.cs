@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub.API.Security;
 using ProcureHub.Modules.MasterData.Application.Queries.GetDocumentTypeList;
+using ProcureHub.Modules.VendorManagement.Application.Commands.AddVendorBankAccount;
+using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocument;
+using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetMyVendorId;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
@@ -161,6 +164,40 @@ public class VendorPortalController : ControllerBase
         return Ok(ApiResponse.Ok(result));
     }
 
+    /// <summary>Add a bank account for own vendor profile.</summary>
+    [HttpPost("{vendorId:guid}/bank-accounts")]
+    public async Task<ActionResult<ApiResponse<object>>> AddBankAccount(
+        Guid vendorId, [FromBody] PortalBankAccountRequest request, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        var bankId = await _mediator.Send(new AddVendorBankAccountCommand(
+            vendorId, request.BankName, request.AccountNumber, request.AccountName,
+            request.BranchName, request.Currency, request.IsDefault, request.Notes), ct);
+        return CreatedAtAction(nameof(GetProfile), new { vendorId }, ApiResponse.Ok(new { id = bankId }));
+    }
+
+    /// <summary>Update own vendor bank account.</summary>
+    [HttpPut("{vendorId:guid}/bank-accounts/{bankAccountId:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> UpdateBankAccount(
+        Guid vendorId, Guid bankAccountId, [FromBody] PortalBankAccountRequest request, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        await _mediator.Send(new UpdateVendorBankAccountCommand(
+            bankAccountId, vendorId, request.BankName, request.AccountNumber, request.AccountName,
+            request.BranchName, request.Currency, request.IsDefault, request.Notes), ct);
+        return Ok(ApiResponse.Ok("Bank account updated."));
+    }
+
+    /// <summary>Delete own vendor bank account.</summary>
+    [HttpDelete("{vendorId:guid}/bank-accounts/{bankAccountId:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteBankAccount(
+        Guid vendorId, Guid bankAccountId, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        await _mediator.Send(new DeleteVendorBankAccountCommand(bankAccountId, vendorId), ct);
+        return Ok(ApiResponse.Ok("Bank account removed."));
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private async Task VerifyOwnershipAsync(Guid vendorId, CancellationToken ct)
@@ -174,3 +211,12 @@ public class VendorPortalController : ControllerBase
             throw new ForbiddenException("You do not have access to this vendor.");
     }
 }
+
+public record PortalBankAccountRequest(
+    string  BankName,
+    string  AccountNumber,
+    string  AccountName,
+    string? BranchName,
+    string  Currency,
+    bool    IsDefault,
+    string? Notes);

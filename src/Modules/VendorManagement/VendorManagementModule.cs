@@ -10,16 +10,18 @@ public static class VendorManagementModule
 {
     public static IServiceCollection AddVendorManagementServices(this IServiceCollection services)
     {
-        services.AddScoped<IVendorRepository,           VendorRepository>();
+        services.AddScoped<IVendorRepository,            VendorRepository>();
         services.AddScoped<IVendorDocumentRepository,   VendorDocumentRepository>();
         services.AddScoped<IVendorCapabilityRepository, VendorCapabilityRepository>();
         services.AddScoped<IVendorScoreRepository,      VendorScoreRepository>();
+        services.AddScoped<IVendorBankAccountRepository, VendorBankAccountRepository>();
 
         services.AddScoped<IStorageService,           SeaweedFsStorageService>();
 
         services.AddHostedService<SeaweedFsBucketInitializer>();
 
         services.AddScoped<DocumentExpiryCheckJob>();
+        services.AddScoped<CapabilityExpiryCheckJob>();
 
         return services;
     }

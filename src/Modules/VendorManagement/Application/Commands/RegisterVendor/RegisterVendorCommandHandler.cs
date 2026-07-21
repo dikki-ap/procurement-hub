@@ -30,6 +30,11 @@ public class RegisterVendorCommandHandler : ICommandHandler<RegisterVendorComman
             Npwp       = command.Npwp,
             Siup       = command.Siup,
             Nib        = command.Nib,
+            Address    = command.Address,
+            City       = command.City,
+            Province   = command.Province,
+            PostalCode = command.PostalCode,
+            Country    = command.Country,
         };
 
         vendor.Contacts.Add(new VendorContact
