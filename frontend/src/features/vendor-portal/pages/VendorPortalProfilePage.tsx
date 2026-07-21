@@ -1,8 +1,12 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { User, Building2, Store, Hash, FileCheck, Tag, Mail, Phone, Package } from 'lucide-react';
+import {
+  User, Building2, Store, Hash, FileCheck, Tag, Mail, Phone,
+  Package, MapPin, CreditCard, Landmark,
+} from 'lucide-react';
 import { vendorPortalApi, type VendorStatus } from '@/features/vendors/api/vendorApi';
 import { TierBadge, ScoreDisplay } from '@/features/vendors/components/VendorBadges';
+import { fmtDate } from '@/shared/lib/date';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
   const cfg: Record<VendorStatus, string> = {
@@ -37,6 +41,9 @@ export default function VendorPortalProfilePage() {
   }
 
   if (!vendor) return null;
+
+  const addressLine = [vendor.address, vendor.city, vendor.province, vendor.postalCode, vendor.country]
+    .filter(Boolean).join(', ');
 
   const infoFields = [
     { label: 'Legal Name',  value: vendor.legalName,        Icon: Building2 },
@@ -92,6 +99,15 @@ export default function VendorPortalProfilePage() {
             </div>
           ))}
         </div>
+        {addressLine && (
+          <div className="mt-4 pt-4 border-t border-slate-100">
+            <p className="flex items-center text-xs text-slate-500 mb-1">
+              <MapPin className="h-3.5 w-3.5 mr-1 text-slate-400" />
+              Address
+            </p>
+            <p className="text-sm font-medium text-slate-800">{addressLine}</p>
+          </div>
+        )}
       </div>
 
       {/* Contacts */}
@@ -117,14 +133,12 @@ export default function VendorPortalProfilePage() {
                   <div className="flex flex-wrap gap-4 mt-1">
                     {c.email && (
                       <span className="flex items-center text-xs text-slate-500">
-                        <Mail className="h-3 w-3 mr-1 text-slate-400" />
-                        {c.email}
+                        <Mail className="h-3 w-3 mr-1 text-slate-400" />{c.email}
                       </span>
                     )}
                     {c.phone && (
                       <span className="flex items-center text-xs text-slate-500">
-                        <Phone className="h-3 w-3 mr-1 text-slate-400" />
-                        {c.phone}
+                        <Phone className="h-3 w-3 mr-1 text-slate-400" />{c.phone}
                       </span>
                     )}
                   </div>
@@ -134,6 +148,34 @@ export default function VendorPortalProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Bank Accounts */}
+      {vendor.bankAccounts.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-100 p-6 mb-6">
+          <h2 className="text-sm font-semibold text-slate-700 mb-4">Bank Accounts</h2>
+          <div className="space-y-3">
+            {vendor.bankAccounts.map((b) => (
+              <div key={b.id} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50">
+                <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                  <CreditCard className="h-3.5 w-3.5 text-emerald-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-slate-800">{b.bankName}</p>
+                    {b.isDefault && (
+                      <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full">Default</span>
+                    )}
+                    <span className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full">{b.currency}</span>
+                  </div>
+                  <p className="text-sm text-slate-700">{b.accountNumber}</p>
+                  <p className="text-xs text-slate-500">a/n {b.accountName}</p>
+                  {b.branchName && <p className="text-xs text-slate-400">{b.branchName}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Capabilities (read-only) */}
       {vendor.capabilities.length > 0 && (
@@ -147,10 +189,17 @@ export default function VendorPortalProfilePage() {
                   <Package className="h-3.5 w-3.5 text-indigo-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-800">{cap.materialCategoryId}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-slate-800">{cap.materialCategoryId}</p>
+                    {cap.isExpired && (
+                      <span className="text-xs bg-red-50 text-red-600 px-1.5 py-0.5 rounded-full">Expired</span>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-3 mt-0.5 text-xs text-slate-500">
-                    {cap.minOrderQty  != null && <span>Min Order: <strong>{cap.minOrderQty}</strong></span>}
+                    {cap.minOrderQty != null && <span>Min Order: <strong>{cap.minOrderQty}{cap.uom ? ` ${cap.uom}` : ''}</strong></span>}
+                    {cap.maxOrderQty != null && <span>Max Order: <strong>{cap.maxOrderQty}{cap.uom ? ` ${cap.uom}` : ''}</strong></span>}
                     {cap.leadTimeDays != null && <span>Lead Time: <strong>{cap.leadTimeDays}d</strong></span>}
+                    {cap.expiryDate && <span>Exp: <strong>{fmtDate(cap.expiryDate)}</strong></span>}
                     {cap.notes && <span className="italic">{cap.notes}</span>}
                   </div>
                 </div>

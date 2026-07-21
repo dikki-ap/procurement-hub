@@ -5,6 +5,7 @@ import {
   ArrowLeft, FileText, User, Mail, Phone,
   Building2, Store, Hash, FileCheck, Tag,
   Download, Eye, Plus, Pencil, Trash2, Package,
+  MapPin, CreditCard, AlertTriangle, CheckCircle2, Landmark,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -53,19 +54,45 @@ const DocStatusBadge = ({ status }: { status: DocumentStatus }) => {
 
 // ── tab definition ────────────────────────────────────────────────────────────
 
-const tabs = ['Info', 'Contacts', 'Documents', 'Capabilities'] as const;
+const tabs = ['Info', 'Contacts', 'Documents', 'Capabilities', 'Bank Accounts'] as const;
 type Tab = typeof tabs[number];
-
-// ── info field metadata ───────────────────────────────────────────────────────
-
-type InfoField = { label: string; value: string; Icon: React.ElementType };
 
 // ── capability modal state ────────────────────────────────────────────────────
 
-type CapForm = { materialCategoryId: string; minOrderQty: string; uom: string; leadTimeDays: string; notes: string };
-const emptyCapForm = (): CapForm => ({ materialCategoryId: '', minOrderQty: '', uom: '', leadTimeDays: '', notes: '' });
+type CapForm = {
+  materialCategoryId: string;
+  minOrderQty: string;
+  maxOrderQty: string;
+  uom: string;
+  leadTimeDays: string;
+  effectiveDate: string;
+  expiryDate: string;
+  notes: string;
+};
+const emptyCapForm = (): CapForm => ({
+  materialCategoryId: '', minOrderQty: '', maxOrderQty: '', uom: '',
+  leadTimeDays: '', effectiveDate: '', expiryDate: '', notes: '',
+});
 
 const UOM_OPTIONS = ['pcs', 'kg', 'ton', 'liter', 'm', 'm²', 'm³', 'box', 'set', 'unit'];
+
+// ── bank account modal state ──────────────────────────────────────────────────
+
+const CURRENCY_OPTIONS = ['IDR', 'USD', 'EUR', 'SGD'];
+
+type BankForm = {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  branchName: string;
+  currency: string;
+  isDefault: boolean;
+  notes: string;
+};
+const emptyBankForm = (): BankForm => ({
+  bankName: '', accountNumber: '', accountName: '', branchName: '',
+  currency: 'IDR', isDefault: false, notes: '',
+});
 
 // ── main component ────────────────────────────────────────────────────────────
 
@@ -81,9 +108,14 @@ export default function VendorDetailPage() {
   const [previewName, setPreviewName] = useState<string | null>(null);
 
   // capability modal state
-  const [capModalOpen, setCapModalOpen]   = useState(false);
-  const [editingCapId, setEditingCapId]   = useState<string | null>(null);
-  const [capForm, setCapForm]             = useState<CapForm>(emptyCapForm());
+  const [capModalOpen, setCapModalOpen] = useState(false);
+  const [editingCapId, setEditingCapId] = useState<string | null>(null);
+  const [capForm, setCapForm]           = useState<CapForm>(emptyCapForm());
+
+  // bank account modal state
+  const [bankModalOpen, setBankModalOpen] = useState(false);
+  const [editingBankId, setEditingBankId] = useState<string | null>(null);
+  const [bankForm, setBankForm]           = useState<BankForm>(emptyBankForm());
 
   // ── queries ──────────────────────────────────────────────────────────────────
 
@@ -111,9 +143,12 @@ export default function VendorDetailPage() {
     mutationFn: () => vendorApi.addCapability(id!, {
       materialCategoryId: capForm.materialCategoryId,
       minOrderQty:   capForm.minOrderQty   ? parseFloat(capForm.minOrderQty)   : null,
-      uom:           capForm.uom || null,
+      maxOrderQty:   capForm.maxOrderQty   ? parseFloat(capForm.maxOrderQty)   : null,
+      uom:           capForm.uom           || null,
       leadTimeDays:  capForm.leadTimeDays  ? parseInt(capForm.leadTimeDays)    : null,
-      notes:         capForm.notes || null,
+      effectiveDate: capForm.effectiveDate || null,
+      expiryDate:    capForm.expiryDate    || null,
+      notes:         capForm.notes         || null,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vendor', id] });
@@ -127,9 +162,12 @@ export default function VendorDetailPage() {
   const updateCapMutation = useMutation({
     mutationFn: () => vendorApi.updateCapability(id!, editingCapId!, {
       minOrderQty:   capForm.minOrderQty   ? parseFloat(capForm.minOrderQty)   : null,
-      uom:           capForm.uom || null,
+      maxOrderQty:   capForm.maxOrderQty   ? parseFloat(capForm.maxOrderQty)   : null,
+      uom:           capForm.uom           || null,
       leadTimeDays:  capForm.leadTimeDays  ? parseInt(capForm.leadTimeDays)    : null,
-      notes:         capForm.notes || null,
+      effectiveDate: capForm.effectiveDate || null,
+      expiryDate:    capForm.expiryDate    || null,
+      notes:         capForm.notes         || null,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vendor', id] });
@@ -148,6 +186,56 @@ export default function VendorDetailPage() {
       toast.success('Capability removed');
     },
     onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to remove capability')),
+  });
+
+  // ── bank account mutations ───────────────────────────────────────────────────
+
+  const addBankMutation = useMutation({
+    mutationFn: () => vendorApi.addBankAccount(id!, {
+      bankName:      bankForm.bankName,
+      accountNumber: bankForm.accountNumber,
+      accountName:   bankForm.accountName,
+      branchName:    bankForm.branchName || null,
+      currency:      bankForm.currency,
+      isDefault:     bankForm.isDefault,
+      notes:         bankForm.notes || null,
+    }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['vendor', id] });
+      toast.success('Bank account added');
+      setBankModalOpen(false);
+      setBankForm(emptyBankForm());
+    },
+    onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to add bank account')),
+  });
+
+  const updateBankMutation = useMutation({
+    mutationFn: () => vendorApi.updateBankAccount(id!, editingBankId!, {
+      bankName:      bankForm.bankName,
+      accountNumber: bankForm.accountNumber,
+      accountName:   bankForm.accountName,
+      branchName:    bankForm.branchName || null,
+      currency:      bankForm.currency,
+      isDefault:     bankForm.isDefault,
+      notes:         bankForm.notes || null,
+    }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['vendor', id] });
+      toast.success('Bank account updated');
+      setBankModalOpen(false);
+      setEditingBankId(null);
+      setBankForm(emptyBankForm());
+    },
+    onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to update bank account')),
+  });
+
+  const deleteBankMutation = useMutation({
+    mutationFn: (bankId: string) => vendorApi.deleteBankAccount(id!, bankId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['vendor', id] });
+      toast.success('Bank account removed');
+    },
+    onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to remove bank account')),
   });
 
   // ── document actions ─────────────────────────────────────────────────────────
@@ -173,29 +261,41 @@ export default function VendorDetailPage() {
 
   // ── helpers ──────────────────────────────────────────────────────────────────
 
-  const openAddCap = () => {
-    setEditingCapId(null);
-    setCapForm(emptyCapForm());
-    setCapModalOpen(true);
-  };
+  const openAddCap = () => { setEditingCapId(null); setCapForm(emptyCapForm()); setCapModalOpen(true); };
 
-  const openEditCap = (cap: { id: string; materialCategoryId: string; minOrderQty: number | null; leadTimeDays: number | null; notes: string | null }) => {
+  const openEditCap = (cap: typeof vendor extends undefined ? never : NonNullable<typeof vendor>['capabilities'][number]) => {
     setEditingCapId(cap.id);
     setCapForm({
       materialCategoryId: cap.materialCategoryId,
-      minOrderQty:  cap.minOrderQty  != null ? String(cap.minOrderQty)  : '',
-      uom:          cap.uom ?? '',
-      leadTimeDays: cap.leadTimeDays != null ? String(cap.leadTimeDays) : '',
-      notes:        cap.notes ?? '',
+      minOrderQty:   cap.minOrderQty  != null ? String(cap.minOrderQty)  : '',
+      maxOrderQty:   cap.maxOrderQty  != null ? String(cap.maxOrderQty)  : '',
+      uom:           cap.uom ?? '',
+      leadTimeDays:  cap.leadTimeDays != null ? String(cap.leadTimeDays) : '',
+      effectiveDate: cap.effectiveDate ?? '',
+      expiryDate:    cap.expiryDate    ?? '',
+      notes:         cap.notes ?? '',
     });
     setCapModalOpen(true);
   };
 
-  const handleCapSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingCapId) updateCapMutation.mutate();
-    else              addCapMutation.mutate();
+  const openAddBank = () => { setEditingBankId(null); setBankForm(emptyBankForm()); setBankModalOpen(true); };
+
+  const openEditBank = (b: NonNullable<typeof vendor>['bankAccounts'][number]) => {
+    setEditingBankId(b.id);
+    setBankForm({
+      bankName:      b.bankName,
+      accountNumber: b.accountNumber,
+      accountName:   b.accountName,
+      branchName:    b.branchName ?? '',
+      currency:      b.currency,
+      isDefault:     b.isDefault,
+      notes:         b.notes ?? '',
+    });
+    setBankModalOpen(true);
   };
+
+  const handleCapSubmit  = (e: React.FormEvent) => { e.preventDefault(); editingCapId  ? updateCapMutation.mutate()  : addCapMutation.mutate(); };
+  const handleBankSubmit = (e: React.FormEvent) => { e.preventDefault(); editingBankId ? updateBankMutation.mutate() : addBankMutation.mutate(); };
 
   const isPdf = (name: string | null) => name?.toLowerCase().endsWith('.pdf') ?? false;
 
@@ -212,14 +312,8 @@ export default function VendorDetailPage() {
 
   if (!vendor) return null;
 
-  const infoFields: InfoField[] = [
-    { label: 'Legal Name',   value: vendor.legalName,         Icon: Building2  },
-    { label: 'Trade Name',   value: vendor.tradeName ?? '—',  Icon: Store      },
-    { label: 'NPWP',         value: vendor.npwp    ?? '—',    Icon: Hash       },
-    { label: 'SIUP',         value: vendor.siup    ?? '—',    Icon: FileCheck  },
-    { label: 'NIB',          value: vendor.nib     ?? '—',    Icon: Hash       },
-    { label: 'Vendor Type',  value: vendor.vendorType,        Icon: Tag        },
-  ];
+  const addressLine = [vendor.address, vendor.city, vendor.province, vendor.postalCode, vendor.country]
+    .filter(Boolean).join(', ');
 
   return (
     <div>
@@ -267,6 +361,11 @@ export default function VendorDetailPage() {
               }`}
             >
               {tab}
+              {tab === 'Bank Accounts' && vendor.bankAccounts.length > 0 && (
+                <span className="ml-1.5 text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full">
+                  {vendor.bankAccounts.length}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -274,18 +373,38 @@ export default function VendorDetailPage() {
 
       {/* ── Info tab ── */}
       {activeTab === 'Info' && (
-        <div className="grid grid-cols-2 gap-6">
-          {infoFields.map(({ label, value, Icon }) => (
-            <div key={label}>
-              <p className="flex items-center text-xs text-slate-500 mb-0.5">
-                <Icon className="h-3.5 w-3.5 mr-1 text-slate-400" />
-                {label}
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            {[
+              { label: 'Legal Name',  value: vendor.legalName,        Icon: Building2 },
+              { label: 'Trade Name',  value: vendor.tradeName ?? '—', Icon: Store     },
+              { label: 'NPWP',        value: vendor.npwp    ?? '—',   Icon: Hash      },
+              { label: 'SIUP',        value: vendor.siup    ?? '—',   Icon: FileCheck },
+              { label: 'NIB',         value: vendor.nib     ?? '—',   Icon: Hash      },
+              { label: 'Vendor Type', value: vendor.vendorType,       Icon: Tag       },
+            ].map(({ label, value, Icon }) => (
+              <div key={label}>
+                <p className="flex items-center text-xs text-slate-500 mb-0.5">
+                  <Icon className="h-3.5 w-3.5 mr-1 text-slate-400" />
+                  {label}
+                </p>
+                <p className="text-sm font-medium text-slate-800">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          {addressLine && (
+            <div className="bg-slate-50 rounded-lg p-4">
+              <p className="flex items-center text-xs text-slate-500 mb-1">
+                <MapPin className="h-3.5 w-3.5 mr-1 text-slate-400" />
+                Address
               </p>
-              <p className="text-sm font-medium text-slate-800">{value}</p>
+              <p className="text-sm font-medium text-slate-800">{addressLine}</p>
             </div>
-          ))}
+          )}
+
           {vendor.isBlacklisted && (
-            <div className="col-span-2 bg-red-50 rounded-lg p-4">
+            <div className="bg-red-50 rounded-lg p-4">
               <p className="text-xs font-semibold text-red-600 mb-1">Blacklist Reason</p>
               <p className="text-sm text-red-700">{vendor.blacklistReason}</p>
             </div>
@@ -315,14 +434,12 @@ export default function VendorDetailPage() {
                   <div className="flex flex-wrap gap-4 mt-1.5">
                     {c.email && (
                       <span className="flex items-center text-xs text-slate-500">
-                        <Mail className="h-3 w-3 mr-1 text-slate-400" />
-                        {c.email}
+                        <Mail className="h-3 w-3 mr-1 text-slate-400" />{c.email}
                       </span>
                     )}
                     {c.phone && (
                       <span className="flex items-center text-xs text-slate-500">
-                        <Phone className="h-3 w-3 mr-1 text-slate-400" />
-                        {c.phone}
+                        <Phone className="h-3 w-3 mr-1 text-slate-400" />{c.phone}
                       </span>
                     )}
                   </div>
@@ -349,23 +466,15 @@ export default function VendorDetailPage() {
                 </div>
                 <div className="text-right">
                   <DocStatusBadge status={d.status} />
-                  {d.expiredAt && (
-                    <p className="text-xs text-slate-400 mt-1">Exp: {fmtDate(d.expiredAt)}</p>
-                  )}
+                  {d.expiredAt && <p className="text-xs text-slate-400 mt-1">Exp: {fmtDate(d.expiredAt)}</p>}
                 </div>
                 <div className="flex items-center gap-1.5 ml-2">
-                  <Button
-                    variant="ghost" size="sm"
-                    className="text-slate-500 hover:text-blue-600"
-                    onClick={() => handlePreview(d.id, d.fileName)}
-                  >
+                  <Button variant="ghost" size="sm" className="text-slate-500 hover:text-blue-600"
+                    onClick={() => handlePreview(d.id, d.fileName)}>
                     <Eye className="h-3.5 w-3.5 mr-1" /> Preview
                   </Button>
-                  <Button
-                    variant="ghost" size="sm"
-                    className="text-slate-500 hover:text-emerald-600"
-                    onClick={() => handleDownload(d.id, d.fileName)}
-                  >
+                  <Button variant="ghost" size="sm" className="text-slate-500 hover:text-emerald-600"
+                    onClick={() => handleDownload(d.id, d.fileName)}>
                     <Download className="h-3.5 w-3.5 mr-1" /> Download
                   </Button>
                 </div>
@@ -379,9 +488,7 @@ export default function VendorDetailPage() {
       {activeTab === 'Capabilities' && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-500">
-              Approved supply categories for this vendor
-            </p>
+            <p className="text-xs text-slate-500">Approved supply categories for this vendor</p>
             <Button size="sm" onClick={openAddCap}>
               <Plus className="h-3.5 w-3.5 mr-1" /> Add Capability
             </Button>
@@ -399,31 +506,92 @@ export default function VendorDetailPage() {
                   <Package className="h-4 w-4" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-900">
-                    {categoryMap.get(cap.materialCategoryId) ?? cap.materialCategoryId}
-                  </p>
-                  <div className="flex flex-wrap gap-4 mt-1 text-xs text-slate-500">
-                    {cap.minOrderQty  != null && (
-                      <span>Min Order: <strong>{cap.minOrderQty}{cap.uom ? ` ${cap.uom}` : ''}</strong></span>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-slate-900">
+                      {categoryMap.get(cap.materialCategoryId) ?? cap.materialCategoryId}
+                    </p>
+                    {cap.isExpired && (
+                      <span className="inline-flex items-center gap-0.5 text-xs bg-red-50 text-red-600 px-1.5 py-0.5 rounded-full">
+                        <AlertTriangle className="h-3 w-3" /> Expired
+                      </span>
                     )}
-                    {cap.leadTimeDays != null && <span>Lead Time: <strong>{cap.leadTimeDays}d</strong></span>}
+                    {!cap.isExpired && cap.expiryDate && (
+                      <span className="inline-flex items-center gap-0.5 text-xs bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-full">
+                        <CheckCircle2 className="h-3 w-3" /> Valid
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-4 mt-1 text-xs text-slate-500">
+                    {cap.minOrderQty != null && (
+                      <span>Min: <strong>{cap.minOrderQty}{cap.uom ? ` ${cap.uom}` : ''}</strong></span>
+                    )}
+                    {cap.maxOrderQty != null && (
+                      <span>Max: <strong>{cap.maxOrderQty}{cap.uom ? ` ${cap.uom}` : ''}</strong></span>
+                    )}
+                    {cap.leadTimeDays != null && <span>Lead: <strong>{cap.leadTimeDays}d</strong></span>}
+                    {cap.expiryDate && <span>Exp: <strong>{fmtDate(cap.expiryDate)}</strong></span>}
                     {cap.notes && <span className="italic">{cap.notes}</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost" size="icon"
-                    className="h-7 w-7 text-slate-400 hover:text-blue-600"
-                    onClick={() => openEditCap(cap)}
-                  >
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-blue-600"
+                    onClick={() => openEditCap(cap)}>
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                  <Button
-                    variant="ghost" size="icon"
-                    className="h-7 w-7 text-slate-400 hover:text-red-500"
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-red-500"
                     onClick={() => deleteCapMutation.mutate(cap.id)}
-                    disabled={deleteCapMutation.isPending}
-                  >
+                    disabled={deleteCapMutation.isPending}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* ── Bank Accounts tab ── */}
+      {activeTab === 'Bank Accounts' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-slate-500">Registered bank accounts for payment disbursement</p>
+            <Button size="sm" onClick={openAddBank}>
+              <Plus className="h-3.5 w-3.5 mr-1" /> Add Account
+            </Button>
+          </div>
+
+          {vendor.bankAccounts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+              <Landmark className="h-10 w-10 mb-3" />
+              <p className="text-sm">No bank accounts registered yet.</p>
+            </div>
+          ) : (
+            vendor.bankAccounts.map((b) => (
+              <div key={b.id} className="flex items-start gap-4 bg-white rounded-xl border border-slate-100 p-4">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                  <CreditCard className="h-4 w-4" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-slate-900">{b.bankName}</p>
+                    {b.isDefault && (
+                      <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full">Default</span>
+                    )}
+                    <span className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full">{b.currency}</span>
+                  </div>
+                  <p className="text-sm text-slate-700 mt-0.5">{b.accountNumber}</p>
+                  <p className="text-xs text-slate-500">a/n {b.accountName}</p>
+                  {b.branchName && <p className="text-xs text-slate-400">{b.branchName}</p>}
+                  {b.notes && <p className="text-xs text-slate-400 italic mt-0.5">{b.notes}</p>}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-blue-600"
+                    onClick={() => openEditBank(b)}>
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-red-500"
+                    onClick={() => deleteBankMutation.mutate(b.id)}
+                    disabled={deleteBankMutation.isPending}>
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
@@ -470,61 +638,128 @@ export default function VendorDetailPage() {
                 disabled={!!editingCapId}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Min Order Qty</label>
-                <input
-                  type="number" min="0" step="0.01"
-                  className={inputCls}
+                <label className="block text-sm font-medium mb-1">Min Qty</label>
+                <input type="number" min="0" step="0.01" className={inputCls}
                   value={capForm.minOrderQty}
                   onChange={(e) => setCapForm(f => ({ ...f, minOrderQty: e.target.value }))}
-                  placeholder="e.g. 10"
-                />
+                  placeholder="e.g. 10" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Unit of Measure</label>
-                <select
-                  className={inputCls}
-                  value={capForm.uom}
-                  onChange={(e) => setCapForm(f => ({ ...f, uom: e.target.value }))}
-                >
-                  <option value="">— select —</option>
+                <label className="block text-sm font-medium mb-1">Max Qty</label>
+                <input type="number" min="0" step="0.01" className={inputCls}
+                  value={capForm.maxOrderQty}
+                  onChange={(e) => setCapForm(f => ({ ...f, maxOrderQty: e.target.value }))}
+                  placeholder="e.g. 1000" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">UoM</label>
+                <select className={inputCls} value={capForm.uom}
+                  onChange={(e) => setCapForm(f => ({ ...f, uom: e.target.value }))}>
+                  <option value="">—</option>
                   {UOM_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
                 </select>
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Lead Time (days)</label>
-              <input
-                type="number" min="0" step="1"
-                className={inputCls}
+              <input type="number" min="0" step="1" className={inputCls}
                 value={capForm.leadTimeDays}
                 onChange={(e) => setCapForm(f => ({ ...f, leadTimeDays: e.target.value }))}
-                placeholder="e.g. 7"
-              />
+                placeholder="e.g. 7" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Effective Date</label>
+                <input type="date" className={inputCls}
+                  value={capForm.effectiveDate}
+                  onChange={(e) => setCapForm(f => ({ ...f, effectiveDate: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Expiry Date</label>
+                <input type="date" className={inputCls}
+                  value={capForm.expiryDate}
+                  onChange={(e) => setCapForm(f => ({ ...f, expiryDate: e.target.value }))} />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Notes</label>
-              <textarea
-                rows={2}
-                className={inputCls}
+              <textarea rows={2} className={inputCls}
                 value={capForm.notes}
                 onChange={(e) => setCapForm(f => ({ ...f, notes: e.target.value }))}
-                placeholder="Optional notes..."
-              />
+                placeholder="Optional notes..." />
             </div>
             <div className="flex justify-end gap-2 pt-1">
-              <Button
-                type="button" variant="outline"
-                onClick={() => { setCapModalOpen(false); setEditingCapId(null); setCapForm(emptyCapForm()); }}
-              >
+              <Button type="button" variant="outline"
+                onClick={() => { setCapModalOpen(false); setEditingCapId(null); setCapForm(emptyCapForm()); }}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={addCapMutation.isPending || updateCapMutation.isPending || (!editingCapId && !capForm.materialCategoryId)}
-              >
+              <Button type="submit"
+                disabled={addCapMutation.isPending || updateCapMutation.isPending || (!editingCapId && !capForm.materialCategoryId)}>
                 {editingCapId ? 'Update' : 'Add'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Bank Account Add/Edit Modal ── */}
+      <Dialog open={bankModalOpen} onOpenChange={(v) => { if (!v) { setBankModalOpen(false); setEditingBankId(null); setBankForm(emptyBankForm()); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingBankId ? 'Edit Bank Account' : 'Add Bank Account'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleBankSubmit} className="space-y-4 mt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Bank Name <span className="text-red-500">*</span></label>
+                <input className={inputCls} required placeholder="e.g. BCA" value={bankForm.bankName}
+                  onChange={(e) => setBankForm(f => ({ ...f, bankName: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Currency</label>
+                <select className={inputCls} value={bankForm.currency}
+                  onChange={(e) => setBankForm(f => ({ ...f, currency: e.target.value }))}>
+                  {CURRENCY_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Account Number <span className="text-red-500">*</span></label>
+              <input className={inputCls} required placeholder="e.g. 1234567890" value={bankForm.accountNumber}
+                onChange={(e) => setBankForm(f => ({ ...f, accountNumber: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Account Name <span className="text-red-500">*</span></label>
+              <input className={inputCls} required placeholder="Account holder name" value={bankForm.accountName}
+                onChange={(e) => setBankForm(f => ({ ...f, accountName: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Branch Name</label>
+              <input className={inputCls} placeholder="e.g. KCP Sudirman" value={bankForm.branchName}
+                onChange={(e) => setBankForm(f => ({ ...f, branchName: e.target.value }))} />
+            </div>
+            <div className="flex items-center gap-2">
+              <input type="checkbox" id="isDefault" checked={bankForm.isDefault}
+                onChange={(e) => setBankForm(f => ({ ...f, isDefault: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+              <label htmlFor="isDefault" className="text-sm font-medium">Set as default account</label>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Notes</label>
+              <textarea rows={2} className={inputCls} placeholder="Optional notes..."
+                value={bankForm.notes}
+                onChange={(e) => setBankForm(f => ({ ...f, notes: e.target.value }))} />
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button type="button" variant="outline"
+                onClick={() => { setBankModalOpen(false); setEditingBankId(null); setBankForm(emptyBankForm()); }}>
+                Cancel
+              </Button>
+              <Button type="submit"
+                disabled={addBankMutation.isPending || updateBankMutation.isPending}>
+                {editingBankId ? 'Update' : 'Add'}
               </Button>
             </div>
           </form>

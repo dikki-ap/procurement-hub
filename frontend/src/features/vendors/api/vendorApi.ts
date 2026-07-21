@@ -57,17 +57,42 @@ export interface VendorDocumentDto {
   notes: string | null;
 }
 
+export interface VendorBankAccountDto {
+  id: string;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  branchName: string | null;
+  currency: string;
+  isDefault: boolean;
+  notes: string | null;
+}
+
+export interface VendorCapabilityDto {
+  id: string;
+  materialCategoryId: string;
+  minOrderQty: number | null;
+  maxOrderQty: number | null;
+  uom: string | null;
+  leadTimeDays: number | null;
+  effectiveDate: string | null;
+  expiryDate: string | null;
+  isExpired: boolean;
+  notes: string | null;
+}
+
 export interface VendorDetailDto extends VendorDto {
+  address: string | null;
+  city: string | null;
+  province: string | null;
+  postalCode: string | null;
+  country: string | null;
+  defaultPaymentTermId: string | null;
+  defaultCurrencyId: string | null;
   contacts: VendorContactDto[];
   documents: VendorDocumentDto[];
-  capabilities: {
-    id: string;
-    materialCategoryId: string;
-    minOrderQty: number | null;
-    uom: string | null;
-    leadTimeDays: number | null;
-    notes: string | null;
-  }[];
+  capabilities: VendorCapabilityDto[];
+  bankAccounts: VendorBankAccountDto[];
 }
 
 export interface RegisterVendorRequest {
@@ -78,6 +103,11 @@ export interface RegisterVendorRequest {
   npwp?: string;
   siup?: string;
   nib?: string;
+  address?: string;
+  city?: string;
+  province?: string;
+  postalCode?: string;
+  country?: string;
   contactName: string;
   contactPosition?: string;
   contactEmail: string;
@@ -120,17 +150,48 @@ export const vendorApi = {
 
   addCapability: (
     vendorId: string,
-    payload: { materialCategoryId: string; minOrderQty?: number | null; uom?: string | null; leadTimeDays?: number | null; notes?: string | null }
+    payload: {
+      materialCategoryId: string;
+      minOrderQty?: number | null;
+      maxOrderQty?: number | null;
+      uom?: string | null;
+      leadTimeDays?: number | null;
+      effectiveDate?: string | null;
+      expiryDate?: string | null;
+      notes?: string | null;
+    }
   ) => apiClient.post(`${BASE}/${vendorId}/capabilities`, payload),
 
   updateCapability: (
     vendorId: string,
     capabilityId: string,
-    payload: { minOrderQty?: number | null; uom?: string | null; leadTimeDays?: number | null; notes?: string | null }
+    payload: {
+      minOrderQty?: number | null;
+      maxOrderQty?: number | null;
+      uom?: string | null;
+      leadTimeDays?: number | null;
+      effectiveDate?: string | null;
+      expiryDate?: string | null;
+      notes?: string | null;
+    }
   ) => apiClient.put(`${BASE}/${vendorId}/capabilities/${capabilityId}`, payload),
 
   deleteCapability: (vendorId: string, capabilityId: string) =>
     apiClient.delete(`${BASE}/${vendorId}/capabilities/${capabilityId}`),
+
+  addBankAccount: (
+    vendorId: string,
+    payload: { bankName: string; accountNumber: string; accountName: string; branchName?: string | null; currency: string; isDefault: boolean; notes?: string | null }
+  ) => apiClient.post(`${BASE}/${vendorId}/bank-accounts`, payload),
+
+  updateBankAccount: (
+    vendorId: string,
+    bankAccountId: string,
+    payload: { bankName: string; accountNumber: string; accountName: string; branchName?: string | null; currency: string; isDefault: boolean; notes?: string | null }
+  ) => apiClient.put(`${BASE}/${vendorId}/bank-accounts/${bankAccountId}`, payload),
+
+  deleteBankAccount: (vendorId: string, bankAccountId: string) =>
+    apiClient.delete(`${BASE}/${vendorId}/bank-accounts/${bankAccountId}`),
 };
 
 export const vendorRegistrationApi = {
@@ -168,4 +229,18 @@ export const vendorPortalApi = {
 
   getDocumentTypes: (vendorId: string) =>
     apiClient.get<{ data: DocumentTypeConfigDto[] }>(`/vendor-portal/${vendorId}/document-types`).then((r) => r.data.data),
+
+  addBankAccount: (
+    vendorId: string,
+    payload: { bankName: string; accountNumber: string; accountName: string; branchName?: string | null; currency: string; isDefault: boolean; notes?: string | null }
+  ) => apiClient.post(`/vendor-portal/${vendorId}/bank-accounts`, payload),
+
+  updateBankAccount: (
+    vendorId: string,
+    bankAccountId: string,
+    payload: { bankName: string; accountNumber: string; accountName: string; branchName?: string | null; currency: string; isDefault: boolean; notes?: string | null }
+  ) => apiClient.put(`/vendor-portal/${vendorId}/bank-accounts/${bankAccountId}`, payload),
+
+  deleteBankAccount: (vendorId: string, bankAccountId: string) =>
+    apiClient.delete(`/vendor-portal/${vendorId}/bank-accounts/${bankAccountId}`),
 };

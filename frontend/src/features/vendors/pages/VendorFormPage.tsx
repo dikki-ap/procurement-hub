@@ -5,14 +5,14 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { vendorRegistrationApi, type VendorType } from '../api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const vendorTypes: VendorType[] = ['Manufacturer', 'Distributor', 'Trader'];
 
 export default function VendorFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const companyId = useAuthStore(s => s.user?.companyId ?? '');
 
   const mutation = useMutation({
     mutationFn: vendorRegistrationApi.register,
@@ -28,13 +28,18 @@ export default function VendorFormPage() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
-      companyId:       COMPANY_ID,
+      companyId,
       legalName:       fd.get('legalName') as string,
       tradeName:       (fd.get('tradeName') as string) || undefined,
       vendorType:      fd.get('vendorType') as VendorType,
       npwp:            (fd.get('npwp') as string) || undefined,
       siup:            (fd.get('siup') as string) || undefined,
       nib:             (fd.get('nib') as string) || undefined,
+      address:         (fd.get('address') as string) || undefined,
+      city:            (fd.get('city') as string) || undefined,
+      province:        (fd.get('province') as string) || undefined,
+      postalCode:      (fd.get('postalCode') as string) || undefined,
+      country:         (fd.get('country') as string) || 'Indonesia',
       contactName:     fd.get('contactName') as string,
       contactPosition: (fd.get('contactPosition') as string) || undefined,
       contactEmail:    fd.get('contactEmail') as string,
@@ -86,7 +91,7 @@ export default function VendorFormPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">NPWP</label>
-              <input name="npwp" className={inputCls} />
+              <input name="npwp" className={inputCls} placeholder="e.g. 12.345.678.9-000.000" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">SIUP</label>
@@ -95,6 +100,37 @@ export default function VendorFormPage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">NIB</label>
               <input name="nib" className={inputCls} />
+            </div>
+          </div>
+        </div>
+
+        {/* Address */}
+        <div className="bg-white rounded-xl border border-slate-100 p-6">
+          <h2 className="text-sm font-semibold text-slate-700 mb-4 uppercase tracking-wider">
+            Address
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Street Address</label>
+              <textarea name="address" rows={2} className={inputCls} placeholder="Jl. ..." />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                <input name="city" className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Province</label>
+                <input name="province" className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Postal Code</label>
+                <input name="postalCode" className={inputCls} maxLength={10} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+                <input name="country" className={inputCls} defaultValue="Indonesia" />
+              </div>
             </div>
           </div>
         </div>
