@@ -13,8 +13,9 @@ public class ApplicationDbContext : DbContext
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     // ── Core ──────────────────────────────────────────────────
-    public DbSet<Company> Companies => Set<Company>();
-    public DbSet<User> Users => Set<User>();
+    public DbSet<Company>    Companies   => Set<Company>();
+    public DbSet<User>       Users       => Set<User>();
+    public DbSet<Department> Departments => Set<Department>();
 
     // ── Audit ─────────────────────────────────────────────────
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

@@ -18,6 +18,8 @@ import {
   ShoppingCart,
   Receipt,
   Building2,
+  GitBranch,
+  Settings,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useUIStore } from '@/stores/uiStore';
@@ -32,6 +34,7 @@ const masterDataLinks = [
   { to: '/app/master-data/uoms', icon: Ruler, label: 'Units of Measure' },
   { to: '/app/master-data/material-categories', icon: FolderOpen, label: 'Material Categories' },
   { to: '/app/master-data/document-types', icon: FileText, label: 'Document Types' },
+  { to: '/app/master-data/departments', icon: GitBranch, label: 'Departments' },
 ];
 
 const navCls = (collapsed: boolean) => ({ isActive }: { isActive: boolean }) =>
@@ -227,6 +230,24 @@ export const Sidebar = () => {
                     <NavLabel collapsed={ec}>{label}</NavLabel>
                   </NavLink>
                 ))}
+
+                <div
+                  className="overflow-hidden transition-[max-height,opacity] duration-300 mt-3"
+                  style={{ maxHeight: ec ? 0 : '40px', opacity: ec ? 0 : 1 }}
+                >
+                  <p className="px-5 pb-1 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
+                    Settings
+                  </p>
+                </div>
+
+                <NavLink to="/app/settings/company" title="Company Profile" className={navCls(ec)}>
+                  <Building2 className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Company Profile</NavLabel>
+                </NavLink>
+                <NavLink to="/app/settings/users" title="Users" className={navCls(ec)}>
+                  <Users className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Users</NavLabel>
+                </NavLink>
               </div>
             )}
           </>

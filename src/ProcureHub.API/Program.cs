@@ -10,10 +10,12 @@ using ProcureHub.API.Services;
 using ProcureHub.Modules.Analytics;
 using ProcureHub.Modules.ApprovalEngine;
 using ProcureHub.Modules.Audit;
+using ProcureHub.Modules.CompanyManagement;
 using ProcureHub.Modules.DocumentManagement;
 using ProcureHub.Modules.MasterData;
 using ProcureHub.Modules.Notifications;
 using ProcureHub.Modules.Procurement;
+using ProcureHub.Modules.UserManagement;
 using ProcureHub.Modules.VendorManagement;
 using ProcureHub.SharedKernel.Abstractions;
 using ProcureHub.SharedKernel.Behaviors;
@@ -56,7 +58,9 @@ try
         typeof(DocumentManagementModule).Assembly,
         typeof(NotificationsModule).Assembly,
         typeof(AnalyticsModule).Assembly,
-        typeof(AuditModule).Assembly);
+        typeof(AuditModule).Assembly,
+        typeof(CompanyManagementModule).Assembly,
+        typeof(UserManagementModule).Assembly);
 
     // Pipeline order matters — logging first, then validation, then transaction
     builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
@@ -71,6 +75,8 @@ try
     builder.Services.AddApprovalEngineServices();
     builder.Services.AddDocumentManagementServices();
     builder.Services.AddNotificationsModule(builder.Configuration);
+    builder.Services.AddCompanyManagementServices();
+    builder.Services.AddUserManagementServices();
     // IStorageService (SharedKernel) is registered by AddVendorManagementServices via the global alias
 
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();

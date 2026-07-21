@@ -202,6 +202,34 @@ export const router = createBrowserRouter([
                     '@/features/master-data/document-type/pages/DocumentTypeListPage'
                   ).then((m) => ({ Component: m.default })),
               },
+              {
+                path: 'departments',
+                lazy: () =>
+                  import(
+                    '@/features/master-data/department/pages/DepartmentListPage'
+                  ).then((m) => ({ Component: m.default })),
+              },
+            ],
+          },
+          // ── Settings (super_admin only) ──────────────────────────────────
+          {
+            path: 'settings',
+            element: <ProtectedRoute requiredRoles={['super_admin']} />,
+            children: [
+              {
+                path: 'company',
+                lazy: () =>
+                  import('@/features/company/pages/CompanyProfilePage').then((m) => ({
+                    Component: m.default,
+                  })),
+              },
+              {
+                path: 'users',
+                lazy: () =>
+                  import('@/features/users/pages/UserListPage').then((m) => ({
+                    Component: m.default,
+                  })),
+              },
             ],
           },
         ],

@@ -23,5 +23,11 @@ public class UserConfiguration : BaseAuditableEntityConfiguration<User>
             .HasForeignKey(u => u.CompanyId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<Department>()
+            .WithMany()
+            .HasForeignKey(u => u.DepartmentId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

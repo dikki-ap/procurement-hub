@@ -18,6 +18,7 @@ public static class MasterDataModule
         services.AddScoped<IPaymentTermRepository,      PaymentTermRepository>();
         services.AddScoped<ILocationRepository,         LocationRepository>();
         services.AddScoped<IDocumentTypeRepository,     DocumentTypeRepository>();
+        services.AddScoped<IDepartmentRepository,       DepartmentRepository>();
 
         services.AddHttpClient<IExchangeRateService, ExchangeRateService>(client =>
         {
