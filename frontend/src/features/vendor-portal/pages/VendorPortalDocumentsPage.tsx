@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { SearchableSelect } from '@/shared/components/SearchableSelect';
-import { vendorPortalApi, type DocumentStatus, type DocumentTypeConfigDto } from '@/features/vendors/api/vendorApi';
+import { vendorPortalApi, type DocumentStatus, type DocumentTypeConfigDto, type VendorDocumentDto } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
 
@@ -109,9 +109,16 @@ export default function VendorPortalDocumentsPage() {
     if (fileRef.current) fileRef.current.value = '';
   };
 
-  const openReplace = (doc: { id: string; documentType: string }) => {
-    setReplaceTarget(doc);
-    setForm({ ...EMPTY_FORM, documentType: doc.documentType });
+  const openReplace = (doc: VendorDocumentDto) => {
+    setReplaceTarget({ id: doc.id, documentType: doc.documentType });
+    setForm({
+      ...EMPTY_FORM,
+      documentType:   doc.documentType,
+      documentNumber: doc.documentNumber ?? '',
+      issuedAt:       doc.issuedAt       ?? '',
+      expiredAt:      doc.expiredAt       ?? '',
+      notes:          doc.notes           ?? '',
+    });
     setShowUpload(true);
   };
 
@@ -151,15 +158,9 @@ export default function VendorPortalDocumentsPage() {
 
   const handleDownload = async (docId: string, fileName: string | null) => {
     try {
-      const blob = await vendorPortalApi.downloadDocument(vendorId!, docId, false);
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = fileName ?? 'document';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const { url } = await vendorPortalApi.getDocumentUrl(vendorId!, docId, false);
+      // Open presigned URL in a new tab — SeaweedFS returns Content-Disposition: attachment
+      window.open(url, '_blank', 'noopener,noreferrer');
     } catch {
       toast.error('Failed to download file');
     }
@@ -167,8 +168,7 @@ export default function VendorPortalDocumentsPage() {
 
   const handlePreview = async (docId: string, fileName: string | null) => {
     try {
-      const blob = await vendorPortalApi.downloadDocument(vendorId!, docId, true);
-      const url  = URL.createObjectURL(blob);
+      const { url } = await vendorPortalApi.getDocumentUrl(vendorId!, docId, true);
       setPreviewName(fileName);
       setPreviewUrl(url);
     } catch {
@@ -236,49 +236,52 @@ export default function VendorPortalDocumentsPage() {
       ) : (
         <div className="space-y-3">
           {docs.map((d) => (
-            <div key={d.id} className="flex items-center gap-4 bg-white rounded-xl border border-slate-100 p-4">
-              <FileText className="h-5 w-5 text-slate-400 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-900">{d.documentType}</p>
-                {d.documentNumber && <p className="text-xs text-slate-500">#{d.documentNumber}</p>}
-                <p className="text-xs text-slate-400 mt-0.5">{d.fileName ?? 'Unknown file'}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="text-right mr-1">
-                  <StatusBadge status={d.status} />
-                  {d.expiredAt && (
-                    <p className="text-xs text-slate-400 mt-1">
-                      Exp: {fmtDate(d.expiredAt)}
-                    </p>
-                  )}
+            <div key={d.id} className="bg-white rounded-xl border border-slate-100 p-4">
+              <div className="flex items-start gap-3">
+                <FileText className="h-5 w-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium text-slate-900">{d.documentType}</p>
+                    <StatusBadge status={d.status} />
+                  </div>
+                  {d.documentNumber && <p className="text-xs text-slate-500 mt-0.5">#{d.documentNumber}</p>}
+                  <p className="text-xs text-slate-400 mt-0.5">{d.fileName ?? 'Unknown file'}</p>
+                  {d.expiredAt && <p className="text-xs text-slate-400 mt-0.5">Expires: {fmtDate(d.expiredAt)}</p>}
                 </div>
-                <Button
-                  variant="ghost" size="sm"
-                  className="text-slate-500 hover:text-blue-600 h-8 px-2"
-                  onClick={() => handlePreview(d.id, d.fileName)}
-                >
-                  <Eye className="h-3.5 w-3.5 mr-1" /> Preview
-                </Button>
-                <Button
-                  variant="ghost" size="sm"
-                  className="text-slate-500 hover:text-amber-600 h-8 px-2"
-                  onClick={() => openReplace({ id: d.id, documentType: d.documentType })}
-                >
-                  <RefreshCw className="h-3.5 w-3.5 mr-1" /> Update
-                </Button>
-                <Button
-                  variant="ghost" size="sm"
-                  className="text-slate-500 hover:text-emerald-600 h-8 px-2"
-                  onClick={() => handleDownload(d.id, d.fileName)}
-                >
-                  <Download className="h-3.5 w-3.5 mr-1" /> Download
-                </Button>
-                <Button
-                  variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:text-red-600"
-                  onClick={() => setDeleteTarget(d.id)}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+                <div className="flex items-center gap-0.5 flex-shrink-0">
+                  <Button
+                    variant="ghost" size="icon"
+                    className="h-8 w-8 text-slate-400 hover:text-blue-600"
+                    title="Preview"
+                    onClick={() => handlePreview(d.id, d.fileName)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost" size="icon"
+                    className="h-8 w-8 text-slate-400 hover:text-amber-600"
+                    title="Replace document"
+                    onClick={() => openReplace(d)}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost" size="icon"
+                    className="h-8 w-8 text-slate-400 hover:text-emerald-600"
+                    title="Download"
+                    onClick={() => handleDownload(d.id, d.fileName)}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost" size="icon"
+                    className="h-8 w-8 text-red-400 hover:text-red-600"
+                    title="Delete"
+                    onClick={() => setDeleteTarget(d.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
@@ -409,7 +412,7 @@ export default function VendorPortalDocumentsPage() {
       </Dialog>
 
       {/* Document Preview Modal */}
-      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); setPreviewName(null); } }}>
+      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { setPreviewUrl(null); setPreviewName(null); } }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{previewName ?? 'Document Preview'}</DialogTitle>

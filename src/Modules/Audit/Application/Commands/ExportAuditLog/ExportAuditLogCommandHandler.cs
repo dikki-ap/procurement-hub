@@ -55,7 +55,7 @@ public class ExportAuditLogCommandHandler : IRequestHandler<ExportAuditLogComman
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
         await _storage.UploadAsync(Bucket, objectKey, stream, "text/csv", ct);
 
-        return await _storage.GetPresignedUrlAsync(Bucket, objectKey, TimeSpan.FromHours(1), ct);
+        return await _storage.GetPresignedUrlAsync(Bucket, objectKey, TimeSpan.FromHours(1), ct: ct);
     }
 
     private static string BuildCsv(List<AuditLog> rows)

@@ -2,6 +2,7 @@ using ProcureHub.SharedKernel.CQRS;
 
 namespace ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocumentDownloadUrl;
 
-public record VendorDocumentStream(Stream Content, string ContentType, string? FileName);
+public record VendorDocumentUrl(string Url, string FileName);
 
-public record GetVendorDocumentDownloadUrlQuery(Guid VendorId, Guid DocumentId) : IQuery<VendorDocumentStream>;
+public record GetVendorDocumentDownloadUrlQuery(Guid VendorId, Guid DocumentId, bool Inline = false)
+    : IQuery<VendorDocumentUrl>;

@@ -149,15 +149,8 @@ export default function VendorDetailPage() {
 
   const handleDownload = async (docId: string, fileName: string | null) => {
     try {
-      const blob = await vendorApi.downloadDocument(id!, docId, false);
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = fileName ?? 'document';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const { url } = await vendorApi.getDocumentUrl(id!, docId, false);
+      window.open(url, '_blank', 'noopener,noreferrer');
     } catch {
       toast.error('Failed to download file');
     }
@@ -165,8 +158,7 @@ export default function VendorDetailPage() {
 
   const handlePreview = async (docId: string, fileName: string | null) => {
     try {
-      const blob = await vendorApi.downloadDocument(id!, docId, true);
-      const url  = URL.createObjectURL(blob);
+      const { url } = await vendorApi.getDocumentUrl(id!, docId, true);
       setPreviewName(fileName);
       setPreviewUrl(url);
     } catch {
@@ -434,7 +426,7 @@ export default function VendorDetailPage() {
       )}
 
       {/* ── Document Preview Modal ── */}
-      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); setPreviewName(null); } }}>
+      <Dialog open={!!previewUrl} onOpenChange={(v) => { if (!v) { setPreviewUrl(null); setPreviewName(null); } }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{previewName ?? 'Document Preview'}</DialogTitle>

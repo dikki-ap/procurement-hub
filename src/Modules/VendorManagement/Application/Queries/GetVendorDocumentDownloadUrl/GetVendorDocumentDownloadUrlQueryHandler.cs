@@ -5,7 +5,7 @@ using ProcureHub.SharedKernel.Exceptions;
 
 namespace ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocumentDownloadUrl;
 
-public class GetVendorDocumentDownloadUrlQueryHandler : IQueryHandler<GetVendorDocumentDownloadUrlQuery, VendorDocumentStream>
+public class GetVendorDocumentDownloadUrlQueryHandler : IQueryHandler<GetVendorDocumentDownloadUrlQuery, VendorDocumentUrl>
 {
     private readonly IVendorDocumentRepository _docRepo;
     private readonly IStorageService           _storage;
@@ -16,7 +16,7 @@ public class GetVendorDocumentDownloadUrlQueryHandler : IQueryHandler<GetVendorD
         _storage = storage;
     }
 
-    public async Task<VendorDocumentStream> Handle(GetVendorDocumentDownloadUrlQuery query, CancellationToken ct)
+    public async Task<VendorDocumentUrl> Handle(GetVendorDocumentDownloadUrlQuery query, CancellationToken ct)
     {
         var doc = await _docRepo.GetByIdAsync(query.DocumentId, ct)
             ?? throw new NotFoundException("VendorDocument", query.DocumentId);
@@ -24,8 +24,14 @@ public class GetVendorDocumentDownloadUrlQueryHandler : IQueryHandler<GetVendorD
         if (doc.VendorId != query.VendorId)
             throw new NotFoundException("VendorDocument", query.DocumentId);
 
-        var (stream, contentType) = await _storage.DownloadAsync("vendor-documents", doc.FileUrl, ct);
+        var fileName    = doc.FileName ?? "document";
+        var disposition = query.Inline
+            ? "inline"
+            : $"attachment; filename=\"{Uri.EscapeDataString(fileName)}\"";
 
-        return new VendorDocumentStream(stream, contentType, doc.FileName);
+        var url = await _storage.GetPresignedUrlAsync(
+            "vendor-documents", doc.FileUrl, TimeSpan.FromMinutes(10), disposition, ct);
+
+        return new VendorDocumentUrl(url, fileName);
     }
 }

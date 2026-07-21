@@ -142,9 +142,11 @@ public class VendorsController : ControllerBase
             throw new BusinessRuleException("UploadDocument",
                 $"File exceeds the {docType.MaxFileSizeMb} MB limit for {docType.Name}.");
 
-        await using var stream = request.File.OpenReadStream();
+        using var ms = new MemoryStream((int)request.File.Length);
+        await request.File.CopyToAsync(ms, ct);
+        ms.Position = 0;
 
-        if (!await FileSignatureValidator.IsValidAsync(stream, ext))
+        if (!await FileSignatureValidator.IsValidAsync(ms, ext))
             throw new BusinessRuleException("UploadDocument",
                 "File content does not match the declared file type.");
 
@@ -152,7 +154,7 @@ public class VendorsController : ControllerBase
             id,
             request.DocumentType,
             request.DocumentNumber,
-            stream,
+            ms,
             request.File.FileName,
             request.File.ContentType,
             docType.MaxFileSizeMb,
@@ -174,15 +176,13 @@ public class VendorsController : ControllerBase
         return Ok(ApiResponse.Ok("Document deleted."));
     }
 
-    /// <summary>Stream a vendor document file. Use ?inline=true for browser preview.</summary>
+    /// <summary>Return a short-lived presigned URL for the document. Use ?inline=true for browser preview.</summary>
     [HttpGet("{id:guid}/documents/{documentId:guid}/download")]
-    public async Task<IActionResult> DownloadDocument(
+    public async Task<ActionResult<ApiResponse<object>>> DownloadDocument(
         Guid id, Guid documentId, [FromQuery] bool inline, CancellationToken ct)
     {
-        var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(id, documentId), ct);
-        var disposition = inline ? "inline" : $"attachment; filename=\"{result.FileName ?? "document"}\"";
-        Response.Headers["Content-Disposition"] = disposition;
-        return File(result.Content, result.ContentType);
+        var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(id, documentId, inline), ct);
+        return Ok(ApiResponse.Ok(new { url = result.Url, fileName = result.FileName }));
     }
 
     /// <summary>Add a capability (approved supply category) to a vendor.</summary>

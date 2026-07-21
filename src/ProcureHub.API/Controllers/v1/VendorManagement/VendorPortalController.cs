@@ -104,10 +104,15 @@ public class VendorPortalController : ControllerBase
             throw new BusinessRuleException("UploadDocument",
                 $"File exceeds the {docType.MaxFileSizeMb} MB limit for {docType.Name}.");
 
-        await using var stream = request.File.OpenReadStream();
+        // Buffer to MemoryStream first — IFormFile.OpenReadStream() may return a non-seekable
+        // RangeReadStream; MemoryStream is always seekable so the signature validator can
+        // reset position to 0 before passing the full content to the upload command.
+        using var ms = new MemoryStream((int)request.File.Length);
+        await request.File.CopyToAsync(ms, ct);
+        ms.Position = 0;
 
         // Verify actual file content matches the declared extension (magic bytes)
-        if (!await FileSignatureValidator.IsValidAsync(stream, ext))
+        if (!await FileSignatureValidator.IsValidAsync(ms, ext))
             throw new BusinessRuleException("UploadDocument",
                 "File content does not match the declared file type.");
 
@@ -115,7 +120,7 @@ public class VendorPortalController : ControllerBase
             vendorId,
             request.DocumentType,
             request.DocumentNumber,
-            stream,
+            ms,
             request.File.FileName,
             request.File.ContentType,
             docType.MaxFileSizeMb,
@@ -137,16 +142,14 @@ public class VendorPortalController : ControllerBase
         return Ok(ApiResponse.Ok("Document deleted."));
     }
 
-    /// <summary>Stream own vendor document file. Use ?inline=true for browser preview.</summary>
+    /// <summary>Return a short-lived presigned URL for the document. Use ?inline=true for browser preview.</summary>
     [HttpGet("{vendorId:guid}/documents/{documentId:guid}/download")]
-    public async Task<IActionResult> DownloadDocument(
+    public async Task<ActionResult<ApiResponse<object>>> DownloadDocument(
         Guid vendorId, Guid documentId, [FromQuery] bool inline, CancellationToken ct)
     {
         await VerifyOwnershipAsync(vendorId, ct);
-        var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(vendorId, documentId), ct);
-        var disposition = inline ? "inline" : $"attachment; filename=\"{result.FileName ?? "document"}\"";
-        Response.Headers["Content-Disposition"] = disposition;
-        return File(result.Content, result.ContentType);
+        var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(vendorId, documentId, inline), ct);
+        return Ok(ApiResponse.Ok(new { url = result.Url, fileName = result.FileName }));
     }
 
     /// <summary>Get active document types available for upload.</summary>
