@@ -195,6 +195,36 @@ SMTP_PASSWORD=
 
 ---
 
+## Current Status
+
+All 12 development phases are complete. The system is in **UAT (User Acceptance Testing)** phase. A comprehensive senior architect audit was performed on 2026-07-21 identifying gaps for enterprise go-live readiness.
+
+### UAT Bug Fixes (Resolved)
+
+| # | Issue | Status |
+|---|-------|--------|
+| 1 | Document preview/download showing alt text — SeaweedFS aws-chunked encoding corruption | ✅ Fixed |
+| 2 | Presigned URL using HTTPS on HTTP SeaweedFS endpoint | ✅ Fixed |
+| 3 | `BucketAlreadyExistsException` on startup | ✅ Fixed |
+| 4 | Vendor capability dropdown empty (hardcoded company ID) | ✅ Fixed |
+| 5 | Notification panel causing 401 spam for vendor sessions | ✅ Fixed |
+| 6 | `ExportAuditLogCommandHandler` CS1503 build error | ✅ Fixed |
+
+### Enterprise Completion Roadmap
+
+| Sprint | Focus | Priority |
+|--------|-------|----------|
+| Sprint 1 | Vendor Address · Bank Account · Default Payment/Currency · Quotation Security Fix · Capability Expiry+MaxQty | 🔴 Critical |
+| Sprint 2 | Vendor Score History UI · Company Profile · Department Entity · User Management | 🟠 High |
+| Sprint 3 | Contract Management — full feature (commands, API, Hangfire, frontend) | 🟠 High |
+| Sprint 4 | Invoice 3-Way Matching · Vendor Portal Edit+Notifications · Return Orders | 🟠 High |
+| Sprint 5 | Spend Analytics by Category · Cycle Time KPIs · RFQ/Quotation Attachments · PO Ack Deadline · Multi-Evaluator | 🟡 Medium |
+| Sprint 6 | Indonesian Tax (PKP + PPh) · Multi-Tenancy Security Audit · Document Access Logging · Final Hardening | 🟡 Medium |
+
+Full step-by-step details for each sprint are in [`projects/project.md`](projects/project.md) — Section 31.
+
+---
+
 ## License
 
 Private — All rights reserved.
