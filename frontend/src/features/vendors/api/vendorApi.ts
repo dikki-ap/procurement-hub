@@ -64,6 +64,7 @@ export interface VendorDetailDto extends VendorDto {
     id: string;
     materialCategoryId: string;
     minOrderQty: number | null;
+    uom: string | null;
     leadTimeDays: number | null;
     notes: string | null;
   }[];
@@ -119,13 +120,13 @@ export const vendorApi = {
 
   addCapability: (
     vendorId: string,
-    payload: { materialCategoryId: string; minOrderQty?: number | null; leadTimeDays?: number | null; notes?: string | null }
+    payload: { materialCategoryId: string; minOrderQty?: number | null; uom?: string | null; leadTimeDays?: number | null; notes?: string | null }
   ) => apiClient.post(`${BASE}/${vendorId}/capabilities`, payload),
 
   updateCapability: (
     vendorId: string,
     capabilityId: string,
-    payload: { minOrderQty?: number | null; leadTimeDays?: number | null; notes?: string | null }
+    payload: { minOrderQty?: number | null; uom?: string | null; leadTimeDays?: number | null; notes?: string | null }
   ) => apiClient.put(`${BASE}/${vendorId}/capabilities/${capabilityId}`, payload),
 
   deleteCapability: (vendorId: string, capabilityId: string) =>

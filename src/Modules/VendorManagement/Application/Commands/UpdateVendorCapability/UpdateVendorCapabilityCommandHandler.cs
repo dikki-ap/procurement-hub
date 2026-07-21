@@ -23,6 +23,7 @@ public class UpdateVendorCapabilityCommandHandler : ICommandHandler<UpdateVendor
             ?? throw new NotFoundException("VendorCapability", command.CapabilityId);
 
         capability.MinOrderQty  = command.MinOrderQty;
+        capability.Uom          = command.Uom;
         capability.LeadTimeDays = command.LeadTimeDays;
         capability.Notes        = command.Notes;
 

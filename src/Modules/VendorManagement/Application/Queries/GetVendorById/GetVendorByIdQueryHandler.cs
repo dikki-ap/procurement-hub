@@ -51,5 +51,5 @@ public class GetVendorByIdQueryHandler : IQueryHandler<GetVendorByIdQuery, Vendo
             d.Id, d.DocumentType, d.DocumentNumber, d.FileUrl, d.FileName,
             d.FileSize, d.ExpiredAt, d.IssuedAt, d.Status, d.Notes)).ToList(),
         v.Capabilities.Select(cap => new VendorCapabilityDto(
-            cap.Id, cap.MaterialCategoryId, cap.MinOrderQty, cap.LeadTimeDays, cap.Notes)).ToList());
+            cap.Id, cap.MaterialCategoryId, cap.MinOrderQty, cap.Uom, cap.LeadTimeDays, cap.Notes)).ToList());
 }

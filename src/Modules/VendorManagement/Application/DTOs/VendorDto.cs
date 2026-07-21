@@ -71,6 +71,7 @@ public record VendorCapabilityDto(
     Guid     Id,
     Guid     MaterialCategoryId,
     decimal? MinOrderQty,
+    string?  Uom,
     int?     LeadTimeDays,
     string?  Notes
 );

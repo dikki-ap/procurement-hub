@@ -192,7 +192,7 @@ public class VendorsController : ControllerBase
         Guid id, [FromBody] AddCapabilityRequest request, CancellationToken ct)
     {
         var capId = await _mediator.Send(new AddVendorCapabilityCommand(
-            id, request.MaterialCategoryId, request.MinOrderQty, request.LeadTimeDays, request.Notes), ct);
+            id, request.MaterialCategoryId, request.MinOrderQty, request.Uom, request.LeadTimeDays, request.Notes), ct);
         return CreatedAtAction(nameof(GetById), new { id }, ApiResponse.Ok(new { id = capId }));
     }
 
@@ -203,7 +203,7 @@ public class VendorsController : ControllerBase
         Guid id, Guid capabilityId, [FromBody] UpdateCapabilityRequest request, CancellationToken ct)
     {
         await _mediator.Send(new UpdateVendorCapabilityCommand(
-            capabilityId, request.MinOrderQty, request.LeadTimeDays, request.Notes), ct);
+            capabilityId, request.MinOrderQty, request.Uom, request.LeadTimeDays, request.Notes), ct);
         return Ok(ApiResponse.Ok("Capability updated."));
     }
 
@@ -223,11 +223,13 @@ public record BlacklistRequest(string Reason);
 public record AddCapabilityRequest(
     Guid     MaterialCategoryId,
     decimal? MinOrderQty,
+    string?  Uom,
     int?     LeadTimeDays,
     string?  Notes);
 
 public record UpdateCapabilityRequest(
     decimal? MinOrderQty,
+    string?  Uom,
     int?     LeadTimeDays,
     string?  Notes);
 

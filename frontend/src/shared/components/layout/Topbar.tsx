@@ -42,7 +42,7 @@ export const Topbar = () => {
 
       {/* Right: notifications + user info + logout */}
       <div className="flex items-center gap-3">
-        <NotificationPanel />
+        {!user?.vendorId && <NotificationPanel />}
         <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-xs font-semibold flex-shrink-0">
           {initials}
         </div>

@@ -17,8 +17,7 @@ import { fmtDate, fmtDateTime } from '@/shared/lib/date';
 import { materialCategoryApi } from '@/features/master-data/material-category/api/materialCategoryApi';
 import { SearchableSelect } from '@/shared/components/SearchableSelect';
 import { extractApiError } from '@/shared/lib/apiError';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const inputCls =
   'w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50';
@@ -63,8 +62,10 @@ type InfoField = { label: string; value: string; Icon: React.ElementType };
 
 // ── capability modal state ────────────────────────────────────────────────────
 
-type CapForm = { materialCategoryId: string; minOrderQty: string; leadTimeDays: string; notes: string };
-const emptyCapForm = (): CapForm => ({ materialCategoryId: '', minOrderQty: '', leadTimeDays: '', notes: '' });
+type CapForm = { materialCategoryId: string; minOrderQty: string; uom: string; leadTimeDays: string; notes: string };
+const emptyCapForm = (): CapForm => ({ materialCategoryId: '', minOrderQty: '', uom: '', leadTimeDays: '', notes: '' });
+
+const UOM_OPTIONS = ['pcs', 'kg', 'ton', 'liter', 'm', 'm²', 'm³', 'box', 'set', 'unit'];
 
 // ── main component ────────────────────────────────────────────────────────────
 
@@ -72,6 +73,7 @@ export default function VendorDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const companyId = useAuthStore(s => s.user?.companyId ?? '');
   const [activeTab, setActiveTab] = useState<Tab>('Info');
 
   // document preview state
@@ -92,8 +94,9 @@ export default function VendorDetailPage() {
   });
 
   const { data: categories = [] } = useQuery({
-    queryKey: ['material-categories', COMPANY_ID],
-    queryFn:  () => materialCategoryApi.getAll(COMPANY_ID),
+    queryKey: ['material-categories', companyId],
+    queryFn:  () => materialCategoryApi.getAll(companyId),
+    enabled:  !!companyId,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -108,6 +111,7 @@ export default function VendorDetailPage() {
     mutationFn: () => vendorApi.addCapability(id!, {
       materialCategoryId: capForm.materialCategoryId,
       minOrderQty:   capForm.minOrderQty   ? parseFloat(capForm.minOrderQty)   : null,
+      uom:           capForm.uom || null,
       leadTimeDays:  capForm.leadTimeDays  ? parseInt(capForm.leadTimeDays)    : null,
       notes:         capForm.notes || null,
     }),
@@ -123,6 +127,7 @@ export default function VendorDetailPage() {
   const updateCapMutation = useMutation({
     mutationFn: () => vendorApi.updateCapability(id!, editingCapId!, {
       minOrderQty:   capForm.minOrderQty   ? parseFloat(capForm.minOrderQty)   : null,
+      uom:           capForm.uom || null,
       leadTimeDays:  capForm.leadTimeDays  ? parseInt(capForm.leadTimeDays)    : null,
       notes:         capForm.notes || null,
     }),
@@ -179,6 +184,7 @@ export default function VendorDetailPage() {
     setCapForm({
       materialCategoryId: cap.materialCategoryId,
       minOrderQty:  cap.minOrderQty  != null ? String(cap.minOrderQty)  : '',
+      uom:          cap.uom ?? '',
       leadTimeDays: cap.leadTimeDays != null ? String(cap.leadTimeDays) : '',
       notes:        cap.notes ?? '',
     });
@@ -397,7 +403,9 @@ export default function VendorDetailPage() {
                     {categoryMap.get(cap.materialCategoryId) ?? cap.materialCategoryId}
                   </p>
                   <div className="flex flex-wrap gap-4 mt-1 text-xs text-slate-500">
-                    {cap.minOrderQty  != null && <span>Min Order: <strong>{cap.minOrderQty}</strong></span>}
+                    {cap.minOrderQty  != null && (
+                      <span>Min Order: <strong>{cap.minOrderQty}{cap.uom ? ` ${cap.uom}` : ''}</strong></span>
+                    )}
                     {cap.leadTimeDays != null && <span>Lead Time: <strong>{cap.leadTimeDays}d</strong></span>}
                     {cap.notes && <span className="italic">{cap.notes}</span>}
                   </div>
@@ -474,15 +482,26 @@ export default function VendorDetailPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Lead Time (days)</label>
-                <input
-                  type="number" min="0" step="1"
+                <label className="block text-sm font-medium mb-1">Unit of Measure</label>
+                <select
                   className={inputCls}
-                  value={capForm.leadTimeDays}
-                  onChange={(e) => setCapForm(f => ({ ...f, leadTimeDays: e.target.value }))}
-                  placeholder="e.g. 7"
-                />
+                  value={capForm.uom}
+                  onChange={(e) => setCapForm(f => ({ ...f, uom: e.target.value }))}
+                >
+                  <option value="">— select —</option>
+                  {UOM_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Lead Time (days)</label>
+              <input
+                type="number" min="0" step="1"
+                className={inputCls}
+                value={capForm.leadTimeDays}
+                onChange={(e) => setCapForm(f => ({ ...f, leadTimeDays: e.target.value }))}
+                placeholder="e.g. 7"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Notes</label>

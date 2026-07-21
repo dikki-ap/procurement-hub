@@ -36,6 +36,7 @@ public class AddVendorCapabilityCommandHandler : ICommandHandler<AddVendorCapabi
             VendorId           = vendor.Id,
             MaterialCategoryId = command.MaterialCategoryId,
             MinOrderQty        = command.MinOrderQty,
+            Uom                = command.Uom,
             LeadTimeDays       = command.LeadTimeDays,
             Notes              = command.Notes,
         };
