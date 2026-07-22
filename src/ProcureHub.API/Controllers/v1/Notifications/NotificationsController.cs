@@ -11,7 +11,7 @@ namespace ProcureHub.API.Controllers.v1.Notifications;
 /// <summary>In-app notifications.</summary>
 [ApiController]
 [Route("api/v1/notifications")]
-[Authorize(Policy = "RequireInternal")]
+[Authorize]
 public class NotificationsController : ControllerBase
 {
     private readonly IMediator           _mediator;
