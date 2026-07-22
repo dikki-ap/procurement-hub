@@ -73,6 +73,12 @@ public static class HangfireExtensions
             "0 */2 * * *",
             new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
 
+        RecurringJob.AddOrUpdate<POAcknowledgementReminderJob>(
+            "po-acknowledgement-reminder",
+            job => job.ExecuteAsync(CancellationToken.None),
+            "30 7 * * *",
+            new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
+
         // Register daily exchange rate sync only if auto-sync is enabled in DB settings
         using var scope     = app.Services.CreateScope();
         var       configRepo = scope.ServiceProvider.GetRequiredService<IExchangeRateConfigRepository>();

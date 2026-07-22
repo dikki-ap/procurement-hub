@@ -1,9 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProcureHub.Modules.Analytics.Application.Queries.GetCycleTime;
 using ProcureHub.Modules.Analytics.Application.Queries.GetDashboardWidgets;
 using ProcureHub.Modules.Analytics.Application.Queries.GetProcurementFunnelStats;
+using ProcureHub.Modules.Analytics.Application.Queries.GetSpendByCategory;
 using ProcureHub.Modules.Analytics.Application.Queries.GetSpendSummary;
+using ProcureHub.Modules.Analytics.Application.Queries.GetVendorConcentration;
 using ProcureHub.Modules.Analytics.Application.Queries.GetVendorPerformanceSummary;
 using ProcureHub.SharedKernel.Abstractions;
 using ProcureHub.SharedKernel.Common;
@@ -75,5 +78,37 @@ public class DashboardController : ControllerBase
         var result = await _mediator.Send(
             new GetProcurementFunnelStatsQuery(companyId, year), ct);
         return Ok(ApiResponse<FunnelStatsDto>.Ok(result));
+    }
+
+    /// <summary>Top 10 spend categories for a given year.</summary>
+    [HttpGet("spend-by-category")]
+    public async Task<IActionResult> GetSpendByCategory(
+        [FromQuery] Guid companyId,
+        [FromQuery] int  year = 0,
+        CancellationToken ct = default)
+    {
+        var result = await _mediator.Send(new GetSpendByCategoryQuery(companyId, year), ct);
+        return Ok(ApiResponse<List<SpendByCategoryDto>>.Ok(result));
+    }
+
+    /// <summary>Average procurement cycle time per stage over the last N months.</summary>
+    [HttpGet("cycle-time")]
+    public async Task<IActionResult> GetCycleTime(
+        [FromQuery] Guid companyId,
+        [FromQuery] int  months = 3,
+        CancellationToken ct = default)
+    {
+        var result = await _mediator.Send(new GetCycleTimeQuery(companyId, months), ct);
+        return Ok(ApiResponse<List<CycleTimeStageDto>>.Ok(result));
+    }
+
+    /// <summary>Top 5 vendors by spend share — flags single-vendor concentration risk.</summary>
+    [HttpGet("vendor-concentration")]
+    public async Task<IActionResult> GetVendorConcentration(
+        [FromQuery] Guid companyId,
+        CancellationToken ct = default)
+    {
+        var result = await _mediator.Send(new GetVendorConcentrationQuery(companyId), ct);
+        return Ok(ApiResponse<VendorConcentrationDto>.Ok(result));
     }
 }

@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, FileText, CheckCircle, Truck } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle, Truck, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { fulfillmentApi, type POStatus, type GRNStatus } from '../api/fulfillmentApi';
@@ -123,6 +123,27 @@ export default function PODetailPage() {
             <dd className="mt-0.5 font-semibold">{value}</dd>
           </div>
         ))}
+        {po.status === 'Issued' && po.acknowledgementDeadline && (() => {
+          const deadline = new Date(po.acknowledgementDeadline);
+          const now      = new Date();
+          const daysLeft = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          const isOverdue = daysLeft <= 0;
+          return (
+            <div className="col-span-2 flex items-center gap-2 p-3 rounded-lg border border-amber-200 bg-amber-50">
+              <AlertTriangle className={`h-4 w-4 flex-shrink-0 ${isOverdue ? 'text-red-600' : 'text-amber-600'}`} />
+              <div>
+                <dt className={`text-xs font-semibold ${isOverdue ? 'text-red-700' : 'text-amber-700'}`}>
+                  {isOverdue ? 'Acknowledgement OVERDUE' : 'Acknowledgement Deadline'}
+                </dt>
+                <dd className={`text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-amber-600'}`}>
+                  {fmtDate(po.acknowledgementDeadline)}
+                  {!isOverdue && ` — ${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining`}
+                  {isOverdue && ` — ${Math.abs(daysLeft)} day${Math.abs(daysLeft) !== 1 ? 's' : ''} overdue`}
+                </dd>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {po.notes && (

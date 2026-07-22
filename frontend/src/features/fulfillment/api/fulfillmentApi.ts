@@ -44,7 +44,8 @@ export interface PODto extends POListDto {
   fileUrl: string | null;
   notes: string | null;
   termsConditions: string | null;
-  acknowledgedAt: string | null;
+  acknowledgedAt:           string | null;
+  acknowledgementDeadline:  string | null;
   completedAt: string | null;
   cancelledAt: string | null;
   cancelledReason: string | null;

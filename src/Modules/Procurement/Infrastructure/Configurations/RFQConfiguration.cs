@@ -19,6 +19,8 @@ public class RFQConfiguration : BaseSoftDeleteEntityConfiguration<RFQ>
         builder.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
         builder.Property(e => e.Notes).HasColumnType("TEXT");
         builder.Property(e => e.Terms).HasColumnType("TEXT");
+        builder.Property(e => e.FileKey).HasMaxLength(500);
+        builder.Property(e => e.FileName).HasMaxLength(255);
 
         builder.HasIndex(e => new { e.CompanyId, e.RFQNumber }).IsUnique();
         builder.HasIndex(e => new { e.CompanyId, e.Status });

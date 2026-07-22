@@ -4,7 +4,7 @@ export type PRStatus         = 'Draft' | 'Submitted' | 'Approved' | 'Rejected' |
 export type RFQStatus        = 'Draft' | 'Open' | 'Closed' | 'Cancelled';
 export type RFQVendorStatus  = 'Invited' | 'Declined' | 'Submitted';
 export type QuotationStatus  = 'Draft' | 'Submitted' | 'Withdrawn' | 'Awarded' | 'Rejected';
-export type EvaluationStatus = 'Pending' | 'Awarded';
+export type EvaluationStatus = 'Pending' | 'InProgress' | 'Awarded';
 
 export interface PRItemDto {
   id: string;
@@ -80,6 +80,8 @@ export interface RFQDto extends RFQListDto {
   notes: string | null;
   terms: string | null;
   updatedAt: string;
+  fileKey:  string | null;
+  fileName: string | null;
   items: RFQItemDto[];
   vendors: RFQVendorDto[];
 }
@@ -179,6 +181,13 @@ export interface EvaluationScoreDto {
   weightedTotal: number;
 }
 
+export interface EvaluatorAssignmentDto {
+  id: string;
+  assignedUserId: string;
+  assignedUserName: string;
+  hasSubmitted: boolean;
+}
+
 export interface BidEvaluationDto {
   id: string;
   rfqId: string;
@@ -189,6 +198,7 @@ export interface BidEvaluationDto {
   awardedVendorId: string | null;
   awardedQuotationId: string | null;
   scores: EvaluationScoreDto[];
+  evaluators: EvaluatorAssignmentDto[];
 }
 
 export interface SubmitQuotationItemRequest {
@@ -283,6 +293,17 @@ export const procurementApi = {
   awardVendor: (rfqId: string, quotationId: string, vendorId: string) =>
     apiClient.post(`/rfqs/${rfqId}/award`, { rfqId, quotationId, vendorId }),
 
+  uploadRFQAttachment: (rfqId: string, file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return apiClient.post<{ data: { key: string } }>(`/rfqs/${rfqId}/upload`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  getRFQAttachmentUrl: (rfqId: string) =>
+    apiClient.get<{ data: { url: string } }>(`/rfqs/${rfqId}/download`).then(r => r.data.data.url),
+
   // ── Quotation (vendor portal) ─────────────────────────────────────────────
 
   submitQuotation: (data: SubmitQuotationRequest) =>
@@ -293,4 +314,26 @@ export const procurementApi = {
 
   getMyQuotations: (vendorId: string) =>
     apiClient.get<QuotationListDto[]>('/quotations', { params: { vendorId } }),
+
+  uploadQuotationAttachment: (quotationId: string, file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return apiClient.post<{ data: { key: string } }>(`/quotations/${quotationId}/upload`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  getQuotationAttachmentUrl: (quotationId: string) =>
+    apiClient.get<{ data: { url: string } }>(`/quotations/${quotationId}/download`).then(r => r.data.data.url),
+
+  // ── Multi-evaluator ───────────────────────────────────────────────────────
+
+  assignEvaluator: (rfqId: string, userId: string, userName: string) =>
+    apiClient.post<{ data: { assignmentId: string } }>(`/rfqs/${rfqId}/evaluators`, { userId, userName }),
+
+  submitEvaluatorScores: (rfqId: string, scores: { quotationId: string; qualityScore: number; deliveryScore: number }[]) =>
+    apiClient.post(`/rfqs/${rfqId}/evaluators/scores`, { scores }),
+
+  finalizeEvaluation: (rfqId: string) =>
+    apiClient.post(`/rfqs/${rfqId}/finalize`),
 };

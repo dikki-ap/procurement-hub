@@ -3,15 +3,16 @@ using ProcureHub.Modules.Procurement.Domain.Enums;
 namespace ProcureHub.Modules.Procurement.Application.DTOs;
 
 public record BidEvaluationDto(
-    Guid                     Id,
-    Guid                     RFQId,
-    decimal                  PriceWeight,
-    decimal                  QualityWeight,
-    decimal                  DeliveryWeight,
-    EvaluationStatus         Status,
-    Guid?                    AwardedVendorId,
-    Guid?                    AwardedQuotationId,
-    List<EvaluationScoreDto> Scores);
+    Guid                          Id,
+    Guid                          RFQId,
+    decimal                       PriceWeight,
+    decimal                       QualityWeight,
+    decimal                       DeliveryWeight,
+    EvaluationStatus              Status,
+    Guid?                         AwardedVendorId,
+    Guid?                         AwardedQuotationId,
+    List<EvaluationScoreDto>      Scores,
+    List<EvaluatorAssignmentDto>  Evaluators);
 
 public record EvaluationScoreDto(
     Guid    QuotationId,
@@ -21,3 +22,9 @@ public record EvaluationScoreDto(
     decimal QualityScore,
     decimal DeliveryScore,
     decimal WeightedTotal);
+
+public record EvaluatorAssignmentDto(
+    Guid   Id,
+    Guid   AssignedUserId,
+    string AssignedUserName,
+    bool   HasSubmitted);

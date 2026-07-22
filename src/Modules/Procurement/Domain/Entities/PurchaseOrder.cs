@@ -22,8 +22,9 @@ public class PurchaseOrder : AggregateRoot
     public string?   FileUrl            { get; set; }
     public string?   Notes              { get; set; }
     public string?   TermsConditions    { get; set; }
-    public DateTime? IssuedAt           { get; set; }
-    public DateTime? AcknowledgedAt     { get; set; }
+    public DateTime? IssuedAt                 { get; set; }
+    public DateTime? AcknowledgedAt           { get; set; }
+    public DateTime? AcknowledgementDeadline  { get; set; }
     public DateTime? CompletedAt        { get; set; }
     public DateTime? CancelledAt        { get; set; }
     public string?   CancelledReason    { get; set; }
@@ -63,9 +64,10 @@ public class PurchaseOrder : AggregateRoot
         if (!Items.Any())
             throw new BusinessRuleException("POIssue", "PO must have at least one item.");
 
-        Status   = POStatus.Issued;
-        FileUrl  = fileUrl;
-        IssuedAt = DateTime.UtcNow;
+        Status                  = POStatus.Issued;
+        FileUrl                 = fileUrl;
+        IssuedAt                = DateTime.UtcNow;
+        AcknowledgementDeadline = AddBusinessDays(IssuedAt.Value, 3);
 
         AddDomainEvent(new POIssuedEvent(Id, PONumber, VendorId, CompanyId, TotalAmount));
     }
@@ -121,4 +123,16 @@ public class PurchaseOrder : AggregateRoot
 
     public void RecalculateTotal() =>
         TotalAmount = Items.Sum(i => i.TotalPrice);
+
+    private static DateTime AddBusinessDays(DateTime start, int days)
+    {
+        var date = start;
+        for (var i = 0; i < days; i++)
+        {
+            date = date.AddDays(1);
+            while (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+                date = date.AddDays(1);
+        }
+        return date;
+    }
 }

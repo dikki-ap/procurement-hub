@@ -24,5 +24,10 @@ public class BidEvaluationConfiguration : BaseAuditableEntityConfiguration<BidEv
                .WithOne(s => s.Evaluation)
                .HasForeignKey(s => s.BidEvaluationId)
                .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(e => e.Evaluators)
+               .WithOne(a => a.Evaluation)
+               .HasForeignKey(a => a.BidEvaluationId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

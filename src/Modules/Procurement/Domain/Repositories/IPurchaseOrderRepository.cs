@@ -10,6 +10,7 @@ public interface IPurchaseOrderRepository
     Task<PurchaseOrder?>      GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<PurchaseOrder?>      GetByIdWithItemsAsync(Guid id, CancellationToken ct = default);
     Task<string>              GenerateNextNumberAsync(Guid companyId, CancellationToken ct = default);
+    Task<List<PurchaseOrder>> GetIssuedUnacknowledgedAsync(CancellationToken ct = default);
     void                      Add(PurchaseOrder po);
     void                      Update(PurchaseOrder po);
     Task<int>                 SaveChangesAsync(CancellationToken ct = default);

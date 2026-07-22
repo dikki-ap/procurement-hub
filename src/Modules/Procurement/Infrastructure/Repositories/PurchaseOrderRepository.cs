@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProcureHub.Modules.Procurement.Domain.Entities;
+using ProcureHub.Modules.Procurement.Domain.Enums;
 using ProcureHub.Modules.Procurement.Domain.Repositories;
 using ProcureHub.SharedKernel.Database;
 
@@ -46,6 +47,12 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
                                            && p.CreatedAt.Year == year, ct);
         return $"PO-{year}-{(count + 1):D6}";
     }
+
+    public Task<List<PurchaseOrder>> GetIssuedUnacknowledgedAsync(CancellationToken ct = default)
+        => _db.Set<PurchaseOrder>()
+              .Where(p => p.Status == POStatus.Issued
+                       && p.AcknowledgementDeadline != null)
+              .ToListAsync(ct);
 
     public void Add(PurchaseOrder po)    => _db.Set<PurchaseOrder>().Add(po);
     public void Update(PurchaseOrder po) => _db.Set<PurchaseOrder>().Update(po);

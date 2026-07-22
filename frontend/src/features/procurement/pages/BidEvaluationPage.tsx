@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Trophy, BarChart2 } from 'lucide-react';
+import { ArrowLeft, Trophy, BarChart2, Users, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { procurementApi, type VendorScoreInput } from '@/features/procurement/api/procurementApi';
 
 const fmt = (n: number) =>
@@ -26,19 +27,23 @@ export default function BidEvaluationPage() {
     enabled:  !!id,
   });
 
-  // Weights
+  // Single-evaluator weights
   const [priceWeight,    setPriceWeight]    = useState('50');
   const [qualityWeight,  setQualityWeight]  = useState('30');
   const [deliveryWeight, setDeliveryWeight] = useState('20');
 
-  // Scores per vendor
+  // Single-evaluator scores per vendor
   const [scores, setScores] = useState<Record<string, { quality: string; delivery: string }>>({});
 
   const setScore = (quotationId: string, field: 'quality' | 'delivery', value: string) =>
     setScores(prev => ({ ...prev, [quotationId]: { ...prev[quotationId], [field]: value } }));
 
-  const weightsSum = parseFloat(priceWeight || '0') + parseFloat(qualityWeight || '0') + parseFloat(deliveryWeight || '0');
+  const weightsSum   = parseFloat(priceWeight || '0') + parseFloat(qualityWeight || '0') + parseFloat(deliveryWeight || '0');
   const weightsValid = Math.abs(weightsSum - 100) <= 0.01;
+
+  // Multi-evaluator assignment form
+  const [newEvalUserId,   setNewEvalUserId]   = useState('');
+  const [newEvalUserName, setNewEvalUserName] = useState('');
 
   const evaluateMutation = useMutation({
     mutationFn: () => procurementApi.evaluateBids(id!, {
@@ -64,10 +69,27 @@ export default function BidEvaluationPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bid-evaluation', id] }),
   });
 
+  const assignEvaluatorMutation = useMutation({
+    mutationFn: () => procurementApi.assignEvaluator(id!, newEvalUserId.trim(), newEvalUserName.trim()),
+    onSuccess: () => {
+      setNewEvalUserId('');
+      setNewEvalUserName('');
+      queryClient.invalidateQueries({ queryKey: ['bid-evaluation', id] });
+    },
+  });
+
+  const finalizeMutation = useMutation({
+    mutationFn: () => procurementApi.finalizeEvaluation(id!),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bid-evaluation', id] }),
+  });
+
   if (loadingComp) return <div className="p-6 text-muted-foreground">Loading...</div>;
   if (!comparison) return <div className="p-6 text-red-500">Comparison data not available.</div>;
 
-  const isAwarded = evaluation?.status === 'Awarded';
+  const isAwarded        = evaluation?.status === 'Awarded';
+  const evaluators       = evaluation?.evaluators ?? [];
+  const allSubmitted     = evaluators.length > 0 && evaluators.every(e => e.hasSubmitted);
+  const useMultiEval     = evaluators.length > 0;
 
   return (
     <div className="space-y-8 max-w-5xl">
@@ -101,7 +123,7 @@ export default function BidEvaluationPage() {
             </thead>
             <tbody>
               {comparison.items.map(item => {
-                const prices = comparison.vendors.map(v =>
+                const prices   = comparison.vendors.map(v =>
                   v.itemPrices.find(p => p.rfqItemId === item.rfqItemId)?.unitPrice ?? 0);
                 const minPrice = Math.min(...prices.filter(p => p > 0));
                 return (
@@ -109,7 +131,7 @@ export default function BidEvaluationPage() {
                     <td className="px-3 py-2 font-medium">{item.itemDescription}</td>
                     <td className="px-3 py-2 text-right text-muted-foreground">{item.quantity} {item.unitLabel ?? ''}</td>
                     {comparison.vendors.map(v => {
-                      const p = v.itemPrices.find(ip => ip.rfqItemId === item.rfqItemId);
+                      const p          = v.itemPrices.find(ip => ip.rfqItemId === item.rfqItemId);
                       const isCheapest = p && p.unitPrice === minPrice && minPrice > 0;
                       return (
                         <td key={v.vendorId} className={`px-3 py-2 text-right ${isCheapest ? 'text-green-700 font-semibold' : ''}`}>
@@ -120,7 +142,6 @@ export default function BidEvaluationPage() {
                   </tr>
                 );
               })}
-              {/* Total row */}
               <tr className="border-t bg-muted/30 font-semibold">
                 <td className="px-3 py-2" colSpan={2}>Total Price</td>
                 {comparison.vendors.map(v => {
@@ -137,12 +158,93 @@ export default function BidEvaluationPage() {
         </div>
       </section>
 
-      {/* Weighted Evaluation Form */}
+      {/* Multi-Evaluator Assignment Panel */}
       {!isAwarded && (
         <section className="space-y-4">
-          <h2 className="text-base font-semibold">Weighted Evaluation</h2>
+          <h2 className="text-base font-semibold flex items-center gap-2">
+            <Users className="h-4 w-4" /> Evaluator Assignment
+          </h2>
 
-          {/* Weights */}
+          {/* Assign form */}
+          <div className="flex gap-3 items-end">
+            <div className="flex-1">
+              <label className="text-xs text-muted-foreground font-medium">User ID</label>
+              <Input
+                placeholder="UUID of internal user"
+                value={newEvalUserId}
+                onChange={e => setNewEvalUserId(e.target.value)}
+                className="mt-1 h-8 font-mono text-xs"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-xs text-muted-foreground font-medium">Display Name</label>
+              <Input
+                placeholder="e.g. John Smith"
+                value={newEvalUserName}
+                onChange={e => setNewEvalUserName(e.target.value)}
+                className="mt-1 h-8"
+              />
+            </div>
+            <Button
+              size="sm"
+              onClick={() => assignEvaluatorMutation.mutate()}
+              disabled={!newEvalUserId.trim() || !newEvalUserName.trim() || assignEvaluatorMutation.isPending}
+            >
+              {assignEvaluatorMutation.isPending ? 'Assigning…' : 'Assign'}
+            </Button>
+          </div>
+
+          {/* Current evaluators */}
+          {evaluators.length > 0 && (
+            <div className="rounded-md border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Evaluator</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {evaluators.map(e => (
+                    <tr key={e.id} className="border-t">
+                      <td className="px-3 py-2 font-medium">{e.assignedUserName}</td>
+                      <td className="px-3 py-2">
+                        {e.hasSubmitted
+                          ? <Badge variant="default" className="bg-green-600 gap-1"><CheckCircle className="h-3 w-3" /> Submitted</Badge>
+                          : <Badge variant="outline" className="gap-1"><Clock className="h-3 w-3" /> Pending</Badge>
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Finalize button — only when all evaluators have submitted */}
+          {useMultiEval && (
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => finalizeMutation.mutate()}
+                disabled={!allSubmitted || finalizeMutation.isPending}
+              >
+                {finalizeMutation.isPending ? 'Finalizing…' : 'Finalize Evaluation'}
+              </Button>
+              {!allSubmitted && (
+                <p className="text-xs text-amber-600">
+                  Waiting for {evaluators.filter(e => !e.hasSubmitted).length} evaluator(s) to submit scores.
+                </p>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Single-Evaluator Weighted Evaluation Form — only shown when no multi-evaluator assigned */}
+      {!isAwarded && !useMultiEval && (
+        <section className="space-y-4">
+          <h2 className="text-base font-semibold">Weighted Evaluation (Single Evaluator)</h2>
+
           <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
             {[
               { label: 'Price Weight (%)', value: priceWeight,    set: setPriceWeight },
@@ -164,7 +266,6 @@ export default function BidEvaluationPage() {
             <p className="text-xs text-amber-600">Weights must sum to 100. Current: {weightsSum.toFixed(2)}</p>
           )}
 
-          {/* Per-vendor scores */}
           <div className="rounded-md border overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
@@ -205,7 +306,7 @@ export default function BidEvaluationPage() {
       )}
 
       {/* Evaluation Result */}
-      {evaluation && (
+      {evaluation && evaluation.scores.length > 0 && (
         <section className="space-y-4">
           <h2 className="text-base font-semibold flex items-center gap-2">
             <Trophy className="h-4 w-4 text-amber-500" /> Evaluation Results

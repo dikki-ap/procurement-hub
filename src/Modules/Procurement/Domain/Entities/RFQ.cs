@@ -18,6 +18,8 @@ public class RFQ : AggregateRoot
     public RFQStatus Status                   { get; set; } = RFQStatus.Draft;
     public string?   Notes                    { get; set; }
     public string?   Terms                    { get; set; }
+    public string?   FileKey                  { get; set; }
+    public string?   FileName                 { get; set; }
 
     // Navigation
     public ICollection<RFQItem>   Items   { get; set; } = [];

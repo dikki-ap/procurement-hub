@@ -1,6 +1,7 @@
+import { useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Lock, Play, BarChart2 } from 'lucide-react';
+import { ArrowLeft, Lock, Play, BarChart2, Paperclip, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type RFQStatus, type RFQVendorStatus } from '../api/procurementApi';
@@ -52,6 +53,20 @@ export default function RFQDetailPage() {
     mutationFn: () => procurementApi.closeRFQ(id!),
     onSuccess:  () => { invalidate(); toast.success('RFQ closed'); },
     onError:    (error: unknown) => toast.error(extractApiError(error, 'Failed to close RFQ')),
+  });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadMut = useMutation({
+    mutationFn: (file: File) => procurementApi.uploadRFQAttachment(id!, file),
+    onSuccess:  () => { invalidate(); toast.success('Attachment uploaded.'); },
+    onError:    (error: unknown) => toast.error(extractApiError(error, 'Upload failed')),
+  });
+
+  const downloadMut = useMutation({
+    mutationFn: () => procurementApi.getRFQAttachmentUrl(id!),
+    onSuccess:  (url) => window.open(url, '_blank'),
+    onError:    () => toast.error('Failed to get download link.'),
   });
 
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;
@@ -174,6 +189,56 @@ export default function RFQDetailPage() {
           <p>{rfq.terms}</p>
         </div>
       )}
+
+      {/* Attachment */}
+      <div className="bg-white rounded-xl border border-slate-100 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Paperclip className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium text-sm">Attachment (TOR / Spec)</span>
+          </div>
+          <div className="flex gap-2">
+            {rfq.fileName && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => downloadMut.mutate()}
+                disabled={downloadMut.isPending}
+              >
+                <Download className="h-3.5 w-3.5 mr-1.5" />
+                {rfq.fileName}
+              </Button>
+            )}
+            {rfq.status === 'Draft' && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.xlsx,.xls,.docx,.doc"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) uploadMut.mutate(f);
+                    e.target.value = '';
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadMut.isPending}
+                >
+                  <Upload className="h-3.5 w-3.5 mr-1.5" />
+                  {uploadMut.isPending ? 'Uploading…' : rfq.fileName ? 'Replace' : 'Upload'}
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+        {!rfq.fileName && rfq.status !== 'Draft' && (
+          <p className="text-xs text-muted-foreground mt-2">No attachment uploaded.</p>
+        )}
+      </div>
     </div>
   );
 }

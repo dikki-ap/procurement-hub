@@ -16,7 +16,8 @@ public class BidEvaluation : AggregateRoot
     public Guid?            AwardedQuotationId { get; set; }
 
     // Navigation
-    public ICollection<EvaluationScore> Scores { get; set; } = [];
+    public ICollection<EvaluationScore>    Scores     { get; set; } = [];
+    public ICollection<EvaluatorAssignment> Evaluators { get; set; } = [];
 
     // ── Factory ──────────────────────────────────────────────────────────────
 
@@ -41,6 +42,9 @@ public class BidEvaluation : AggregateRoot
     public decimal CalculateWeightedScore(decimal priceScore, decimal qualityScore, decimal deliveryScore)
         => Math.Round(
             (priceScore * PriceWeight + qualityScore * QualityWeight + deliveryScore * DeliveryWeight) / 100m, 2);
+
+    public bool HasAllEvaluatorsSubmitted()
+        => Evaluators.Any() && Evaluators.All(e => e.HasSubmitted);
 
     public void Award(Guid quotationId, Guid vendorId)
     {

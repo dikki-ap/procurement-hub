@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using ProcureHub.Modules.Procurement.Application.Commands.SubmitQuotation;
+using ProcureHub.Modules.Procurement.Application.Commands.UploadQuotationAttachment;
 using ProcureHub.Modules.Procurement.Application.Commands.WithdrawQuotation;
 using ProcureHub.Modules.Procurement.Application.Queries.GetMyQuotations;
+using ProcureHub.Modules.Procurement.Application.Queries.GetQuotationAttachmentUrl;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetMyVendorId;
 using ProcureHub.SharedKernel.Abstractions;
 using ProcureHub.SharedKernel.Common;
@@ -60,6 +62,31 @@ public class QuotationsController : ControllerBase
         var myVendorId = await ResolveVendorIdAsync(ct);
         await _mediator.Send(new WithdrawQuotationCommand(id, myVendorId), ct);
         return Ok(ApiResponse.Ok("Quotation withdrawn."));
+    }
+
+    /// <summary>Upload a technical document attachment for a quotation (replaces existing).</summary>
+    [HttpPost("{id:guid}/upload")]
+    public async Task<ActionResult<ApiResponse<object>>> Upload(
+        Guid id, IFormFile file, CancellationToken ct)
+    {
+        if (file is null || file.Length == 0)
+            return BadRequest(ApiResponse<object>.Fail("No file provided."));
+
+        using var ms = new MemoryStream((int)file.Length);
+        await file.CopyToAsync(ms, ct);
+        ms.Position = 0;
+
+        var key = await _mediator.Send(
+            new UploadQuotationAttachmentCommand(id, ms, file.FileName, file.ContentType), ct);
+        return Ok(ApiResponse.Ok(new { key }));
+    }
+
+    /// <summary>Get a 30-minute presigned download URL for a quotation attachment.</summary>
+    [HttpGet("{id:guid}/download")]
+    public async Task<ActionResult<ApiResponse<object>>> Download(Guid id, CancellationToken ct)
+    {
+        var url = await _mediator.Send(new GetQuotationAttachmentUrlQuery(id), ct);
+        return Ok(ApiResponse.Ok(new { url }));
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

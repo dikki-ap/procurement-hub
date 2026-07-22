@@ -53,6 +53,29 @@ export interface FunnelStats {
   stages: FunnelStage[];
 }
 
+export interface SpendByCategoryItem {
+  categoryName: string;
+  totalSpend:   number;
+  pctOfTotal:   number;
+}
+
+export interface CycleTimeStage {
+  stage:   string;
+  avgDays: number;
+}
+
+export interface VendorSpendShare {
+  vendorId:    string;
+  vendorName:  string;
+  totalSpend:  number;
+  pctOfTotal:  number;
+}
+
+export interface VendorConcentration {
+  topVendors:          VendorSpendShare[];
+  hasConcentrationRisk: boolean;
+}
+
 export const analyticsApi = {
   getWidgets: (params: { companyId?: string; vendorId?: string }) =>
     apiClient.get<{ data: DashboardWidgets | VendorDashboardWidgets }>('/analytics/widgets', { params }),
@@ -70,5 +93,20 @@ export const analyticsApi = {
   getFunnelStats: (companyId: string, year?: number) =>
     apiClient.get<{ data: FunnelStats }>('/analytics/funnel', {
       params: { companyId, year },
+    }),
+
+  getSpendByCategory: (companyId: string, year?: number) =>
+    apiClient.get<{ data: SpendByCategoryItem[] }>('/analytics/spend-by-category', {
+      params: { companyId, year },
+    }),
+
+  getCycleTime: (companyId: string, months = 3) =>
+    apiClient.get<{ data: CycleTimeStage[] }>('/analytics/cycle-time', {
+      params: { companyId, months },
+    }),
+
+  getVendorConcentration: (companyId: string) =>
+    apiClient.get<{ data: VendorConcentration }>('/analytics/vendor-concentration', {
+      params: { companyId },
     }),
 };

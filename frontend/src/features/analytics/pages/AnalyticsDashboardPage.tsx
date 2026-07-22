@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   AreaChart, Area, PieChart, Pie, Cell,
+  BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { analyticsApi, type DashboardWidgets, type VendorDashboardWidgets } from '../api/analyticsApi';
 import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
@@ -59,6 +60,24 @@ export default function AnalyticsDashboardPage() {
   const { data: funnel } = useQuery({
     queryKey: ['analytics-funnel', companyId],
     queryFn: () => analyticsApi.getFunnelStats(companyId).then(r => r.data.data),
+    enabled:  !!companyId && !isVendor,
+  });
+
+  const { data: spendByCategory } = useQuery({
+    queryKey: ['analytics-spend-category', companyId],
+    queryFn:  () => analyticsApi.getSpendByCategory(companyId).then(r => r.data.data),
+    enabled:  !!companyId && !isVendor,
+  });
+
+  const { data: cycleTime } = useQuery({
+    queryKey: ['analytics-cycle-time', companyId],
+    queryFn:  () => analyticsApi.getCycleTime(companyId).then(r => r.data.data),
+    enabled:  !!companyId && !isVendor,
+  });
+
+  const { data: concentration } = useQuery({
+    queryKey: ['analytics-concentration', companyId],
+    queryFn:  () => analyticsApi.getVendorConcentration(companyId).then(r => r.data.data),
     enabled:  !!companyId && !isVendor,
   });
 
@@ -190,6 +209,90 @@ export default function AnalyticsDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Cycle Time KPI Cards */}
+      {(cycleTime?.length ?? 0) > 0 && (
+        <div className="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+          <h2 className="font-semibold text-base mb-4">Procurement Cycle Time (last 3 months avg)</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {cycleTime!.map(stage => (
+              <div key={stage.stage} className="text-center p-4 bg-slate-50 rounded-lg">
+                <p className="text-xs text-muted-foreground mb-1">{stage.stage}</p>
+                <p className="text-3xl font-bold text-indigo-600">{stage.avgDays}</p>
+                <p className="text-xs text-muted-foreground mt-1">avg days</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Spend by Category Bar Chart */}
+      {(spendByCategory?.length ?? 0) > 0 && (
+        <div className="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+          <h2 className="font-semibold text-base mb-4">Spend by Category ({new Date().getFullYear()})</h2>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={spendByCategory} margin={{ top: 4, right: 8, bottom: 40, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="categoryName" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" interval={0} />
+              <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `${(v / 1_000_000).toFixed(0)}M`} />
+              <Tooltip formatter={(v: number) => [`${sym} ${fmt(v)}`, 'Spend']} />
+              <Bar dataKey="totalSpend" radius={[4, 4, 0, 0]}>
+                {spendByCategory!.map((_, i) => (
+                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Vendor Concentration Donut */}
+      {(concentration?.topVendors?.length ?? 0) > 0 && (
+        <div className="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="font-semibold text-base">Vendor Spend Concentration</h2>
+            {concentration!.hasConcentrationRisk && (
+              <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-medium">
+                <AlertTriangle className="h-3 w-3" />
+                Concentration Risk &gt;40%
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col lg:flex-row gap-6 items-center">
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={concentration!.topVendors}
+                  dataKey="pctOfTotal"
+                  nameKey="vendorName"
+                  cx="50%" cy="50%"
+                  innerRadius={50} outerRadius={80}
+                  label={({ vendorName, pctOfTotal }) => `${pctOfTotal}%`}
+                >
+                  {concentration!.topVendors.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v: number) => [`${v}%`, 'Spend Share']} />
+                <Legend formatter={(value) => value} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="w-full lg:w-64 space-y-2">
+              {concentration!.topVendors.map((v, i) => (
+                <div key={v.vendorId} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                    <span className="text-slate-700 truncate max-w-[140px]">{v.vendorName}</span>
+                  </div>
+                  <span className={`font-semibold ${v.pctOfTotal > 40 ? 'text-amber-600' : 'text-slate-700'}`}>
+                    {v.pctOfTotal}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Vendor Performance Table */}
       {(performance?.vendors?.length ?? 0) > 0 && (

@@ -11,7 +11,9 @@ public class VendorQuotation : AggregateRoot
     public Guid             VendorId { get; set; }
     public QuotationStatus  Status   { get; set; } = QuotationStatus.Draft;
     public decimal          TotalPrice { get; set; }
-    public string?          Notes    { get; set; }
+    public string?          Notes      { get; set; }
+    public string?          FileKey    { get; set; }
+    public string?          FileName   { get; set; }
 
     // Navigation
     public ICollection<QuotationItem> Items { get; set; } = [];

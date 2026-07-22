@@ -1282,6 +1282,100 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.ToTable("evaluation_scores", (string)null);
                 });
 
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.EvaluatorAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AssignedUserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("assigned_user_id");
+
+                    b.Property<string>("AssignedUserName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("assigned_user_name");
+
+                    b.Property<Guid>("BidEvaluationId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("bid_evaluation_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<bool>("HasSubmitted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("has_submitted");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_evaluator_assignments");
+
+                    b.HasIndex("BidEvaluationId")
+                        .HasDatabaseName("ix_evaluator_assignments_bid_evaluation_id");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_evaluator_assignments_created_by_id");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_evaluator_assignments_updated_by_id");
+
+                    b.HasIndex("BidEvaluationId", "AssignedUserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_evaluator_assignments_bid_evaluation_id_assigned_user_id");
+
+                    b.ToTable("evaluator_assignments", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.EvaluatorScore", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("DeliveryScore")
+                        .HasColumnType("DECIMAL(5,2)")
+                        .HasColumnName("delivery_score");
+
+                    b.Property<Guid>("EvaluatorAssignmentId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("evaluator_assignment_id");
+
+                    b.Property<decimal>("QualityScore")
+                        .HasColumnType("DECIMAL(5,2)")
+                        .HasColumnName("quality_score");
+
+                    b.Property<Guid>("QuotationId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("quotation_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_evaluator_scores");
+
+                    b.HasIndex("EvaluatorAssignmentId")
+                        .HasDatabaseName("ix_evaluator_scores_evaluator_assignment_id");
+
+                    b.HasIndex("EvaluatorAssignmentId", "QuotationId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_evaluator_scores_evaluator_assignment_id_quotation_id");
+
+                    b.ToTable("evaluator_scores", (string)null);
+                });
+
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.GRNItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1742,6 +1836,10 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("acknowledged_at");
 
+                    b.Property<DateTime?>("AcknowledgementDeadline")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("acknowledgement_deadline");
+
                     b.Property<DateTime?>("ActualDelivery")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("actual_delivery");
@@ -2074,6 +2172,16 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("delivery_date");
+
+                    b.Property<string>("FileKey")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("file_key");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("file_name");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)")
@@ -2447,6 +2555,16 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Property<Guid?>("DeletedById")
                         .HasColumnType("CHAR(36)")
                         .HasColumnName("deleted_by_id");
+
+                    b.Property<string>("FileKey")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("file_key");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("file_name");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)")
@@ -3839,6 +3957,46 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.EvaluatorAssignment", b =>
+                {
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.BidEvaluation", "Evaluation")
+                        .WithMany("Evaluators")
+                        .HasForeignKey("BidEvaluationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_evaluator_assignments_bid_evaluations_bid_evaluation_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_evaluator_assignments_users_created_by_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_evaluator_assignments_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Evaluation");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.EvaluatorScore", b =>
+                {
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.EvaluatorAssignment", "Assignment")
+                        .WithMany("Scores")
+                        .HasForeignKey("EvaluatorAssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_evaluator_scores_evaluator_assignments_evaluator_assignment_");
+
+                    b.Navigation("Assignment");
+                });
+
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.GRNItem", b =>
                 {
                     b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
@@ -4214,7 +4372,6 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .WithMany("Items")
                         .HasForeignKey("ReturnOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_return_order_items_return_orders_return_order_id");
 
                     b.Navigation("ReturnOrder");
@@ -4538,6 +4695,13 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.BidEvaluation", b =>
+                {
+                    b.Navigation("Evaluators");
+
+                    b.Navigation("Scores");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.EvaluatorAssignment", b =>
                 {
                     b.Navigation("Scores");
                 });

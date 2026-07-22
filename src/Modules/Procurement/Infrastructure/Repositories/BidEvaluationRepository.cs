@@ -20,6 +20,17 @@ public class BidEvaluationRepository : IBidEvaluationRepository
               .Include(e => e.Scores)
               .FirstOrDefaultAsync(e => e.RFQId == rfqId, ct);
 
+    public Task<BidEvaluation?> GetByRFQIdWithEvaluatorsAsync(Guid rfqId, CancellationToken ct = default)
+        => _db.Set<BidEvaluation>()
+              .Include(e => e.Evaluators)
+              .FirstOrDefaultAsync(e => e.RFQId == rfqId, ct);
+
+    public Task<BidEvaluation?> GetByRFQIdFullAsync(Guid rfqId, CancellationToken ct = default)
+        => _db.Set<BidEvaluation>()
+              .Include(e => e.Scores)
+              .Include(e => e.Evaluators).ThenInclude(a => a.Scores)
+              .FirstOrDefaultAsync(e => e.RFQId == rfqId, ct);
+
     public void Add(BidEvaluation evaluation)    => _db.Set<BidEvaluation>().Add(evaluation);
     public void Update(BidEvaluation evaluation) => _db.Set<BidEvaluation>().Update(evaluation);
     public Task<int> SaveChangesAsync(CancellationToken ct = default) => _db.SaveChangesAsync(ct);

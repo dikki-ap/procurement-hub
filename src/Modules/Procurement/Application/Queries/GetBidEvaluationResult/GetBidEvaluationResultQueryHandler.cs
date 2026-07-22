@@ -20,7 +20,7 @@ public class GetBidEvaluationResultQueryHandler : IQueryHandler<GetBidEvaluation
 
     public async Task<BidEvaluationDto?> Handle(GetBidEvaluationResultQuery query, CancellationToken ct)
     {
-        var evaluation = await _evalRepo.GetByRFQIdWithScoresAsync(query.RFQId, ct);
+        var evaluation = await _evalRepo.GetByRFQIdFullAsync(query.RFQId, ct);
         if (evaluation is null) return null;
 
         var vendorIds = evaluation.Scores.Select(s => s.VendorId).Distinct().ToList();
@@ -39,6 +39,10 @@ public class GetBidEvaluationResultQueryHandler : IQueryHandler<GetBidEvaluation
                 s.WeightedTotal))
             .ToList();
 
+        var evaluators = evaluation.Evaluators
+            .Select(e => new EvaluatorAssignmentDto(e.Id, e.AssignedUserId, e.AssignedUserName, e.HasSubmitted))
+            .ToList();
+
         return new BidEvaluationDto(
             evaluation.Id,
             evaluation.RFQId,
@@ -48,6 +52,7 @@ public class GetBidEvaluationResultQueryHandler : IQueryHandler<GetBidEvaluation
             evaluation.Status,
             evaluation.AwardedVendorId,
             evaluation.AwardedQuotationId,
-            scores);
+            scores,
+            evaluators);
     }
 }
