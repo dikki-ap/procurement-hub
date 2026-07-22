@@ -38,5 +38,10 @@ public record InvoiceDto(
     string?       Notes,
     string?       RejectionReason,
     DateTime      SubmittedAt,
-    DateTime?     ReviewedAt
+    DateTime?     ReviewedAt,
+    // 3-way matching
+    bool              PoMatched,
+    bool              GrnMatched,
+    bool              AmountMatched,
+    List<string>      MatchingDiscrepancies
 );

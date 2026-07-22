@@ -86,6 +86,7 @@ export interface VendorScoreDto {
 export interface VendorCapabilityDto {
   id: string;
   materialCategoryId: string;
+  materialCategoryName: string | null;
   minOrderQty: number | null;
   maxOrderQty: number | null;
   uom: string | null;
@@ -264,4 +265,19 @@ export const vendorPortalApi = {
 
   getScoreHistory: (vendorId: string) =>
     apiClient.get<{ data: VendorScoreDto[] }>(`/vendor-portal/${vendorId}/scores`).then((r) => r.data.data),
+
+  updateProfile: (
+    vendorId: string,
+    payload: {
+      tradeName?: string | null;
+      npwp?: string | null;
+      siup?: string | null;
+      nib?: string | null;
+      address?: string | null;
+      city?: string | null;
+      province?: string | null;
+      postalCode?: string | null;
+      country?: string | null;
+    }
+  ) => apiClient.put(`/vendor-portal/${vendorId}/profile`, payload),
 };

@@ -20,6 +20,7 @@ import {
   Building2,
   GitBranch,
   Settings,
+  RotateCcw,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useUIStore } from '@/stores/uiStore';
@@ -148,6 +149,12 @@ export const Sidebar = () => {
                 <NavLabel collapsed={ec}>My Contracts</NavLabel>
               </NavLink>
             </div>
+            <div className="pt-1">
+              <NavLink to={`/app/vendor-portal/${vendorId}/return-orders`} title="Return Orders" className={navCls(ec)}>
+                <RotateCcw className="h-4 w-4 flex-shrink-0" />
+                <NavLabel collapsed={ec}>Return Orders</NavLabel>
+              </NavLink>
+            </div>
           </>
         )}
 
@@ -187,6 +194,15 @@ export const Sidebar = () => {
                 <NavLink to="/app/fulfillment/invoices" title="Invoices" className={navCls(ec)}>
                   <Receipt className="h-4 w-4 flex-shrink-0" />
                   <NavLabel collapsed={ec}>Invoices</NavLabel>
+                </NavLink>
+              </div>
+            )}
+
+            {isPurchasing && (
+              <div className="pt-1">
+                <NavLink to="/app/fulfillment/return-orders" title="Return Orders" className={navCls(ec)}>
+                  <RotateCcw className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Return Orders</NavLabel>
                 </NavLink>
               </div>
             )}

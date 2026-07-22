@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub.API.Security;
 using ProcureHub.Modules.MasterData.Application.Queries.GetDocumentTypeList;
+using ProcureHub.Modules.Procurement.Application.Commands.AcknowledgeReturnOrder;
 using ProcureHub.Modules.Procurement.Application.Queries.GetContractsByVendor;
+using ProcureHub.Modules.Procurement.Application.Queries.GetReturnOrdersByVendor;
 using ProcureHub.Modules.VendorManagement.Application.Commands.AddVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendorBankAccount;
+using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendorProfile;
 using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetMyVendorId;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
@@ -63,6 +66,26 @@ public class VendorPortalController : ControllerBase
         await VerifyOwnershipAsync(vendorId, ct);
         var result = await _mediator.Send(new GetVendorByIdQuery(vendorId), ct);
         return Ok(ApiResponse.Ok(result));
+    }
+
+    /// <summary>Update own vendor profile (trade name, legal numbers, address).</summary>
+    [HttpPut("{vendorId:guid}/profile")]
+    public async Task<ActionResult<ApiResponse<object>>> UpdateProfile(
+        Guid vendorId, [FromBody] UpdateVendorProfileRequest request, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        await _mediator.Send(new UpdateVendorProfileCommand(
+            vendorId,
+            request.TradeName,
+            request.Npwp,
+            request.Siup,
+            request.Nib,
+            request.Address,
+            request.City,
+            request.Province,
+            request.PostalCode,
+            request.Country), ct);
+        return Ok(ApiResponse.Ok("Profile updated."));
     }
 
     /// <summary>Get own vendor documents.</summary>
@@ -220,6 +243,27 @@ public class VendorPortalController : ControllerBase
         return Ok(ApiResponse.Ok(result));
     }
 
+    // ── Return Orders (read-only + acknowledge) ───────────────────────────────
+
+    /// <summary>Get own return orders.</summary>
+    [HttpGet("{vendorId:guid}/return-orders")]
+    public async Task<ActionResult<ApiResponse<object>>> GetReturnOrders(Guid vendorId, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        var result = await _mediator.Send(new GetReturnOrdersByVendorQuery(vendorId), ct);
+        return Ok(ApiResponse.Ok(result));
+    }
+
+    /// <summary>Acknowledge a return order (vendor confirms they will ship it back).</summary>
+    [HttpPost("{vendorId:guid}/return-orders/{returnOrderId:guid}/acknowledge")]
+    public async Task<ActionResult<ApiResponse<object>>> AcknowledgeReturn(
+        Guid vendorId, Guid returnOrderId, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        await _mediator.Send(new AcknowledgeReturnOrderCommand(returnOrderId, vendorId), ct);
+        return Ok(ApiResponse.Ok("Return order acknowledged."));
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private async Task VerifyOwnershipAsync(Guid vendorId, CancellationToken ct)
@@ -242,3 +286,14 @@ public record PortalBankAccountRequest(
     string  Currency,
     bool    IsDefault,
     string? Notes);
+
+public record UpdateVendorProfileRequest(
+    string? TradeName,
+    string? Npwp,
+    string? Siup,
+    string? Nib,
+    string? Address,
+    string? City,
+    string? Province,
+    string? PostalCode,
+    string? Country);

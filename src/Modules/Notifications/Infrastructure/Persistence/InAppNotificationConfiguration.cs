@@ -14,6 +14,7 @@ public class InAppNotificationConfiguration : IEntityTypeConfiguration<InAppNoti
         builder.Property(n => n.Id).HasColumnType("CHAR(36)").ValueGeneratedNever();
 
         builder.Property(n => n.UserId).HasColumnType("CHAR(36)").IsRequired();
+        builder.Property(n => n.VendorUserId).HasColumnType("CHAR(36)");
         builder.Property(n => n.Title).HasMaxLength(200).IsRequired();
         builder.Property(n => n.Message).HasMaxLength(1000).IsRequired();
         builder.Property(n => n.Link).HasMaxLength(500);

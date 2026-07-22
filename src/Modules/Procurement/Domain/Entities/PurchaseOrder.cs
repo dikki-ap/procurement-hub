@@ -1,5 +1,6 @@
 using ProcureHub.Modules.Procurement.Domain.Enums;
 using ProcureHub.Modules.Procurement.Domain.Events;
+using ProcureHub.Modules.VendorManagement.Domain.Entities;
 using ProcureHub.SharedKernel.Domain;
 using ProcureHub.SharedKernel.Exceptions;
 
@@ -27,7 +28,8 @@ public class PurchaseOrder : AggregateRoot
     public DateTime? CancelledAt        { get; set; }
     public string?   CancelledReason    { get; set; }
 
-    public ICollection<POItem> Items { get; set; } = [];
+    public Vendor?             Vendor { get; set; }
+    public ICollection<POItem> Items  { get; set; } = [];
 
     public static PurchaseOrder Create(
         Guid companyId, string poNumber, Guid vendorId,

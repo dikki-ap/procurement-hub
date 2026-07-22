@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProcureHub.Modules.Procurement.Domain.Entities;
+using ProcureHub.Modules.Procurement.Domain.Enums;
 using ProcureHub.Modules.Procurement.Domain.Repositories;
 using ProcureHub.SharedKernel.Database;
 
@@ -15,6 +16,12 @@ public class GoodsReceiptRepository : IGoodsReceiptRepository
         => _db.Set<GoodsReceipt>()
               .Where(g => g.POId == poId)
               .OrderByDescending(g => g.CreatedAt)
+              .ToListAsync(ct);
+
+    public Task<List<GoodsReceipt>> GetByPOWithItemsAsync(Guid poId, CancellationToken ct = default)
+        => _db.Set<GoodsReceipt>()
+              .Include(g => g.Items)
+              .Where(g => g.POId == poId && g.Status != GRNStatus.Draft)
               .ToListAsync(ct);
 
     public Task<GoodsReceipt?> GetByIdAsync(Guid id, CancellationToken ct = default)

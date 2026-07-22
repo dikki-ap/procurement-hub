@@ -46,6 +46,9 @@ public class CurrentUserService : ICurrentUserService
         }
     }
 
+    public Guid? VendorUserId
+        => Context?.Items["VendorLocalUserId"] is Guid id ? id : null;
+
     public IReadOnlyList<string> Roles
     {
         get

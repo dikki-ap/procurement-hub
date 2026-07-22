@@ -17,6 +17,7 @@
 
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\..\ProcureHub.SharedKernel\ProcureHub.SharedKernel.csproj" />
+    <ProjectReference Include="..\MasterData\ProcureHub.Modules.MasterData.csproj" />
   </ItemGroup>
 
 </Project>

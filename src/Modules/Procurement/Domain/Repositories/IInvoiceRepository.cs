@@ -8,6 +8,7 @@ public interface IInvoiceRepository
     Task<List<Invoice>> GetByPOAsync(Guid poId, CancellationToken ct = default);
     Task<List<Invoice>> GetByVendorAsync(Guid vendorId, CancellationToken ct = default);
     Task<Invoice?>      GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<Invoice?>      GetByIdWithPOAsync(Guid id, CancellationToken ct = default);
     Task<string>        GenerateNextNumberAsync(CancellationToken ct = default);
     void                Add(Invoice invoice);
     void                Update(Invoice invoice);

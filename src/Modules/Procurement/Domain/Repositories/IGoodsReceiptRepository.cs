@@ -5,6 +5,7 @@ namespace ProcureHub.Modules.Procurement.Domain.Repositories;
 public interface IGoodsReceiptRepository
 {
     Task<List<GoodsReceipt>> GetByPOAsync(Guid poId, CancellationToken ct = default);
+    Task<List<GoodsReceipt>> GetByPOWithItemsAsync(Guid poId, CancellationToken ct = default);
     Task<GoodsReceipt?>      GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<GoodsReceipt?>      GetByIdWithItemsAsync(Guid id, CancellationToken ct = default);
     Task<string>             GenerateNextNumberAsync(CancellationToken ct = default);

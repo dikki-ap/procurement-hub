@@ -5,6 +5,9 @@ public interface ICurrentUserService
     /// <summary>Internal database user UUID (not the Keycloak UUID).</summary>
     Guid? UserId { get; }
 
+    /// <summary>VendorUser.Id resolved from vendor_users table (null for internal users).</summary>
+    Guid? VendorUserId { get; }
+
     /// <summary>Keycloak subject claim (sub).</summary>
     string? KeycloakId { get; }
 

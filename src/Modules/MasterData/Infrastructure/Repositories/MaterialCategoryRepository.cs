@@ -22,6 +22,9 @@ public class MaterialCategoryRepository : IMaterialCategoryRepository
     public Task<MaterialCategory?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => _db.Set<MaterialCategory>().FirstOrDefaultAsync(e => e.Id == id, ct);
 
+    public Task<List<MaterialCategory>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        => _db.Set<MaterialCategory>().Where(c => ids.Contains(c.Id)).ToListAsync(ct);
+
     public Task<bool> ExistsByCodeAsync(Guid companyId, string code, Guid? excludeId = null, CancellationToken ct = default)
         => _db.Set<MaterialCategory>()
               .AnyAsync(e => e.CompanyId == companyId

@@ -1,12 +1,14 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   User, Building2, Store, Hash, FileCheck, Tag, Mail, Phone,
-  Package, MapPin, CreditCard, Landmark, TrendingUp,
+  Package, MapPin, CreditCard, TrendingUp, Pencil, X, Save,
 } from 'lucide-react';
-import { vendorPortalApi, type VendorStatus } from '@/features/vendors/api/vendorApi';
+import { vendorPortalApi, type VendorStatus, type VendorDetailDto } from '@/features/vendors/api/vendorApi';
 import { TierBadge, ScoreDisplay } from '@/features/vendors/components/VendorBadges';
 import { fmtDate } from '@/shared/lib/date';
+import { toast } from 'sonner';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
   const cfg: Record<VendorStatus, string> = {
@@ -22,8 +24,144 @@ const StatusBadge = ({ status }: { status: VendorStatus }) => {
   );
 };
 
+type ProfileFormData = {
+  tradeName: string;
+  npwp: string;
+  siup: string;
+  nib: string;
+  address: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  country: string;
+};
+
+function toFormData(v: VendorDetailDto): ProfileFormData {
+  return {
+    tradeName:  v.tradeName  ?? '',
+    npwp:       v.npwp       ?? '',
+    siup:       v.siup       ?? '',
+    nib:        v.nib        ?? '',
+    address:    v.address    ?? '',
+    city:       v.city       ?? '',
+    province:   v.province   ?? '',
+    postalCode: v.postalCode ?? '',
+    country:    v.country    ?? '',
+  };
+}
+
+function EditProfileModal({
+  vendor,
+  onClose,
+}: {
+  vendor: VendorDetailDto;
+  onClose: () => void;
+}) {
+  const qc = useQueryClient();
+  const { vendorId } = useParams<{ vendorId: string }>();
+  const [form, setForm] = useState<ProfileFormData>(toFormData(vendor));
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      vendorPortalApi.updateProfile(vendorId!, {
+        tradeName:  form.tradeName  || null,
+        npwp:       form.npwp       || null,
+        siup:       form.siup       || null,
+        nib:        form.nib        || null,
+        address:    form.address    || null,
+        city:       form.city       || null,
+        province:   form.province   || null,
+        postalCode: form.postalCode || null,
+        country:    form.country    || null,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['vendor-portal', 'profile', vendorId] });
+      toast.success('Profile updated successfully.');
+      onClose();
+    },
+    onError: () => toast.error('Failed to update profile.'),
+  });
+
+  const set = (field: keyof ProfileFormData) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <h2 className="text-base font-semibold text-slate-800">Edit Profile</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Trade Name</label>
+              <input className={inputCls} value={form.tradeName} onChange={set('tradeName')} placeholder="Trade name" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">NPWP</label>
+              <input className={inputCls} value={form.npwp} onChange={set('npwp')} placeholder="Tax ID" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">SIUP</label>
+              <input className={inputCls} value={form.siup} onChange={set('siup')} placeholder="Business licence" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">NIB</label>
+              <input className={inputCls} value={form.nib} onChange={set('nib')} placeholder="Business registration" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Address</label>
+            <input className={inputCls} value={form.address} onChange={set('address')} placeholder="Street address" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">City</label>
+              <input className={inputCls} value={form.city} onChange={set('city')} placeholder="City" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Province</label>
+              <input className={inputCls} value={form.province} onChange={set('province')} placeholder="Province / State" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Postal Code</label>
+              <input className={inputCls} value={form.postalCode} onChange={set('postalCode')} placeholder="Postal code" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Country</label>
+              <input className={inputCls} value={form.country} onChange={set('country')} placeholder="Country" />
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 px-6 py-4 border-t border-slate-100">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-60"
+          >
+            <Save className="h-3.5 w-3.5" />
+            {mutation.isPending ? 'Saving…' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function VendorPortalProfilePage() {
   const { vendorId } = useParams<{ vendorId: string }>();
+  const [editOpen, setEditOpen] = useState(false);
 
   const { data: vendor, isLoading } = useQuery({
     queryKey: ['vendor-portal', 'profile', vendorId],
@@ -61,6 +199,10 @@ export default function VendorPortalProfilePage() {
 
   return (
     <div>
+      {editOpen && vendor && (
+        <EditProfileModal vendor={vendor} onClose={() => setEditOpen(false)} />
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-2">
           <Building2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
@@ -69,7 +211,16 @@ export default function VendorPortalProfilePage() {
             <p className="text-sm text-muted-foreground">{vendor.vendorCode}</p>
           </div>
         </div>
-        <StatusBadge status={vendor.status} />
+        <div className="flex items-center gap-2">
+          <StatusBadge status={vendor.status} />
+          <button
+            onClick={() => setEditOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Edit Profile
+          </button>
+        </div>
       </div>
 
       {/* Score / Tier / Type cards */}
@@ -240,7 +391,9 @@ export default function VendorPortalProfilePage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-slate-800">{cap.materialCategoryId}</p>
+                    <p className="text-sm font-medium text-slate-800">
+                      {cap.materialCategoryName ?? cap.materialCategoryId}
+                    </p>
                     {cap.isExpired && (
                       <span className="text-xs bg-red-50 text-red-600 px-1.5 py-0.5 rounded-full">Expired</span>
                     )}

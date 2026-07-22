@@ -1,3 +1,4 @@
+using ProcureHub.Modules.MasterData.Domain.Repositories;
 using ProcureHub.Modules.VendorManagement.Application.DTOs;
 using ProcureHub.Modules.VendorManagement.Domain.Entities;
 using ProcureHub.Modules.VendorManagement.Domain.Repositories;
@@ -9,13 +10,18 @@ namespace ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
 
 public class GetVendorByIdQueryHandler : IQueryHandler<GetVendorByIdQuery, VendorDetailDto>
 {
-    private readonly IVendorRepository _repo;
-    private readonly ICacheService     _cache;
+    private readonly IVendorRepository           _repo;
+    private readonly IMaterialCategoryRepository _categoryRepo;
+    private readonly ICacheService               _cache;
 
-    public GetVendorByIdQueryHandler(IVendorRepository repo, ICacheService cache)
+    public GetVendorByIdQueryHandler(
+        IVendorRepository repo,
+        IMaterialCategoryRepository categoryRepo,
+        ICacheService cache)
     {
-        _repo  = repo;
-        _cache = cache;
+        _repo         = repo;
+        _categoryRepo = categoryRepo;
+        _cache        = cache;
     }
 
     public Task<VendorDetailDto> Handle(GetVendorByIdQuery query, CancellationToken ct)
@@ -25,11 +31,16 @@ public class GetVendorByIdQueryHandler : IQueryHandler<GetVendorByIdQuery, Vendo
             {
                 var v = await _repo.GetByIdWithDetailsAsync(query.Id, ct)
                     ?? throw new NotFoundException("Vendor", query.Id);
-                return ToDetailDto(v);
+
+                var categoryIds = v.Capabilities.Select(c => c.MaterialCategoryId).Distinct();
+                var categories  = await _categoryRepo.GetByIdsAsync(categoryIds, ct);
+                var categoryMap = categories.ToDictionary(c => c.Id, c => c.Name);
+
+                return ToDetailDto(v, categoryMap);
             },
             CacheTTL.VendorById);
 
-    private static VendorDetailDto ToDetailDto(Vendor v) => new(
+    private static VendorDetailDto ToDetailDto(Vendor v, Dictionary<Guid, string> categoryMap) => new(
         v.Id,
         v.VendorCode,
         v.LegalName,
@@ -58,8 +69,17 @@ public class GetVendorByIdQueryHandler : IQueryHandler<GetVendorByIdQuery, Vendo
             d.Id, d.DocumentType, d.DocumentNumber, d.FileUrl, d.FileName,
             d.FileSize, d.ExpiredAt, d.IssuedAt, d.Status, d.Notes)).ToList(),
         v.Capabilities.Select(cap => new VendorCapabilityDto(
-            cap.Id, cap.MaterialCategoryId, cap.MinOrderQty, cap.MaxOrderQty, cap.Uom,
-            cap.LeadTimeDays, cap.EffectiveDate, cap.ExpiryDate, cap.IsExpired, cap.Notes)).ToList(),
+            cap.Id,
+            cap.MaterialCategoryId,
+            categoryMap.GetValueOrDefault(cap.MaterialCategoryId),
+            cap.MinOrderQty,
+            cap.MaxOrderQty,
+            cap.Uom,
+            cap.LeadTimeDays,
+            cap.EffectiveDate,
+            cap.ExpiryDate,
+            cap.IsExpired,
+            cap.Notes)).ToList(),
         v.BankAccounts.Select(b => new VendorBankAccountDto(
             b.Id, b.BankName, b.AccountNumber, b.AccountName, b.BranchName, b.Currency, b.IsDefault, b.Notes)).ToList());
 }

@@ -15,8 +15,14 @@ public class InvoiceRepository : IInvoiceRepository
         => _db.Set<Invoice>()
               .Include(i => i.CreatedBy)
               .Include(i => i.UpdatedBy)
+              .Include(i => i.PurchaseOrder).ThenInclude(p => p!.Vendor)
               .OrderByDescending(i => i.SubmittedAt)
               .ToListAsync(ct);
+
+    public Task<Invoice?> GetByIdWithPOAsync(Guid id, CancellationToken ct = default)
+        => _db.Set<Invoice>()
+              .Include(i => i.PurchaseOrder).ThenInclude(p => p!.Vendor)
+              .FirstOrDefaultAsync(i => i.Id == id, ct);
 
     public Task<List<Invoice>> GetByPOAsync(Guid poId, CancellationToken ct = default)
         => _db.Set<Invoice>().Where(i => i.POId == poId).ToListAsync(ct);

@@ -16,7 +16,12 @@ public class MarkNotificationReadCommandHandler : IRequestHandler<MarkNotificati
         var notification = await _repo.GetByIdAsync(request.NotificationId, ct)
             ?? throw new NotFoundException("Notification", request.NotificationId);
 
-        if (notification.UserId != request.UserId)
+        // For vendor user notifications, ownership is checked via VendorUserId
+        var isOwner = notification.VendorUserId.HasValue
+            ? notification.VendorUserId == request.UserId
+            : notification.UserId == request.UserId;
+
+        if (!isOwner)
             throw new ForbiddenException("You can only mark your own notifications as read.");
 
         notification.MarkAsRead();

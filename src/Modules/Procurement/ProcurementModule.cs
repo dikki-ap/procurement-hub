@@ -19,6 +19,7 @@ public static class ProcurementModule
         services.AddScoped<IGoodsReceiptRepository,        GoodsReceiptRepository>();
         services.AddScoped<IInvoiceRepository,             InvoiceRepository>();
         services.AddScoped<IContractRepository,            ContractRepository>();
+        services.AddScoped<IReturnOrderRepository,         ReturnOrderRepository>();
 
         services.AddScoped<IVendorChecker,                 VendorChecker>();
 

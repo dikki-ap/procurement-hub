@@ -996,6 +996,10 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasColumnType("CHAR(36)")
                         .HasColumnName("user_id");
 
+                    b.Property<Guid?>("VendorUserId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("vendor_user_id");
+
                     b.HasKey("Id")
                         .HasName("pk_in_app_notifications");
 
@@ -1839,7 +1843,7 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasColumnName("updated_by_id");
 
                     b.Property<Guid>("VendorId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("CHAR(36)")
                         .HasColumnName("vendor_id");
 
                     b.HasKey("Id")
@@ -2264,6 +2268,162 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .HasDatabaseName("ix_rfq_vendors_rfq_id_vendor_id");
 
                     b.ToTable("rfq_vendors", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.ReturnOrder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime?>("AcknowledgedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("acknowledged_at");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("deleted_by_id");
+
+                    b.Property<Guid>("GRNId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("grn_id");
+
+                    b.Property<Guid?>("GoodsReceiptId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("goods_receipt_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<Guid>("POId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("po_id");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("reason");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("received_at");
+
+                    b.Property<string>("ReturnNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("return_number");
+
+                    b.Property<DateTime?>("ShippedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("shipped_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("updated_by_id");
+
+                    b.Property<Guid>("VendorId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("vendor_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_return_orders");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_return_orders_created_by_id");
+
+                    b.HasIndex("DeletedById")
+                        .HasDatabaseName("ix_return_orders_deleted_by_id");
+
+                    b.HasIndex("GRNId")
+                        .HasDatabaseName("ix_return_orders_grn_id");
+
+                    b.HasIndex("GoodsReceiptId")
+                        .HasDatabaseName("ix_return_orders_goods_receipt_id");
+
+                    b.HasIndex("ReturnNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_return_orders_return_number");
+
+                    b.HasIndex("UpdatedById")
+                        .HasDatabaseName("ix_return_orders_updated_by_id");
+
+                    b.HasIndex("VendorId")
+                        .HasDatabaseName("ix_return_orders_vendor_id");
+
+                    b.ToTable("return_orders", (string)null);
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.ReturnOrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ItemDescription")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("item_description");
+
+                    b.Property<Guid?>("POItemId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("po_item_id");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)")
+                        .HasColumnName("quantity");
+
+                    b.Property<Guid>("ReturnOrderId")
+                        .HasColumnType("CHAR(36)")
+                        .HasColumnName("return_order_id");
+
+                    b.Property<string>("ReturnReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("return_reason");
+
+                    b.Property<string>("Uom")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("uom");
+
+                    b.HasKey("Id")
+                        .HasName("pk_return_order_items");
+
+                    b.HasIndex("ReturnOrderId")
+                        .HasDatabaseName("ix_return_order_items_return_order_id");
+
+                    b.ToTable("return_order_items", (string)null);
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.VendorQuotation", b =>
@@ -3860,11 +4020,20 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_purchase_orders_users_updated_by_id");
 
+                    b.HasOne("ProcureHub.Modules.VendorManagement.Domain.Entities.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_purchase_orders_vendors_vendor_id");
+
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedBy");
 
                     b.Navigation("UpdatedBy");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.PurchaseRequisition", b =>
@@ -4003,6 +4172,52 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Navigation("RFQ");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.ReturnOrder", b =>
+                {
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_return_orders_users_created_by_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_return_orders_users_deleted_by_id");
+
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.GoodsReceipt", "GoodsReceipt")
+                        .WithMany()
+                        .HasForeignKey("GoodsReceiptId")
+                        .HasConstraintName("fk_return_orders_goods_receipts_goods_receipt_id");
+
+                    b.HasOne("ProcureHub.SharedKernel.Domain.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_return_orders_users_updated_by_id");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("GoodsReceipt");
+
+                    b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.ReturnOrderItem", b =>
+                {
+                    b.HasOne("ProcureHub.Modules.Procurement.Domain.Entities.ReturnOrder", "ReturnOrder")
+                        .WithMany("Items")
+                        .HasForeignKey("ReturnOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_return_order_items_return_orders_return_order_id");
+
+                    b.Navigation("ReturnOrder");
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.VendorQuotation", b =>
@@ -4347,6 +4562,11 @@ namespace ProcureHub.SharedKernel.Database.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Vendors");
+                });
+
+            modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.ReturnOrder", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("ProcureHub.Modules.Procurement.Domain.Entities.VendorQuotation", b =>

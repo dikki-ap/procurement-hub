@@ -78,6 +78,7 @@ public record VendorDocumentDto(
 public record VendorCapabilityDto(
     Guid      Id,
     Guid      MaterialCategoryId,
+    string?   MaterialCategoryName,
     decimal?  MinOrderQty,
     decimal?  MaxOrderQty,
     string?   Uom,

@@ -8,7 +8,7 @@ using ProcureHub.SharedKernel.Common;
 
 namespace ProcureHub.API.Controllers.v1.Notifications;
 
-/// <summary>In-app notifications.</summary>
+/// <summary>In-app notifications — supports both internal and vendor users.</summary>
 [ApiController]
 [Route("api/v1/notifications")]
 [Authorize]
@@ -27,10 +27,19 @@ public class NotificationsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetMine(CancellationToken ct)
     {
-        var userId = _currentUser.UserId
-            ?? throw new UnauthorizedAccessException("User not authenticated.");
+        List<NotificationDto> result;
 
-        var result = await _mediator.Send(new GetMyNotificationsQuery(userId), ct);
+        if (_currentUser.VendorUserId is { } vendorUserId)
+        {
+            result = await _mediator.Send(new GetMyNotificationsQuery(vendorUserId, IsVendorUser: true), ct);
+        }
+        else
+        {
+            var userId = _currentUser.UserId
+                ?? throw new UnauthorizedAccessException("User not authenticated.");
+            result = await _mediator.Send(new GetMyNotificationsQuery(userId, IsVendorUser: false), ct);
+        }
+
         return Ok(ApiResponse<List<NotificationDto>>.Ok(result));
     }
 
@@ -38,7 +47,7 @@ public class NotificationsController : ControllerBase
     [HttpPost("{id:guid}/read")]
     public async Task<IActionResult> MarkRead(Guid id, CancellationToken ct)
     {
-        var userId = _currentUser.UserId
+        var userId = _currentUser.UserId ?? _currentUser.VendorUserId
             ?? throw new UnauthorizedAccessException("User not authenticated.");
 
         await _mediator.Send(new MarkNotificationReadCommand(id, userId), ct);

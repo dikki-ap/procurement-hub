@@ -13,7 +13,10 @@ public class GetMyNotificationsQueryHandler
 
     public async Task<List<NotificationDto>> Handle(GetMyNotificationsQuery request, CancellationToken ct)
     {
-        var list = await _repo.GetForUserAsync(request.UserId, ct);
+        var list = request.IsVendorUser
+            ? await _repo.GetForVendorUserAsync(request.UserId, ct)
+            : await _repo.GetForUserAsync(request.UserId, ct);
+
         return list
             .OrderByDescending(n => n.CreatedAt)
             .Select(n => new NotificationDto(n.Id, n.Title, n.Message, n.Link, n.IsRead, n.CreatedAt, n.ReadAt))

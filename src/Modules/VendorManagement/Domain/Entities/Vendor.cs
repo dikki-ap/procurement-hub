@@ -89,4 +89,7 @@ public class Vendor : AggregateRoot
 
         AddDomainEvent(new VendorReinstatedEvent(Id, LegalName));
     }
+
+    public void RaiseProfileUpdated()
+        => AddDomainEvent(new VendorProfileUpdatedEvent(Id, VendorCode, LegalName));
 }

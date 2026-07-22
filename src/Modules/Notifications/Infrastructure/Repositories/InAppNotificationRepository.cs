@@ -18,6 +18,13 @@ public class InAppNotificationRepository : IInAppNotificationRepository
                     .Take(50)
                     .ToListAsync(ct);
 
+    public async Task<List<InAppNotification>> GetForVendorUserAsync(Guid vendorUserId, CancellationToken ct = default)
+        => await _db.Set<InAppNotification>()
+                    .Where(n => n.VendorUserId == vendorUserId)
+                    .OrderByDescending(n => n.CreatedAt)
+                    .Take(50)
+                    .ToListAsync(ct);
+
     public async Task<InAppNotification?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => await _db.Set<InAppNotification>().FindAsync([id], ct);
 
