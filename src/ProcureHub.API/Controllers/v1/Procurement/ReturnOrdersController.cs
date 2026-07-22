@@ -15,7 +15,7 @@ namespace ProcureHub.API.Controllers.v1.Procurement;
 /// <summary>Return Order management.</summary>
 [ApiController]
 [Route("api/v1/return-orders")]
-[Authorize(Policy = "RequireInternal")]
+[Authorize(Policy = "RequirePurchasing")]
 public class ReturnOrdersController : ControllerBase
 {
     private readonly IMediator              _mediator;
@@ -37,10 +37,10 @@ public class ReturnOrdersController : ControllerBase
 
     /// <summary>List all return orders for the company.</summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<object>>> GetList(CancellationToken ct)
+    public async Task<ActionResult<ApiResponse<object>>> GetList(
+        [FromQuery] Guid companyId, CancellationToken ct)
     {
-        var companyId = _currentUser.UserId ?? Guid.Empty;
-        var result    = await _mediator.Send(new GetReturnOrdersQuery(companyId), ct);
+        var result = await _mediator.Send(new GetReturnOrdersQuery(companyId), ct);
         return Ok(ApiResponse.Ok(result));
     }
 

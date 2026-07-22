@@ -165,7 +165,7 @@ public class VendorPortalController : ControllerBase
         Guid vendorId, Guid documentId, CancellationToken ct)
     {
         await VerifyOwnershipAsync(vendorId, ct);
-        var deletedById = _currentUser.UserId ?? Guid.Empty;
+        var deletedById = _currentUser.VendorUserId ?? Guid.Empty;
         await _mediator.Send(new DeleteVendorDocumentCommand(documentId, deletedById), ct);
         return Ok(ApiResponse.Ok("Document deleted."));
     }
