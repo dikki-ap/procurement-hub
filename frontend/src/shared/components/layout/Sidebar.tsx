@@ -142,6 +142,12 @@ export const Sidebar = () => {
                 <NavLabel collapsed={ec}>My Invoices</NavLabel>
               </NavLink>
             </div>
+            <div className="pt-1">
+              <NavLink to={`/app/vendor-portal/${vendorId}/contracts`} title="My Contracts" className={navCls(ec)}>
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <NavLabel collapsed={ec}>My Contracts</NavLabel>
+              </NavLink>
+            </div>
           </>
         )}
 
@@ -190,6 +196,15 @@ export const Sidebar = () => {
                 <NavLink to="/app/approval/inbox" title="Approval Inbox" className={navCls(ec)}>
                   <Inbox className="h-4 w-4 flex-shrink-0" />
                   <NavLabel collapsed={ec}>Approval Inbox</NavLabel>
+                </NavLink>
+              </div>
+            )}
+
+            {(isPurchasing || isFinance) && (
+              <div className="pt-1">
+                <NavLink to="/app/contracts" title="Contracts" className={navCls(ec)}>
+                  <FileText className="h-4 w-4 flex-shrink-0" />
+                  <NavLabel collapsed={ec}>Contracts</NavLabel>
                 </NavLink>
               </div>
             )}

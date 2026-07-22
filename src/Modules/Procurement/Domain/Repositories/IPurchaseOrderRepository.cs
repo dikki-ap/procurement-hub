@@ -6,6 +6,7 @@ public interface IPurchaseOrderRepository
 {
     Task<List<PurchaseOrder>> GetAllAsync(Guid companyId, CancellationToken ct = default);
     Task<List<PurchaseOrder>> GetByVendorAsync(Guid vendorId, CancellationToken ct = default);
+    Task<List<PurchaseOrder>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     Task<PurchaseOrder?>      GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<PurchaseOrder?>      GetByIdWithItemsAsync(Guid id, CancellationToken ct = default);
     Task<string>              GenerateNextNumberAsync(Guid companyId, CancellationToken ct = default);

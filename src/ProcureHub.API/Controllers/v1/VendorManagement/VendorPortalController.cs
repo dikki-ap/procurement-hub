@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProcureHub.API.Security;
 using ProcureHub.Modules.MasterData.Application.Queries.GetDocumentTypeList;
+using ProcureHub.Modules.Procurement.Application.Queries.GetContractsByVendor;
 using ProcureHub.Modules.VendorManagement.Application.Commands.AddVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorBankAccount;
 using ProcureHub.Modules.VendorManagement.Application.Commands.DeleteVendorDocument;
@@ -10,6 +11,7 @@ using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendorBankA
 using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetMyVendorId;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
+using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorScoreHistory;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocumentDownloadUrl;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocuments;
 using ProcureHub.SharedKernel.Abstractions;
@@ -155,6 +157,15 @@ public class VendorPortalController : ControllerBase
         return Ok(ApiResponse.Ok(new { url = result.Url, fileName = result.FileName }));
     }
 
+    /// <summary>Get score history for own vendor profile.</summary>
+    [HttpGet("{vendorId:guid}/scores")]
+    public async Task<ActionResult<ApiResponse<object>>> GetScoreHistory(Guid vendorId, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        var result = await _mediator.Send(new GetVendorScoreHistoryQuery(vendorId), ct);
+        return Ok(ApiResponse.Ok(result));
+    }
+
     /// <summary>Get active document types available for upload.</summary>
     [HttpGet("{vendorId:guid}/document-types")]
     public async Task<ActionResult<ApiResponse<object>>> GetDocumentTypes(Guid vendorId, CancellationToken ct)
@@ -196,6 +207,17 @@ public class VendorPortalController : ControllerBase
         await VerifyOwnershipAsync(vendorId, ct);
         await _mediator.Send(new DeleteVendorBankAccountCommand(bankAccountId, vendorId), ct);
         return Ok(ApiResponse.Ok("Bank account removed."));
+    }
+
+    // ── Contracts (read-only) ─────────────────────────────────────────────────
+
+    /// <summary>Get own contracts (read-only).</summary>
+    [HttpGet("{vendorId:guid}/contracts")]
+    public async Task<ActionResult<ApiResponse<object>>> GetContracts(Guid vendorId, CancellationToken ct)
+    {
+        await VerifyOwnershipAsync(vendorId, ct);
+        var result = await _mediator.Send(new GetContractsByVendorQuery(vendorId), ct);
+        return Ok(ApiResponse.Ok(result));
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

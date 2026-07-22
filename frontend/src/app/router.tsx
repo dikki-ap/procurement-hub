@@ -135,6 +135,21 @@ export const router = createBrowserRouter([
               },
             ],
           },
+          // ── Contracts ────────────────────────────────────────────────
+          {
+            path: 'contracts',
+            lazy: () =>
+              import('@/features/contracts/pages/ContractListPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'contracts/:id',
+            lazy: () =>
+              import('@/features/contracts/pages/ContractDetailPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
           // ── Audit Log ────────────────────────────────────────────────────
           {
             path: 'audit',
@@ -289,6 +304,13 @@ export const router = createBrowserRouter([
             path: 'invoices',
             lazy: () =>
               import('@/features/fulfillment/pages/VendorInvoicesPage').then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: 'contracts',
+            lazy: () =>
+              import('@/features/vendor-portal/pages/VendorContractsPage').then((m) => ({
                 Component: m.default,
               })),
           },

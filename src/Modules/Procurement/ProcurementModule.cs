@@ -18,10 +18,12 @@ public static class ProcurementModule
         services.AddScoped<IPurchaseOrderRepository,       PurchaseOrderRepository>();
         services.AddScoped<IGoodsReceiptRepository,        GoodsReceiptRepository>();
         services.AddScoped<IInvoiceRepository,             InvoiceRepository>();
+        services.AddScoped<IContractRepository,            ContractRepository>();
 
         services.AddScoped<IVendorChecker,                 VendorChecker>();
 
         services.AddScoped<BidDeadlineReminderJob>();
+        services.AddScoped<ContractExpiryReminderJob>();
 
         return services;
     }

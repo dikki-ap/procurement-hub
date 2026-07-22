@@ -124,4 +124,38 @@ public static class EmailTemplates
         </div>
         <p>Please log in to ProcureHub immediately to review and approve or reject this request.</p>
         """);
+
+    public static string ContractActivated(
+        string vendorName, string contractNumber, string title,
+        DateTime? startDate, DateTime? endDate) => Wrap(
+        $"Contract Activated — {contractNumber}",
+        $$"""
+        <h2>Your contract is now active</h2>
+        <p>Dear <strong>{{vendorName}}</strong>,</p>
+        <p>We are pleased to inform you that the following contract has been activated:</p>
+        <div class="info">
+          <p><strong>Contract Number:</strong> {{contractNumber}}</p>
+          <p><strong>Title:</strong> {{title}}</p>
+          <p><strong>Start Date:</strong> {{(startDate.HasValue ? startDate.Value.ToString("dd MMMM yyyy") : "—")}}</p>
+          <p><strong>End Date:</strong> {{(endDate.HasValue ? endDate.Value.ToString("dd MMMM yyyy") : "—")}}</p>
+        </div>
+        <p>Please review the contract terms and keep a copy for your records. Contact your procurement team if you have any questions.</p>
+        """);
+
+    public static string ContractExpiring(
+        string vendorName, string contractNumber, string title,
+        DateTime endDate, int daysLeft) => Wrap(
+        $"Contract Expiry Reminder — {contractNumber}",
+        $$"""
+        <h2>Contract expiring in {{daysLeft}} day{{(daysLeft == 1 ? "" : "s")}}</h2>
+        <p>Dear <strong>{{vendorName}}</strong>,</p>
+        <p>This is a reminder that the following contract will expire soon:</p>
+        <div class="info">
+          <p><strong>Contract Number:</strong> {{contractNumber}}</p>
+          <p><strong>Title:</strong> {{title}}</p>
+          <p><strong>Expiry Date:</strong> {{endDate:dddd, dd MMMM yyyy}}</p>
+          <p><strong>Days Remaining:</strong> {{daysLeft}}</p>
+        </div>
+        <p>Please contact your procurement team to discuss renewal or replacement before the expiry date.</p>
+        """);
 }

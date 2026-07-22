@@ -61,6 +61,12 @@ public static class HangfireExtensions
             Cron.Hourly(),
             new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
 
+        RecurringJob.AddOrUpdate<ContractExpiryReminderJob>(
+            "contract-expiry-reminder",
+            job => job.ExecuteAsync(CancellationToken.None),
+            "10 0 * * *",
+            new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
+
         RecurringJob.AddOrUpdate<ApprovalEscalationJob>(
             "approval-escalation",
             job => job.ExecuteAsync(CancellationToken.None),

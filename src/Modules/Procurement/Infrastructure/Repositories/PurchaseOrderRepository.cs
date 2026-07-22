@@ -25,6 +25,11 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
               .OrderByDescending(p => p.CreatedAt)
               .ToListAsync(ct);
 
+    public Task<List<PurchaseOrder>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        => _db.Set<PurchaseOrder>()
+              .Where(p => ids.Contains(p.Id))
+              .ToListAsync(ct);
+
     public Task<PurchaseOrder?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => _db.Set<PurchaseOrder>().FirstOrDefaultAsync(p => p.Id == id, ct);
 
