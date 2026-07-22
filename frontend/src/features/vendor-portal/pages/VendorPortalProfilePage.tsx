@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   User, Building2, Store, Hash, FileCheck, Tag, Mail, Phone,
-  Package, MapPin, CreditCard, Landmark,
+  Package, MapPin, CreditCard, Landmark, TrendingUp,
 } from 'lucide-react';
 import { vendorPortalApi, type VendorStatus } from '@/features/vendors/api/vendorApi';
 import { TierBadge, ScoreDisplay } from '@/features/vendors/components/VendorBadges';
@@ -28,6 +28,12 @@ export default function VendorPortalProfilePage() {
   const { data: vendor, isLoading } = useQuery({
     queryKey: ['vendor-portal', 'profile', vendorId],
     queryFn: () => vendorPortalApi.getProfile(vendorId!),
+    enabled: !!vendorId,
+  });
+
+  const { data: scoreHistory = [] } = useQuery({
+    queryKey: ['vendor-portal', 'scores', vendorId],
+    queryFn: () => vendorPortalApi.getScoreHistory(vendorId!),
     enabled: !!vendorId,
   });
 
@@ -170,6 +176,50 @@ export default function VendorPortalProfilePage() {
                   <p className="text-sm text-slate-700">{b.accountNumber}</p>
                   <p className="text-xs text-slate-500">a/n {b.accountName}</p>
                   {b.branchName && <p className="text-xs text-slate-400">{b.branchName}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Score History */}
+      {scoreHistory.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-100 p-6 mb-6">
+          <h2 className="text-sm font-semibold text-slate-700 mb-1">Performance Score History</h2>
+          <p className="text-xs text-slate-400 mb-4">Quarterly evaluation scores</p>
+          <div className="space-y-3">
+            {scoreHistory.map((s) => (
+              <div key={s.id} className="p-3 rounded-lg bg-slate-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="text-sm font-medium text-slate-700">Q{s.periodQuarter} {s.periodYear}</span>
+                    {s.tier && (
+                      <span className="text-xs bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full">{s.tier}</span>
+                    )}
+                  </div>
+                  <span className={`text-lg font-bold ${
+                    s.totalScore != null && s.totalScore >= 80 ? 'text-emerald-600'
+                    : s.totalScore != null && s.totalScore >= 60 ? 'text-amber-500'
+                    : 'text-red-500'
+                  }`}>
+                    {s.totalScore != null ? s.totalScore.toFixed(1) : '—'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-2 mt-2">
+                  {[
+                    { label: 'Delivery',  value: s.deliveryScore  },
+                    { label: 'Quality',   value: s.qualityScore   },
+                    { label: 'Price',     value: s.priceScore     },
+                    { label: 'Response',  value: s.responseScore  },
+                    { label: 'Docs',      value: s.docScore       },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="text-center">
+                      <p className="text-xs text-slate-400">{label}</p>
+                      <p className="text-xs font-semibold text-slate-600">{value != null ? value.toFixed(1) : '—'}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}

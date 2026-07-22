@@ -19,6 +19,7 @@ using ProcureHub.Modules.VendorManagement.Application.Commands.UpdateVendorCapab
 using ProcureHub.Modules.VendorManagement.Application.Commands.UploadVendorDocument;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorById;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocumentDownloadUrl;
+using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorScoreHistory;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocuments;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorList;
 using ProcureHub.SharedKernel.Abstractions;
@@ -56,6 +57,14 @@ public class VendorsController : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> GetById(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetVendorByIdQuery(id), ct);
+        return Ok(ApiResponse.Ok(result));
+    }
+
+    /// <summary>Get score history for a vendor.</summary>
+    [HttpGet("{id:guid}/scores")]
+    public async Task<ActionResult<ApiResponse<object>>> GetScoreHistory(Guid id, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetVendorScoreHistoryQuery(id), ct);
         return Ok(ApiResponse.Ok(result));
     }
 

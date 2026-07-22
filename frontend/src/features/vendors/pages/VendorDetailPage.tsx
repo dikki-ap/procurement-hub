@@ -5,7 +5,7 @@ import {
   ArrowLeft, FileText, User, Mail, Phone,
   Building2, Store, Hash, FileCheck, Tag,
   Download, Eye, Plus, Pencil, Trash2, Package,
-  MapPin, CreditCard, AlertTriangle, CheckCircle2, Landmark,
+  MapPin, CreditCard, AlertTriangle, CheckCircle2, Landmark, TrendingUp,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -54,7 +54,7 @@ const DocStatusBadge = ({ status }: { status: DocumentStatus }) => {
 
 // ── tab definition ────────────────────────────────────────────────────────────
 
-const tabs = ['Info', 'Contacts', 'Documents', 'Capabilities', 'Bank Accounts'] as const;
+const tabs = ['Info', 'Contacts', 'Documents', 'Capabilities', 'Bank Accounts', 'Score History'] as const;
 type Tab = typeof tabs[number];
 
 // ── capability modal state ────────────────────────────────────────────────────
@@ -136,6 +136,12 @@ export default function VendorDetailPage() {
   const categoryOptions = categories
     .filter(c => c.isActive)
     .map(c => ({ value: c.id, label: `${c.code} — ${c.name}` }));
+
+  const { data: scoreHistory = [] } = useQuery({
+    queryKey: ['vendor', id, 'scores'],
+    queryFn:  () => vendorApi.getScoreHistory(id!),
+    enabled:  !!id && activeTab === 'Score History',
+  });
 
   // ── capability mutations ─────────────────────────────────────────────────────
 
@@ -597,6 +603,63 @@ export default function VendorDetailPage() {
                 </div>
               </div>
             ))
+          )}
+        </div>
+      )}
+
+      {/* ── Score History tab ── */}
+      {activeTab === 'Score History' && (
+        <div>
+          {scoreHistory.length === 0 ? (
+            <div className="text-center py-12 text-sm text-slate-400">No score records found.</div>
+          ) : (
+            <div className="space-y-3">
+              {scoreHistory.map((s) => (
+                <div key={s.id} className="bg-white rounded-xl border border-slate-100 p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-slate-400" />
+                      <span className="font-semibold text-slate-800">
+                        Q{s.periodQuarter} {s.periodYear}
+                      </span>
+                      {s.tier && (
+                        <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
+                          {s.tier}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-400">Total Score</p>
+                      <p className={`text-xl font-bold ${
+                        s.totalScore != null && s.totalScore >= 80 ? 'text-emerald-600'
+                        : s.totalScore != null && s.totalScore >= 60 ? 'text-amber-500'
+                        : 'text-red-500'
+                      }`}>
+                        {s.totalScore != null ? s.totalScore.toFixed(1) : '—'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-5 gap-3">
+                    {[
+                      { label: 'Delivery',  value: s.deliveryScore  },
+                      { label: 'Quality',   value: s.qualityScore   },
+                      { label: 'Price',     value: s.priceScore     },
+                      { label: 'Response',  value: s.responseScore  },
+                      { label: 'Documents', value: s.docScore       },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="bg-slate-50 rounded-lg p-3 text-center">
+                        <p className="text-xs text-slate-400 mb-1">{label}</p>
+                        <p className="text-sm font-semibold text-slate-700">
+                          {value != null ? value.toFixed(1) : '—'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  {s.notes && <p className="text-xs text-slate-400 mt-3 italic">{s.notes}</p>}
+                  <p className="text-xs text-slate-300 mt-2">Calculated: {fmtDateTime(s.calculatedAt)}</p>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}

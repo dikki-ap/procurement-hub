@@ -98,3 +98,18 @@ public record VendorBankAccountDto(
     bool    IsDefault,
     string? Notes
 );
+
+public record VendorScoreDto(
+    Guid      Id,
+    int       PeriodYear,
+    int       PeriodQuarter,
+    decimal?  DeliveryScore,
+    decimal?  QualityScore,
+    decimal?  PriceScore,
+    decimal?  ResponseScore,
+    decimal?  DocScore,
+    decimal?  TotalScore,
+    string?   Tier,
+    string?   Notes,
+    DateTime  CalculatedAt
+);

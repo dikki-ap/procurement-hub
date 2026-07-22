@@ -68,6 +68,21 @@ export interface VendorBankAccountDto {
   notes: string | null;
 }
 
+export interface VendorScoreDto {
+  id: string;
+  periodYear: number;
+  periodQuarter: number;
+  deliveryScore: number | null;
+  qualityScore: number | null;
+  priceScore: number | null;
+  responseScore: number | null;
+  docScore: number | null;
+  totalScore: number | null;
+  tier: string | null;
+  notes: string | null;
+  calculatedAt: string;
+}
+
 export interface VendorCapabilityDto {
   id: string;
   materialCategoryId: string;
@@ -192,6 +207,9 @@ export const vendorApi = {
 
   deleteBankAccount: (vendorId: string, bankAccountId: string) =>
     apiClient.delete(`${BASE}/${vendorId}/bank-accounts/${bankAccountId}`),
+
+  getScoreHistory: (vendorId: string) =>
+    apiClient.get<{ data: VendorScoreDto[] }>(`${BASE}/${vendorId}/scores`).then((r) => r.data.data),
 };
 
 export const vendorRegistrationApi = {
@@ -243,4 +261,7 @@ export const vendorPortalApi = {
 
   deleteBankAccount: (vendorId: string, bankAccountId: string) =>
     apiClient.delete(`/vendor-portal/${vendorId}/bank-accounts/${bankAccountId}`),
+
+  getScoreHistory: (vendorId: string) =>
+    apiClient.get<{ data: VendorScoreDto[] }>(`/vendor-portal/${vendorId}/scores`).then((r) => r.data.data),
 };

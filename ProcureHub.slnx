@@ -10,6 +10,9 @@
   <Folder Name="/src/Modules/ApprovalEngine/">
     <Project Path="src/Modules/ApprovalEngine/ProcureHub.Modules.ApprovalEngine.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/CompanyManagement/">
+    <Project Path="src/Modules/CompanyManagement/ProcureHub.Modules.CompanyManagement.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/DocumentManagement/">
     <Project Path="src/Modules/DocumentManagement/ProcureHub.Modules.DocumentManagement.csproj" />
   </Folder>
@@ -21,6 +24,9 @@
   </Folder>
   <Folder Name="/src/Modules/Procurement/">
     <Project Path="src/Modules/Procurement/ProcureHub.Modules.Procurement.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/UserManagement/">
+    <Project Path="src/Modules/UserManagement/ProcureHub.Modules.UserManagement.csproj" />
   </Folder>
   <Folder Name="/src/Modules/VendorManagement/">
     <Project Path="src/Modules/VendorManagement/ProcureHub.Modules.VendorManagement.csproj" />
