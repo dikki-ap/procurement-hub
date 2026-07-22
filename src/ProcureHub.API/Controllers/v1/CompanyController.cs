@@ -14,7 +14,7 @@ namespace ProcureHub.API.Controllers.v1;
 
 [ApiController]
 [Route("api/v1/company")]
-[Authorize(Policy = "RequireSuperAdmin")]
+[Authorize(Policy = "RequireInternal")]
 public class CompanyController : ControllerBase
 {
     private static readonly HashSet<string> AllowedImageTypes =
@@ -49,6 +49,7 @@ public class CompanyController : ControllerBase
 
     /// <summary>Update company profile (name, type, address, phone, email).</summary>
     [HttpPut]
+    [Authorize(Policy = "RequireSuperAdmin")]
     public async Task<ActionResult<ApiResponse<object>>> Update(
         [FromBody] UpdateCompanyRequest request, CancellationToken ct)
     {
@@ -61,6 +62,7 @@ public class CompanyController : ControllerBase
 
     /// <summary>Upload company logo (JPEG/PNG/WebP, max 2 MB).</summary>
     [HttpPost("logo")]
+    [Authorize(Policy = "RequireSuperAdmin")]
     public async Task<ActionResult<ApiResponse<object>>> UploadLogo(
         [FromForm] IFormFile file, CancellationToken ct)
     {

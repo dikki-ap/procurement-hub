@@ -13,7 +13,7 @@ namespace ProcureHub.API.Controllers.v1.Analytics;
 /// <summary>Analytics and dashboard data.</summary>
 [ApiController]
 [Route("api/v1/analytics")]
-[Authorize]
+[Authorize(Policy = "RequireInternal")]
 public class DashboardController : ControllerBase
 {
     private readonly IMediator           _mediator;
@@ -44,7 +44,6 @@ public class DashboardController : ControllerBase
 
     /// <summary>Monthly spend summary for the last N months.</summary>
     [HttpGet("spend-summary")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<IActionResult> GetSpendSummary(
         [FromQuery] Guid companyId,
         [FromQuery] int  months = 12,
@@ -56,7 +55,6 @@ public class DashboardController : ControllerBase
 
     /// <summary>Top-N vendor performance summary.</summary>
     [HttpGet("vendor-performance")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<IActionResult> GetVendorPerformance(
         [FromQuery] Guid companyId,
         [FromQuery] int  topN = 10,
@@ -69,7 +67,6 @@ public class DashboardController : ControllerBase
 
     /// <summary>Procurement funnel stage counts for a given year.</summary>
     [HttpGet("funnel")]
-    [Authorize(Policy = "RequireInternal")]
     public async Task<IActionResult> GetFunnelStats(
         [FromQuery] Guid companyId,
         [FromQuery] int  year = 0,

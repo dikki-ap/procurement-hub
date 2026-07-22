@@ -10,10 +10,10 @@ using ProcureHub.SharedKernel.Common;
 
 namespace ProcureHub.API.Controllers.v1.MasterData;
 
-/// <summary>Document type master data — readable by all authenticated users, writable by super_admin only.</summary>
+/// <summary>Document type master data — readable by internal users, writable by super_admin only.</summary>
 [ApiController]
 [Route("api/v1/master-data/document-types")]
-[Authorize]
+[Authorize(Policy = "RequireInternal")]
 public class DocumentTypesController : ControllerBase
 {
     private readonly IMediator _mediator;

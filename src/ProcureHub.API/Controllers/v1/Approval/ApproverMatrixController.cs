@@ -17,7 +17,7 @@ namespace ProcureHub.API.Controllers.v1.Approval;
 /// <summary>Manage the per-company approver matrix (who approves PR/PO/RFQ at each level).</summary>
 [ApiController]
 [Route("api/v1/approver-matrix")]
-[Authorize(Policy = "RequireSuperAdmin")]
+[Authorize(Policy = "RequireInternal")]
 public class ApproverMatrixController : ControllerBase
 {
     private readonly IMediator               _mediator;
@@ -39,7 +39,7 @@ public class ApproverMatrixController : ControllerBase
 
     /// <summary>List all approver matrix entries for a company.</summary>
     [HttpGet]
-    [Authorize(Policy = "RequireInternal")]
+    [Authorize(Policy = "RequireSuperAdmin")]
     public async Task<ActionResult<ApiResponse<List<ApproverMatrixEntryDto>>>> GetAll(
         [FromQuery] Guid companyId, CancellationToken ct)
     {
@@ -49,6 +49,7 @@ public class ApproverMatrixController : ControllerBase
 
     /// <summary>Create a new approver matrix entry.</summary>
     [HttpPost]
+    [Authorize(Policy = "RequireSuperAdmin")]
     public async Task<ActionResult<ApiResponse<Guid>>> Create(
         [FromBody] CreateApproverMatrixEntryRequest request, CancellationToken ct)
     {
@@ -66,6 +67,7 @@ public class ApproverMatrixController : ControllerBase
 
     /// <summary>Update an existing approver matrix entry.</summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireSuperAdmin")]
     public async Task<ActionResult<ApiResponse<object>>> Update(
         Guid id, [FromBody] UpdateApproverMatrixEntryRequest request, CancellationToken ct)
     {
@@ -83,6 +85,7 @@ public class ApproverMatrixController : ControllerBase
 
     /// <summary>Delete an approver matrix entry.</summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "RequireSuperAdmin")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken ct)
     {
         await _mediator.Send(new DeleteApproverMatrixEntryCommand(id), ct);
