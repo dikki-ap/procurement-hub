@@ -19,5 +19,7 @@ public record RegisterVendorCommand(
     string     ContactName,
     string?    ContactPosition,
     string     ContactEmail,
-    string?    ContactPhone
+    string?    ContactPhone,
+    bool       IsPkp   = false,
+    decimal?   PphRate = null
 ) : ICommand<Guid>;

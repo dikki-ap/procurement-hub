@@ -80,6 +80,7 @@ try
     // IStorageService (SharedKernel) is registered by AddVendorManagementServices via the global alias
 
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+    builder.Services.AddScoped<IDocumentAccessLogger, DocumentAccessLogger>();
 
     if (builder.Environment.IsDevelopment())
         builder.Services.AddHostedService<ViteDevServerService>();

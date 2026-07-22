@@ -100,6 +100,8 @@ export interface InvoiceListDto {
 export interface InvoiceDto extends InvoiceListDto {
   amount: number;
   taxAmount: number;
+  withholdingTax: number;
+  netPayable: number;
   currencyCode: string | null;
   fileUrl: string | null;
   paidAt: string | null;

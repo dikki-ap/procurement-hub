@@ -34,13 +34,15 @@ namespace ProcureHub.API.Controllers.v1.VendorManagement;
 [Authorize(Policy = "RequireInternal")]
 public class VendorsController : ControllerBase
 {
-    private readonly IMediator           _mediator;
-    private readonly ICurrentUserService _currentUser;
+    private readonly IMediator                _mediator;
+    private readonly ICurrentUserService      _currentUser;
+    private readonly IDocumentAccessLogger    _accessLogger;
 
-    public VendorsController(IMediator mediator, ICurrentUserService currentUser)
+    public VendorsController(IMediator mediator, ICurrentUserService currentUser, IDocumentAccessLogger accessLogger)
     {
-        _mediator    = mediator;
-        _currentUser = currentUser;
+        _mediator     = mediator;
+        _currentUser  = currentUser;
+        _accessLogger = accessLogger;
     }
 
     /// <summary>List all vendors for a company.</summary>
@@ -86,7 +88,8 @@ public class VendorsController : ControllerBase
             id, request.LegalName, request.TradeName, request.VendorType,
             request.Npwp, request.Siup, request.Nib,
             request.Address, request.City, request.Province, request.PostalCode, request.Country,
-            request.DefaultPaymentTermId, request.DefaultCurrencyId), ct);
+            request.DefaultPaymentTermId, request.DefaultCurrencyId,
+            request.IsPkp, request.PphRate), ct);
         return Ok(ApiResponse.Ok("Vendor updated."));
     }
 
@@ -210,6 +213,7 @@ public class VendorsController : ControllerBase
         Guid id, Guid documentId, [FromQuery] bool inline, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(id, documentId, inline), ct);
+        await _accessLogger.LogAsync("VendorDocument", documentId, result.FileName, inline, ct);
         return Ok(ApiResponse.Ok(new { url = result.Url, fileName = result.FileName }));
     }
 
@@ -297,7 +301,9 @@ public record UpdateVendorRequest(
     string?    PostalCode,
     string?    Country,
     Guid?      DefaultPaymentTermId,
-    Guid?      DefaultCurrencyId);
+    Guid?      DefaultCurrencyId,
+    bool       IsPkp   = false,
+    decimal?   PphRate = null);
 
 public record AddCapabilityRequest(
     Guid      MaterialCategoryId,

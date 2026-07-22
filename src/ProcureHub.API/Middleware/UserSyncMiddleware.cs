@@ -33,9 +33,11 @@ public class UserSyncMiddleware
 
                 if (InternalRoles.Contains(role))
                 {
-                    var internalId = await SyncInternalUserAsync(ctx, db, keycloakId, role);
+                    var (internalId, companyId) = await SyncInternalUserAsync(ctx, db, keycloakId, role);
                     if (internalId.HasValue)
                         ctx.Items["LocalUserId"] = internalId.Value;
+                    if (companyId.HasValue)
+                        ctx.Items["LocalCompanyId"] = companyId.Value;
                 }
                 else
                 {
@@ -52,7 +54,7 @@ public class UserSyncMiddleware
         await _next(ctx);
     }
 
-    private static async Task<Guid?> SyncInternalUserAsync(
+    private static async Task<(Guid? UserId, Guid? CompanyId)> SyncInternalUserAsync(
         HttpContext ctx, ApplicationDbContext db, string keycloakId, string role)
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.KeycloakId == keycloakId);
@@ -60,7 +62,7 @@ public class UserSyncMiddleware
         if (user is null)
         {
             var company = await db.Companies.FirstOrDefaultAsync();
-            if (company is null) return null;
+            if (company is null) return (null, null);
 
             user = new User
             {
@@ -88,7 +90,7 @@ public class UserSyncMiddleware
             }
         }
 
-        return user?.Id;
+        return (user?.Id, user?.CompanyId);
     }
 
     private static async Task<Guid?> SyncVendorUserAsync(

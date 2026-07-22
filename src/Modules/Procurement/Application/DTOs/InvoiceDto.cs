@@ -30,6 +30,8 @@ public record InvoiceDto(
     decimal       Amount,
     decimal       TaxAmount,
     decimal       TotalAmount,
+    decimal       WithholdingTax,
+    decimal       NetPayable,
     string?       CurrencyCode,
     string?       FileUrl,
     DateTime?     DueAt,

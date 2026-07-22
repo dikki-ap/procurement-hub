@@ -1,6 +1,7 @@
 using MediatR;
 using ProcureHub.Modules.Procurement.Domain.Enums;
 using ProcureHub.Modules.Procurement.Domain.Repositories;
+using ProcureHub.Modules.VendorManagement.Domain.Repositories;
 using ProcureHub.SharedKernel.CQRS;
 using ProcureHub.SharedKernel.Exceptions;
 
@@ -8,15 +9,18 @@ namespace ProcureHub.Modules.Procurement.Application.Commands.ReviewInvoice;
 
 public class ReviewInvoiceCommandHandler : ICommandHandler<ReviewInvoiceCommand>
 {
-    private readonly IInvoiceRepository      _invoiceRepo;
+    private readonly IInvoiceRepository       _invoiceRepo;
     private readonly IPurchaseOrderRepository _poRepo;
+    private readonly IVendorRepository        _vendorRepo;
 
     public ReviewInvoiceCommandHandler(
-        IInvoiceRepository      invoiceRepo,
-        IPurchaseOrderRepository poRepo)
+        IInvoiceRepository       invoiceRepo,
+        IPurchaseOrderRepository poRepo,
+        IVendorRepository        vendorRepo)
     {
         _invoiceRepo = invoiceRepo;
         _poRepo      = poRepo;
+        _vendorRepo  = vendorRepo;
     }
 
     public async Task<Unit> Handle(ReviewInvoiceCommand command, CancellationToken ct)
@@ -46,6 +50,10 @@ public class ReviewInvoiceCommandHandler : ICommandHandler<ReviewInvoiceCommand>
                 throw new BusinessRuleException("InvoiceApprove",
                     $"Invoice total {invoice.TotalAmount:N2} exceeds remaining PO balance " +
                     $"{po.TotalAmount - alreadyInvoiced:N2}. Reduce invoice amount or reject.");
+
+            // Calculate Indonesian tax (PPN + PPh) based on vendor's PKP status
+            var vendor = await _vendorRepo.GetByIdAsync(invoice.VendorId, ct);
+            invoice.ApplyTax(vendor?.IsPkp ?? false, vendor?.PphRate);
 
             invoice.Approve(command.ReviewerId);
         }

@@ -28,13 +28,15 @@ namespace ProcureHub.API.Controllers.v1.Procurement;
 [Authorize(Policy = "RequireInternal")]
 public class RFQsController : ControllerBase
 {
-    private readonly IMediator           _mediator;
-    private readonly ICurrentUserService _currentUser;
+    private readonly IMediator                _mediator;
+    private readonly ICurrentUserService      _currentUser;
+    private readonly IDocumentAccessLogger    _accessLogger;
 
-    public RFQsController(IMediator mediator, ICurrentUserService currentUser)
+    public RFQsController(IMediator mediator, ICurrentUserService currentUser, IDocumentAccessLogger accessLogger)
     {
-        _mediator    = mediator;
-        _currentUser = currentUser;
+        _mediator     = mediator;
+        _currentUser  = currentUser;
+        _accessLogger = accessLogger;
     }
 
     /// <summary>List all RFQs for a company.</summary>
@@ -200,6 +202,7 @@ public class RFQsController : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> Download(Guid id, CancellationToken ct)
     {
         var url = await _mediator.Send(new GetRFQAttachmentUrlQuery(id), ct);
+        await _accessLogger.LogAsync("RFQAttachment", id, null, false, ct);
         return Ok(ApiResponse.Ok(new { url }));
     }
 }

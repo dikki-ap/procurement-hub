@@ -101,7 +101,14 @@ export default function VendorDetailPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const companyId = useAuthStore(s => s.user?.companyId ?? '');
+  const isMasterData = useAuthStore(s =>
+    s.user?.roles?.some(r => ['master_data', 'super_admin'].includes(r)) ?? false);
   const [activeTab, setActiveTab] = useState<Tab>('Info');
+
+  // tax edit modal state
+  const [taxModalOpen, setTaxModalOpen] = useState(false);
+  const [taxIsPkp, setTaxIsPkp]       = useState(false);
+  const [taxPphRate, setTaxPphRate]    = useState('');
 
   // document preview state
   const [previewUrl, setPreviewUrl]   = useState<string | null>(null);
@@ -243,6 +250,22 @@ export default function VendorDetailPage() {
     },
     onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to remove bank account')),
   });
+
+  const updateTaxMutation = useMutation({
+    mutationFn: () => vendorApi.updateTaxInfo(id!, taxIsPkp, taxPphRate ? parseFloat(taxPphRate) : null, vendor!),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['vendor', id] });
+      toast.success('Tax settings updated');
+      setTaxModalOpen(false);
+    },
+    onError: (e: unknown) => toast.error(extractApiError(e, 'Failed to update tax settings')),
+  });
+
+  const openTaxModal = () => {
+    setTaxIsPkp(vendor?.isPkp ?? false);
+    setTaxPphRate(vendor?.pphRate != null ? String(vendor.pphRate) : '');
+    setTaxModalOpen(true);
+  };
 
   // ── document actions ─────────────────────────────────────────────────────────
 
@@ -408,6 +431,37 @@ export default function VendorDetailPage() {
               <p className="text-sm font-medium text-slate-800">{addressLine}</p>
             </div>
           )}
+
+          {/* Tax Settings */}
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Indonesian Tax</p>
+              {isMasterData && (
+                <button
+                  onClick={openTaxModal}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-slate-500 mb-0.5">PKP Status</p>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                  vendor.isPkp ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  {vendor.isPkp ? 'PKP (VAT-registered)' : 'Non-PKP'}
+                </span>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-0.5">PPh Rate</p>
+                <p className="text-sm font-medium text-slate-800">
+                  {vendor.pphRate != null ? `${vendor.pphRate}%` : '—'}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {vendor.isBlacklisted && (
             <div className="bg-red-50 rounded-lg p-4">
@@ -679,6 +733,46 @@ export default function VendorDetailPage() {
               </div>
             ) : null}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Tax Settings Modal ── */}
+      <Dialog open={taxModalOpen} onOpenChange={(v) => { if (!v) setTaxModalOpen(false); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Edit Tax Settings</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); updateTaxMutation.mutate(); }} className="space-y-4 mt-2">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="taxIsPkp"
+                checked={taxIsPkp}
+                onChange={(e) => setTaxIsPkp(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="taxIsPkp" className="text-sm font-medium">
+                PKP (Pengusaha Kena Pajak) — VAT-registered vendor
+              </label>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">PPh Withholding Rate (%)</label>
+              <input
+                type="number" min="0" max="100" step="0.01"
+                className={inputCls}
+                value={taxPphRate}
+                onChange={(e) => setTaxPphRate(e.target.value)}
+                placeholder="e.g. 2.00"
+              />
+              <p className="text-xs text-slate-400 mt-1">Leave blank if no PPh withholding applies.</p>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button type="button" variant="outline" onClick={() => setTaxModalOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={updateTaxMutation.isPending}>
+                {updateTaxMutation.isPending ? 'Saving…' : 'Save'}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 

@@ -30,13 +30,15 @@ public class ContractsController : ControllerBase
 
     private const long MaxFileSizeBytes = 20 * 1024 * 1024; // 20 MB
 
-    private readonly IMediator           _mediator;
-    private readonly ICurrentUserService _currentUser;
+    private readonly IMediator                _mediator;
+    private readonly ICurrentUserService      _currentUser;
+    private readonly IDocumentAccessLogger    _accessLogger;
 
-    public ContractsController(IMediator mediator, ICurrentUserService currentUser)
+    public ContractsController(IMediator mediator, ICurrentUserService currentUser, IDocumentAccessLogger accessLogger)
     {
-        _mediator    = mediator;
-        _currentUser = currentUser;
+        _mediator     = mediator;
+        _currentUser  = currentUser;
+        _accessLogger = accessLogger;
     }
 
     /// <summary>List contracts for the caller's company.</summary>
@@ -142,6 +144,7 @@ public class ContractsController : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> Download(Guid id, CancellationToken ct)
     {
         var url = await _mediator.Send(new GetContractDownloadUrlQuery(id), ct);
+        await _accessLogger.LogAsync("Contract", id, null, false, ct);
         return Ok(ApiResponse.Ok(new { url }));
     }
 

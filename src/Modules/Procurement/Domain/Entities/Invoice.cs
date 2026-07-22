@@ -23,6 +23,8 @@ public class Invoice : AggregateRoot
     public DateTime      SubmittedAt      { get; set; }
     public Guid?         ReviewedBy       { get; set; }
     public DateTime?     ReviewedAt       { get; set; }
+    public decimal       WithholdingTax   { get; set; } = 0;  // PPh deducted by buyer
+    public decimal       NetPayable       { get; set; } = 0;  // TotalAmount - WithholdingTax
 
     public PurchaseOrder? PurchaseOrder { get; set; }
 
@@ -69,6 +71,18 @@ public class Invoice : AggregateRoot
         Status     = InvoiceStatus.Approved;
         ReviewedBy = reviewerId;
         ReviewedAt = DateTime.UtcNow;
+    }
+
+    public void ApplyTax(bool isPkp, decimal? pphRate)
+    {
+        if (isPkp)
+            TaxAmount = Math.Round(Amount * 0.11m, 4);
+
+        TotalAmount    = Amount + TaxAmount;
+        WithholdingTax = pphRate.HasValue
+            ? Math.Round(Amount * (pphRate.Value / 100m), 4)
+            : 0;
+        NetPayable     = TotalAmount - WithholdingTax;
     }
 
     public void ConfirmPayment(string paymentReference)

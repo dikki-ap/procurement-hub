@@ -14,6 +14,7 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
 
     public Task<List<PurchaseOrder>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<PurchaseOrder>()
+              .AsNoTracking()
               .Include(p => p.CreatedBy)
               .Include(p => p.UpdatedBy)
               .Where(p => p.CompanyId == companyId)
@@ -22,6 +23,7 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
 
     public Task<List<PurchaseOrder>> GetByVendorAsync(Guid vendorId, CancellationToken ct = default)
         => _db.Set<PurchaseOrder>()
+              .AsNoTracking()
               .Where(p => p.VendorId == vendorId)
               .OrderByDescending(p => p.CreatedAt)
               .ToListAsync(ct);

@@ -18,6 +18,8 @@ public class InvoiceConfiguration : BaseSoftDeleteEntityConfiguration<Invoice>
         builder.Property(e => e.Amount).HasColumnType("DECIMAL(18,4)").IsRequired();
         builder.Property(e => e.TaxAmount).HasColumnType("DECIMAL(18,4)");
         builder.Property(e => e.TotalAmount).HasColumnType("DECIMAL(18,4)").IsRequired();
+        builder.Property(e => e.WithholdingTax).HasColumnType("DECIMAL(18,4)");
+        builder.Property(e => e.NetPayable).HasColumnType("DECIMAL(18,4)");
         builder.Property(e => e.FileUrl).HasColumnType("TEXT");
         builder.Property(e => e.PaymentReference).HasMaxLength(100);
         builder.Property(e => e.Notes).HasColumnType("TEXT");

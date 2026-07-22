@@ -13,6 +13,7 @@ public class VendorRepository : IVendorRepository
 
     public Task<List<Vendor>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<Vendor>()
+              .AsNoTracking()
               .Include(v => v.CreatedBy)
               .Include(v => v.UpdatedBy)
               .Where(v => v.CompanyId == companyId)

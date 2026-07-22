@@ -4,7 +4,7 @@ namespace ProcureHub.Modules.Procurement.Domain.Repositories;
 
 public interface IInvoiceRepository
 {
-    Task<List<Invoice>> GetAllAsync(CancellationToken ct = default);
+    Task<List<Invoice>> GetByCompanyAsync(Guid companyId, CancellationToken ct = default);
     Task<List<Invoice>> GetByPOAsync(Guid poId, CancellationToken ct = default);
     Task<List<Invoice>> GetByVendorAsync(Guid vendorId, CancellationToken ct = default);
     Task<Invoice?>      GetByIdAsync(Guid id, CancellationToken ct = default);

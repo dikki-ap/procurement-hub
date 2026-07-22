@@ -20,13 +20,15 @@ namespace ProcureHub.API.Controllers.v1.Procurement;
 [Authorize(Policy = "RequireVendor")]
 public class QuotationsController : ControllerBase
 {
-    private readonly IMediator           _mediator;
-    private readonly ICurrentUserService _currentUser;
+    private readonly IMediator                _mediator;
+    private readonly ICurrentUserService      _currentUser;
+    private readonly IDocumentAccessLogger    _accessLogger;
 
-    public QuotationsController(IMediator mediator, ICurrentUserService currentUser)
+    public QuotationsController(IMediator mediator, ICurrentUserService currentUser, IDocumentAccessLogger accessLogger)
     {
-        _mediator    = mediator;
-        _currentUser = currentUser;
+        _mediator     = mediator;
+        _currentUser  = currentUser;
+        _accessLogger = accessLogger;
     }
 
     /// <summary>List all quotations for the authenticated vendor.</summary>
@@ -86,6 +88,7 @@ public class QuotationsController : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> Download(Guid id, CancellationToken ct)
     {
         var url = await _mediator.Send(new GetQuotationAttachmentUrlQuery(id), ct);
+        await _accessLogger.LogAsync("QuotationAttachment", id, null, false, ct);
         return Ok(ApiResponse.Ok(new { url }));
     }
 

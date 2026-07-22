@@ -61,6 +61,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     private sealed class DesignTimeCurrentUserService : ICurrentUserService
     {
         public Guid?  UserId        => null;
+        public Guid?  CompanyId     => null;
         public Guid?  VendorUserId  => null;
         public string? KeycloakId   => null;
         public string? Email        => null;

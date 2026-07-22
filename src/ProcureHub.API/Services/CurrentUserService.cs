@@ -46,6 +46,9 @@ public class CurrentUserService : ICurrentUserService
         }
     }
 
+    public Guid? CompanyId
+        => Context?.Items["LocalCompanyId"] is Guid cid ? cid : null;
+
     public Guid? VendorUserId
         => Context?.Items["VendorLocalUserId"] is Guid id ? id : null;
 

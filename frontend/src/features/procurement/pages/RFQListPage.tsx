@@ -15,10 +15,11 @@ const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
 const StatusBadge = ({ status }: { status: RFQStatus }) => {
   const cfg: Record<RFQStatus, string> = {
-    Draft:     'bg-slate-100 text-slate-700',
-    Open:      'bg-blue-50 text-blue-700',
-    Closed:    'bg-emerald-50 text-emerald-700',
-    Cancelled: 'bg-gray-100 text-gray-500',
+    Draft:           'bg-slate-100 text-slate-700',
+    Open:            'bg-blue-50 text-blue-700',
+    Closed:          'bg-emerald-50 text-emerald-700',
+    Cancelled:       'bg-gray-100 text-gray-500',
+    PendingApproval: 'bg-amber-50 text-amber-700',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cfg[status]}`}>

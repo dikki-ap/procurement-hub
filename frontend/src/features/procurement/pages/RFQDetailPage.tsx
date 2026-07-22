@@ -10,10 +10,11 @@ import { fmtDate, fmtDateTime } from '@/shared/lib/date';
 
 const StatusBadge = ({ status }: { status: RFQStatus }) => {
   const cfg: Record<RFQStatus, string> = {
-    Draft:     'bg-slate-100 text-slate-700',
-    Open:      'bg-blue-50 text-blue-700',
-    Closed:    'bg-emerald-50 text-emerald-700',
-    Cancelled: 'bg-gray-100 text-gray-500',
+    Draft:           'bg-slate-100 text-slate-700',
+    Open:            'bg-blue-50 text-blue-700',
+    Closed:          'bg-emerald-50 text-emerald-700',
+    Cancelled:       'bg-gray-100 text-gray-500',
+    PendingApproval: 'bg-amber-50 text-amber-700',
   };
   return <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${cfg[status]}`}>{status}</span>;
 };

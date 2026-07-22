@@ -27,9 +27,32 @@ public class RFQ : AggregateRoot
 
     // ── Domain methods ──────────────────────────────────────────────────────
 
+    public void ValidateReadyToOpen()
+    {
+        if (Status is not (RFQStatus.Draft or RFQStatus.PendingApproval))
+            throw new BusinessRuleException("RFQOpen", $"Only draft RFQs can be opened. Current status: {Status}");
+
+        if (!Items.Any())
+            throw new BusinessRuleException("RFQOpen", "RFQ must have at least one item before opening.");
+
+        var activeVendors = Vendors.Count(v => v.Status == RFQVendorStatus.Invited);
+        if (activeVendors < MinimumVendors)
+            throw new BusinessRuleException("RFQOpen",
+                $"At least {MinimumVendors} vendors must be invited before opening. Currently invited: {activeVendors}");
+
+        if (BidDeadline <= DateTime.UtcNow)
+            throw new BusinessRuleException("RFQOpen", "Bid deadline must be in the future.");
+    }
+
+    public void SubmitForApproval()
+    {
+        ValidateReadyToOpen();
+        Status = RFQStatus.PendingApproval;
+    }
+
     public void Open()
     {
-        if (Status != RFQStatus.Draft)
+        if (Status is not (RFQStatus.Draft or RFQStatus.PendingApproval))
             throw new BusinessRuleException("RFQOpen", $"Only draft RFQs can be opened. Current status: {Status}");
 
         if (!Items.Any())

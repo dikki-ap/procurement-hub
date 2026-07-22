@@ -38,13 +38,15 @@ public class VendorPortalController : ControllerBase
         "application/vnd.ms-excel",
     ];
 
-    private readonly IMediator           _mediator;
-    private readonly ICurrentUserService _currentUser;
+    private readonly IMediator                _mediator;
+    private readonly ICurrentUserService      _currentUser;
+    private readonly IDocumentAccessLogger    _accessLogger;
 
-    public VendorPortalController(IMediator mediator, ICurrentUserService currentUser)
+    public VendorPortalController(IMediator mediator, ICurrentUserService currentUser, IDocumentAccessLogger accessLogger)
     {
-        _mediator    = mediator;
-        _currentUser = currentUser;
+        _mediator     = mediator;
+        _currentUser  = currentUser;
+        _accessLogger = accessLogger;
     }
 
     /// <summary>Resolve the vendorId for the currently authenticated vendor user.</summary>
@@ -177,6 +179,7 @@ public class VendorPortalController : ControllerBase
     {
         await VerifyOwnershipAsync(vendorId, ct);
         var result = await _mediator.Send(new GetVendorDocumentDownloadUrlQuery(vendorId, documentId, inline), ct);
+        await _accessLogger.LogAsync("VendorDocument", documentId, result.FileName, inline, ct);
         return Ok(ApiResponse.Ok(new { url = result.Url, fileName = result.FileName }));
     }
 

@@ -3,4 +3,4 @@ using ProcureHub.SharedKernel.CQRS;
 
 namespace ProcureHub.Modules.Procurement.Application.Queries.GetInvoiceList;
 
-public record GetInvoiceListQuery : IQuery<List<InvoiceListDto>>;
+public record GetInvoiceListQuery(Guid CompanyId) : IQuery<List<InvoiceListDto>>;

@@ -105,6 +105,8 @@ export interface VendorDetailDto extends VendorDto {
   country: string | null;
   defaultPaymentTermId: string | null;
   defaultCurrencyId: string | null;
+  isPkp: boolean;
+  pphRate: number | null;
   contacts: VendorContactDto[];
   documents: VendorDocumentDto[];
   capabilities: VendorCapabilityDto[];
@@ -211,6 +213,25 @@ export const vendorApi = {
 
   getScoreHistory: (vendorId: string) =>
     apiClient.get<{ data: VendorScoreDto[] }>(`${BASE}/${vendorId}/scores`).then((r) => r.data.data),
+
+  updateTaxInfo: (vendorId: string, isPkp: boolean, pphRate: number | null, vendor: VendorDetailDto) =>
+    apiClient.put(`${BASE}/${vendorId}`, {
+      legalName:           vendor.legalName,
+      tradeName:           vendor.tradeName,
+      vendorType:          vendor.vendorType,
+      npwp:                vendor.npwp,
+      siup:                vendor.siup,
+      nib:                 vendor.nib,
+      address:             vendor.address,
+      city:                vendor.city,
+      province:            vendor.province,
+      postalCode:          vendor.postalCode,
+      country:             vendor.country,
+      defaultPaymentTermId: vendor.defaultPaymentTermId,
+      defaultCurrencyId:   vendor.defaultCurrencyId,
+      isPkp,
+      pphRate,
+    }),
 };
 
 export const vendorRegistrationApi = {

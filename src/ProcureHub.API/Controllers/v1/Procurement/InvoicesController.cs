@@ -26,12 +26,14 @@ public class InvoicesController : ControllerBase
         _currentUser = currentUser;
     }
 
-    /// <summary>List all invoices (finance only).</summary>
+    /// <summary>List invoices scoped to the caller's company (finance only).</summary>
     [HttpGet]
     [Authorize(Policy = "RequireFinance")]
     public async Task<ActionResult<ApiResponse<object>>> GetList(CancellationToken ct)
     {
-        var result = await _mediator.Send(new GetInvoiceListQuery(), ct);
+        var companyId = _currentUser.CompanyId
+                        ?? throw new UnauthorizedAccessException("CompanyId not resolved.");
+        var result = await _mediator.Send(new GetInvoiceListQuery(companyId), ct);
         return Ok(ApiResponse.Ok(result));
     }
 

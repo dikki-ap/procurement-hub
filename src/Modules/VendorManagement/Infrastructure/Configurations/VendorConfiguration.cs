@@ -33,6 +33,7 @@ public class VendorConfiguration : BaseSoftDeleteEntityConfiguration<Vendor>
         builder.Property(e => e.Score).HasColumnType("DECIMAL(5,2)");
         builder.Property(e => e.BlacklistReason).HasColumnType("TEXT");
         builder.Property(e => e.KeycloakGroupId).HasMaxLength(100);
+        builder.Property(e => e.PphRate).HasColumnType("DECIMAL(5,2)");
 
         builder.HasIndex(e => new { e.CompanyId, e.VendorCode }).IsUnique();
 

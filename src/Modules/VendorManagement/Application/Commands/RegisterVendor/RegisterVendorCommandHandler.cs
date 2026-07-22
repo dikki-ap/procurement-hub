@@ -35,6 +35,8 @@ public class RegisterVendorCommandHandler : ICommandHandler<RegisterVendorComman
             Province   = command.Province,
             PostalCode = command.PostalCode,
             Country    = command.Country,
+            IsPkp      = command.IsPkp,
+            PphRate    = command.PphRate,
         };
 
         vendor.Contacts.Add(new VendorContact

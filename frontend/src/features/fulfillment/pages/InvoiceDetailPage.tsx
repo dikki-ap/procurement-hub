@@ -200,9 +200,15 @@ export default function InvoiceDetailPage() {
           } />
           <InfoRow label="PO Number" value={invoice.poNumber || '—'} />
           <InfoRow label="Due Date"  value={fmtDate(invoice.dueAt)} />
-          <InfoRow label="Amount"    value={fmt(invoice.amount)} />
-          <InfoRow label="Tax"       value={fmt(invoice.taxAmount)} />
-          <InfoRow label="Total"     value={<span className="font-semibold">{fmt(invoice.totalAmount)}</span>} />
+          <InfoRow label="Amount (DPP)" value={fmt(invoice.amount)} />
+          <InfoRow label="PPN (11%)"    value={fmt(invoice.taxAmount)} />
+          <InfoRow label="Total"        value={<span className="font-semibold">{fmt(invoice.totalAmount)}</span>} />
+          {invoice.withholdingTax > 0 && (
+            <>
+              <InfoRow label="PPh (Withholding)" value={<span className="text-red-600">- {fmt(invoice.withholdingTax)}</span>} />
+              <InfoRow label="Net Payable"        value={<span className="font-semibold text-emerald-700">{fmt(invoice.netPayable)}</span>} />
+            </>
+          )}
           {invoice.status === 'Paid' && (
             <>
               <InfoRow label="Paid At"          value={fmtDate(invoice.paidAt)} />

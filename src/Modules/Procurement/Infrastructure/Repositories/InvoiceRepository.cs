@@ -11,11 +11,13 @@ public class InvoiceRepository : IInvoiceRepository
 
     public InvoiceRepository(ApplicationDbContext db) => _db = db;
 
-    public Task<List<Invoice>> GetAllAsync(CancellationToken ct = default)
+    public Task<List<Invoice>> GetByCompanyAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<Invoice>()
+              .AsNoTracking()
               .Include(i => i.CreatedBy)
               .Include(i => i.UpdatedBy)
               .Include(i => i.PurchaseOrder).ThenInclude(p => p!.Vendor)
+              .Where(i => i.PurchaseOrder!.CompanyId == companyId)
               .OrderByDescending(i => i.SubmittedAt)
               .ToListAsync(ct);
 
@@ -28,7 +30,7 @@ public class InvoiceRepository : IInvoiceRepository
         => _db.Set<Invoice>().Where(i => i.POId == poId).ToListAsync(ct);
 
     public Task<List<Invoice>> GetByVendorAsync(Guid vendorId, CancellationToken ct = default)
-        => _db.Set<Invoice>().Where(i => i.VendorId == vendorId).OrderByDescending(i => i.SubmittedAt).ToListAsync(ct);
+        => _db.Set<Invoice>().AsNoTracking().Where(i => i.VendorId == vendorId).OrderByDescending(i => i.SubmittedAt).ToListAsync(ct);
 
     public Task<Invoice?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => _db.Set<Invoice>().FirstOrDefaultAsync(i => i.Id == id, ct);

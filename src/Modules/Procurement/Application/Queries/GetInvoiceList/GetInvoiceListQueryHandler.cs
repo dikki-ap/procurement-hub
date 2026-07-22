@@ -17,7 +17,7 @@ public class GetInvoiceListQueryHandler : IQueryHandler<GetInvoiceListQuery, Lis
 
     public async Task<List<InvoiceListDto>> Handle(GetInvoiceListQuery query, CancellationToken ct)
     {
-        var invoices = await _invoiceRepo.GetAllAsync(ct);
+        var invoices = await _invoiceRepo.GetByCompanyAsync(query.CompanyId, ct);
         return invoices.Select(i => new InvoiceListDto(
             i.Id,
             i.InvoiceNumber,

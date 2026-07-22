@@ -14,6 +14,7 @@ public class RFQRepository : IRFQRepository
 
     public Task<List<RFQ>> GetAllAsync(Guid companyId, CancellationToken ct = default)
         => _db.Set<RFQ>()
+              .AsNoTracking()
               .Include(r => r.Items)
               .Include(r => r.Vendors)
               .Include(r => r.CreatedBy)
@@ -24,6 +25,7 @@ public class RFQRepository : IRFQRepository
 
     public Task<List<RFQ>> GetOpenWithVendorsAsync(CancellationToken ct = default)
         => _db.Set<RFQ>()
+              .AsNoTracking()
               .Include(r => r.Vendors)
               .Where(r => r.Status == RFQStatus.Open)
               .ToListAsync(ct);

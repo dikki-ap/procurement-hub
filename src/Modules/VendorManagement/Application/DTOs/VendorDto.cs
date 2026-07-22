@@ -47,6 +47,8 @@ public record VendorDetailDto(
     string?                       BlacklistReason,
     DateTime?                     ApprovedAt,
     DateTime                      CreatedAt,
+    bool                          IsPkp,
+    decimal?                      PphRate,
     List<VendorContactDto>        Contacts,
     List<VendorDocumentDto>       Documents,
     List<VendorCapabilityDto>     Capabilities,

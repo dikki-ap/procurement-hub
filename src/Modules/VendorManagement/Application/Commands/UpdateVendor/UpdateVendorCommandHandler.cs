@@ -35,6 +35,8 @@ public class UpdateVendorCommandHandler : ICommandHandler<UpdateVendorCommand>
         vendor.Country              = command.Country;
         vendor.DefaultPaymentTermId = command.DefaultPaymentTermId;
         vendor.DefaultCurrencyId    = command.DefaultCurrencyId;
+        vendor.IsPkp                = command.IsPkp;
+        vendor.PphRate              = command.PphRate;
 
         _repo.Update(vendor);
         await _repo.SaveChangesAsync(ct);

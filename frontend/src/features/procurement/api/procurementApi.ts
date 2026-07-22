@@ -1,7 +1,7 @@
 import { apiClient } from '@/shared/lib/axios';
 
 export type PRStatus         = 'Draft' | 'Submitted' | 'Approved' | 'Rejected' | 'Cancelled';
-export type RFQStatus        = 'Draft' | 'Open' | 'Closed' | 'Cancelled';
+export type RFQStatus        = 'Draft' | 'Open' | 'Closed' | 'Cancelled' | 'PendingApproval';
 export type RFQVendorStatus  = 'Invited' | 'Declined' | 'Submitted';
 export type QuotationStatus  = 'Draft' | 'Submitted' | 'Withdrawn' | 'Awarded' | 'Rejected';
 export type EvaluationStatus = 'Pending' | 'InProgress' | 'Awarded';

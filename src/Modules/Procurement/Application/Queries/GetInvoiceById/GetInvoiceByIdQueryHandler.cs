@@ -114,6 +114,8 @@ public class GetInvoiceByIdQueryHandler : IQueryHandler<GetInvoiceByIdQuery, Inv
             invoice.Amount,
             invoice.TaxAmount,
             invoice.TotalAmount,
+            invoice.WithholdingTax,
+            invoice.NetPayable,
             null,
             invoice.FileUrl,
             invoice.DueAt,

@@ -17,4 +17,6 @@ public record UpdateVendorCommand(
     string?    PostalCode,
     string?    Country,
     Guid?      DefaultPaymentTermId,
-    Guid?      DefaultCurrencyId) : ICommand;
+    Guid?      DefaultCurrencyId,
+    bool       IsPkp   = false,
+    decimal?   PphRate = null) : ICommand;

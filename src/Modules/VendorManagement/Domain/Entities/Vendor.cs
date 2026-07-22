@@ -33,6 +33,10 @@ public class Vendor : AggregateRoot
     public Guid?        ApprovedById     { get; set; }
     public string?      KeycloakGroupId  { get; set; }
 
+    // Indonesian tax
+    public bool     IsPkp   { get; set; } = false;  // Pengusaha Kena Pajak (VAT-registered)
+    public decimal? PphRate { get; set; }             // PPh withholding rate %, e.g. 2.0 or 4.0
+
     // Navigation
     public ICollection<VendorContact>     Contacts     { get; set; } = [];
     public ICollection<VendorDocument>    Documents    { get; set; } = [];

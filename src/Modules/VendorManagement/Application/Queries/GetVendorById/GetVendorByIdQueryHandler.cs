@@ -63,6 +63,8 @@ public class GetVendorByIdQueryHandler : IQueryHandler<GetVendorByIdQuery, Vendo
         v.BlacklistReason,
         v.ApprovedAt,
         v.CreatedAt,
+        v.IsPkp,
+        v.PphRate,
         v.Contacts.Select(c => new VendorContactDto(
             c.Id, c.Name, c.Position, c.Email, c.Phone, c.IsPrimary)).ToList(),
         v.Documents.Select(d => new VendorDocumentDto(
