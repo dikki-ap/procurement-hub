@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { procurementApi, type VendorScoreInput } from '@/features/procurement/api/procurementApi';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -14,6 +15,8 @@ export default function BidEvaluationPage() {
   const { id }      = useParams<{ id: string }>();
   const navigate    = useNavigate();
   const queryClient = useQueryClient();
+  const base        = useBaseCurrency();
+  const sym         = base?.symbol ?? base?.code ?? 'Rp';
 
   const { data: comparison, isLoading: loadingComp } = useQuery({
     queryKey: ['bid-comparison', id],
@@ -135,7 +138,7 @@ export default function BidEvaluationPage() {
                       const isCheapest = p && p.unitPrice === minPrice && minPrice > 0;
                       return (
                         <td key={v.vendorId} className={`px-3 py-2 text-right ${isCheapest ? 'text-green-700 font-semibold' : ''}`}>
-                          {p ? `Rp ${fmt(p.unitPrice)}` : '—'}
+                          {p ? `${sym} ${fmt(p.unitPrice)}` : '—'}
                         </td>
                       );
                     })}
@@ -148,7 +151,7 @@ export default function BidEvaluationPage() {
                   const minTotal = Math.min(...comparison.vendors.map(vv => vv.totalPrice).filter(p => p > 0));
                   return (
                     <td key={v.vendorId} className={`px-3 py-2 text-right ${v.totalPrice === minTotal ? 'text-green-700' : ''}`}>
-                      Rp {fmt(v.totalPrice)}
+                      {sym} {fmt(v.totalPrice)}
                     </td>
                   );
                 })}
@@ -280,7 +283,7 @@ export default function BidEvaluationPage() {
                 {comparison.vendors.filter(v => v.status === 'Submitted').map(v => (
                   <tr key={v.vendorId} className="border-t">
                     <td className="px-3 py-2 font-medium">{v.vendorName}</td>
-                    <td className="px-3 py-2 text-right">Rp {fmt(v.totalPrice)}</td>
+                    <td className="px-3 py-2 text-right">{sym} {fmt(v.totalPrice)}</td>
                     <td className="px-3 py-2 w-32">
                       <Input type="number" min={0} max={100} step="0.01" placeholder="0"
                         value={scores[v.quotationId]?.quality ?? ''}

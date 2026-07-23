@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/authStore';
 import ApprovalActionModal from './ApprovalActionModal';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate, fmtDateTime } from '@/shared/lib/date';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -42,6 +43,8 @@ export default function ApprovalDetailPage() {
   const navigate    = useNavigate();
   const queryClient = useQueryClient();
   const { user }    = useAuthStore();
+  const base        = useBaseCurrency();
+  const sym         = base?.symbol ?? base?.code ?? 'Rp';
   const [modal, setModal] = useState<ModalType>(null);
 
   const { data: workflow, isLoading } = useQuery({
@@ -87,7 +90,7 @@ export default function ApprovalDetailPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
           { label: 'Type',        value: workflow.referenceType },
-          { label: 'Total Value', value: `Rp ${fmt(workflow.totalValue)}` },
+          { label: 'Total Value', value: `${sym} ${fmt(workflow.totalValue)}` },
           { label: 'Level',       value: `${workflow.currentLevel} / ${workflow.maxLevel}` },
           { label: 'Iteration',   value: workflow.iteration },
           { label: 'Submitted',   value: fmtDate(workflow.createdAt) },

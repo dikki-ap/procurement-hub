@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { approvalApi, type WorkflowStatus } from '../api/approvalApi';
 import { useAuthStore } from '@/stores/authStore';
 import { fmtDate } from '@/shared/lib/date';
+import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -28,6 +29,8 @@ export default function ApprovalInboxPage() {
   const navigate  = useNavigate();
   const { user }  = useAuthStore();
   const companyId = user?.companyId ?? '';
+  const base      = useBaseCurrency();
+  const sym       = base?.symbol ?? base?.code ?? 'Rp';
   const userId    = user?.id ?? '';
 
   const { data: items = [], isLoading } = useQuery({
@@ -76,7 +79,7 @@ export default function ApprovalInboxPage() {
                     <p className="text-xs text-muted-foreground truncate max-w-[200px]">{item.referenceTitle}</p>
                   </td>
                   <td className="px-3 py-2 text-muted-foreground">{item.referenceType}</td>
-                  <td className="px-3 py-2 font-mono text-xs">Rp {fmt(item.totalValue)}</td>
+                  <td className="px-3 py-2 font-mono text-xs">{sym} {fmt(item.totalValue)}</td>
                   <td className="px-3 py-2 text-center">
                     <span className="text-xs font-medium">{item.currentLevel}/{item.maxLevel}</span>
                   </td>

@@ -69,6 +69,7 @@ export default function PODetailPage() {
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading...</div>;
   if (!po)       return <div className="p-6 text-red-500">PO not found.</div>;
 
+  const currSym = po.currencyCode ?? 'IDR';
   const canCreateGRN = isPurchasing && ['Acknowledged', 'InDelivery'].includes(po.status);
 
   return (
@@ -109,7 +110,7 @@ export default function PODetailPage() {
       {/* Info Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
-          { label: 'Total Amount',      value: `Rp ${fmt(po.totalAmount)}` },
+          { label: 'Total Amount',      value: `${currSym} ${fmt(po.totalAmount)}` },
           { label: 'Currency',          value: po.currencyCode ?? 'IDR' },
           { label: 'Payment Terms',     value: po.paymentTermName ?? '—' },
           { label: 'Delivery Location', value: po.deliveryLocation ?? '—' },
@@ -181,8 +182,8 @@ export default function PODetailPage() {
                   <td className="px-3 py-2 font-medium">{item.description}</td>
                   <td className="px-3 py-2">{item.quantity}</td>
                   <td className="px-3 py-2">{item.uomCode ?? '—'}</td>
-                  <td className="px-3 py-2">Rp {fmt(item.unitPrice)}</td>
-                  <td className="px-3 py-2 font-semibold">Rp {fmt(item.totalPrice)}</td>
+                  <td className="px-3 py-2">{currSym} {fmt(item.unitPrice)}</td>
+                  <td className="px-3 py-2 font-semibold">{currSym} {fmt(item.totalPrice)}</td>
                   <td className="px-3 py-2">
                     <span className={item.receivedQty >= item.quantity ? 'text-emerald-600 font-semibold' : ''}>
                       {item.receivedQty} / {item.quantity}
@@ -194,7 +195,7 @@ export default function PODetailPage() {
             <tfoot className="bg-muted/30 border-t">
               <tr>
                 <td colSpan={5} className="px-3 py-2 text-right font-semibold">Total</td>
-                <td className="px-3 py-2 font-bold">Rp {fmt(po.totalAmount)}</td>
+                <td className="px-3 py-2 font-bold">{currSym} {fmt(po.totalAmount)}</td>
                 <td />
               </tr>
             </tfoot>
