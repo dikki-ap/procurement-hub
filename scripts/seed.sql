@@ -201,51 +201,51 @@ VALUES
 -- purchasing team (2 buyers)
 ('fa000000-0000-0000-0000-000000000002', @company_id,
  'fa000000-kc00-0000-0000-000000000002',
- 'agus.prasetyo@nexcore-industries.com', 'Agus Prasetyo', 'purchasing',
+ 'james.carter@nexcore-industries.com', 'James Carter', 'purchasing',
  @dept_proc, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000003', @company_id,
  'fa000000-kc00-0000-0000-000000000003',
- 'dewi.kusuma@nexcore-industries.com', 'Dewi Kusuma', 'purchasing',
+ 'sarah.mitchell@nexcore-industries.com', 'Sarah Mitchell', 'purchasing',
  @dept_proc, 1, @now, @now),
 
 -- requesters (production + engineering)
 ('fa000000-0000-0000-0000-000000000004', @company_id,
  'fa000000-kc00-0000-0000-000000000004',
- 'budi.santoso@nexcore-industries.com', 'Budi Santoso', 'requester',
+ 'michael.davis@nexcore-industries.com', 'Michael Davis', 'requester',
  @dept_prod, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000005', @company_id,
  'fa000000-kc00-0000-0000-000000000005',
- 'sari.wijaya@nexcore-industries.com', 'Sari Wijaya', 'requester',
+ 'emily.chen@nexcore-industries.com', 'Emily Chen', 'requester',
  @dept_eng, 1, @now, @now),
 
 -- approvers (L1 manager, L2 VP, L3 director)
 ('fa000000-0000-0000-0000-000000000006', @company_id,
  'fa000000-kc00-0000-0000-000000000006',
- 'bambang.sutrisno@nexcore-industries.com', 'Bambang Sutrisno', 'approver',
+ 'robert.hayes@nexcore-industries.com', 'Robert Hayes', 'approver',
  @dept_proc, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000007', @company_id,
  'fa000000-kc00-0000-0000-000000000007',
- 'hendra.gunawan@nexcore-industries.com', 'Hendra Gunawan', 'approver',
+ 'william.foster@nexcore-industries.com', 'William Foster', 'approver',
  @dept_mgmt, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000008', @company_id,
  'fa000000-kc00-0000-0000-000000000008',
- 'director@nexcore-industries.com', 'Ir. Hadi Purnomo', 'approver',
+ 'director@nexcore-industries.com', 'David Harrison', 'approver',
  @dept_mgmt, 1, @now, @now),
 
 -- finance
 ('fa000000-0000-0000-0000-000000000009', @company_id,
  'fa000000-kc00-0000-0000-000000000009',
- 'rina.marlina@nexcore-industries.com', 'Rina Marlina', 'finance',
+ 'jennifer.walsh@nexcore-industries.com', 'Jennifer Walsh', 'finance',
  @dept_fin, 1, @now, @now),
 
 -- management (read-only analytics)
 ('fa000000-0000-0000-0000-000000000010', @company_id,
  'fa000000-kc00-0000-0000-000000000010',
- 'cfo@nexcore-industries.com', 'Drs. Santoso Wibowo', 'management',
+ 'cfo@nexcore-industries.com', 'Thomas Reynolds', 'management',
  @dept_mgmt, 1, @now, @now);
 
 -- ============================================================
@@ -258,18 +258,18 @@ INSERT IGNORE INTO approver_matrix_entries
 VALUES
 -- PR approvers
 ('a1000000-0000-0000-0000-000000000001', @company_id, 'PR', 1,
- 'Bambang Sutrisno', 'Procurement Manager', 'bambang.sutrisno@nexcore-industries.com', @now, @now),
+ 'Robert Hayes',    'Procurement Manager', 'robert.hayes@nexcore-industries.com',    @now, @now),
 ('a1000000-0000-0000-0000-000000000002', @company_id, 'PR', 2,
- 'Hendra Gunawan',   'VP Operations',       'hendra.gunawan@nexcore-industries.com',   @now, @now),
+ 'William Foster',  'VP Operations',       'william.foster@nexcore-industries.com',  @now, @now),
 ('a1000000-0000-0000-0000-000000000003', @company_id, 'PR', 3,
- 'Ir. Hadi Purnomo', 'President Director',  'director@nexcore-industries.com',          @now, @now),
+ 'David Harrison',  'President Director',  'director@nexcore-industries.com',        @now, @now),
 -- PO approvers
 ('a1000000-0000-0000-0000-000000000004', @company_id, 'PO', 1,
- 'Bambang Sutrisno', 'Procurement Manager', 'bambang.sutrisno@nexcore-industries.com', @now, @now),
+ 'Robert Hayes',    'Procurement Manager', 'robert.hayes@nexcore-industries.com',    @now, @now),
 ('a1000000-0000-0000-0000-000000000005', @company_id, 'PO', 2,
- 'Hendra Gunawan',   'VP Operations',       'hendra.gunawan@nexcore-industries.com',   @now, @now),
+ 'William Foster',  'VP Operations',       'william.foster@nexcore-industries.com',  @now, @now),
 ('a1000000-0000-0000-0000-000000000006', @company_id, 'PO', 3,
- 'Ir. Hadi Purnomo', 'President Director',  'director@nexcore-industries.com',          @now, @now);
+ 'David Harrison',  'President Director',  'director@nexcore-industries.com',        @now, @now);
 
 -- ============================================================
 -- 12. VENDORS

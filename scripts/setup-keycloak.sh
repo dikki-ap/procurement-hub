@@ -202,32 +202,32 @@ main() {
     user_map["admin@nexcore-industries.com"]=$(create_user \
         "admin@nexcore-industries.com" "System" "Administrator" "super_admin")
 
-    user_map["agus.prasetyo@nexcore-industries.com"]=$(create_user \
-        "agus.prasetyo@nexcore-industries.com" "Agus" "Prasetyo" "purchasing")
+    user_map["james.carter@nexcore-industries.com"]=$(create_user \
+        "james.carter@nexcore-industries.com" "James" "Carter" "purchasing")
 
-    user_map["dewi.kusuma@nexcore-industries.com"]=$(create_user \
-        "dewi.kusuma@nexcore-industries.com" "Dewi" "Kusuma" "purchasing")
+    user_map["sarah.mitchell@nexcore-industries.com"]=$(create_user \
+        "sarah.mitchell@nexcore-industries.com" "Sarah" "Mitchell" "purchasing")
 
-    user_map["budi.santoso@nexcore-industries.com"]=$(create_user \
-        "budi.santoso@nexcore-industries.com" "Budi" "Santoso" "requester")
+    user_map["michael.davis@nexcore-industries.com"]=$(create_user \
+        "michael.davis@nexcore-industries.com" "Michael" "Davis" "requester")
 
-    user_map["sari.wijaya@nexcore-industries.com"]=$(create_user \
-        "sari.wijaya@nexcore-industries.com" "Sari" "Wijaya" "requester")
+    user_map["emily.chen@nexcore-industries.com"]=$(create_user \
+        "emily.chen@nexcore-industries.com" "Emily" "Chen" "requester")
 
-    user_map["bambang.sutrisno@nexcore-industries.com"]=$(create_user \
-        "bambang.sutrisno@nexcore-industries.com" "Bambang" "Sutrisno" "approver")
+    user_map["robert.hayes@nexcore-industries.com"]=$(create_user \
+        "robert.hayes@nexcore-industries.com" "Robert" "Hayes" "approver")
 
-    user_map["hendra.gunawan@nexcore-industries.com"]=$(create_user \
-        "hendra.gunawan@nexcore-industries.com" "Hendra" "Gunawan" "approver")
+    user_map["william.foster@nexcore-industries.com"]=$(create_user \
+        "william.foster@nexcore-industries.com" "William" "Foster" "approver")
 
     user_map["director@nexcore-industries.com"]=$(create_user \
-        "director@nexcore-industries.com" "Hadi" "Purnomo" "approver")
+        "director@nexcore-industries.com" "David" "Harrison" "approver")
 
-    user_map["rina.marlina@nexcore-industries.com"]=$(create_user \
-        "rina.marlina@nexcore-industries.com" "Rina" "Marlina" "finance")
+    user_map["jennifer.walsh@nexcore-industries.com"]=$(create_user \
+        "jennifer.walsh@nexcore-industries.com" "Jennifer" "Walsh" "finance")
 
     user_map["cfo@nexcore-industries.com"]=$(create_user \
-        "cfo@nexcore-industries.com" "Santoso" "Wibowo" "management")
+        "cfo@nexcore-industries.com" "Thomas" "Reynolds" "management")
 
     echo ""
     generate_sql user_map
