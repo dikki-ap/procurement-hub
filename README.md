@@ -446,6 +446,23 @@ The `scripts/seed.sql` script provides a realistic starting dataset for developm
 | Departments | 6 | Procurement, Production, Engineering, Finance, Management, IT |
 | Internal Users | 10 | All roles: super_admin, purchasing (×2), requester (×2), approver (×3), finance, management |
 | Approver Matrix | 6 | L1 / L2 / L3 for both PR and PO document types |
+
+### Demo Accounts (Internal Portal)
+
+All accounts use the temporary password set in `TEMP_PASSWORD` (default: `ProcureHub@2024!`). Users are prompted to change it on first login.
+
+| Name | Email | Role |
+|---|---|---|
+| System Administrator | admin@nexcore-industries.com | super_admin |
+| James Carter | james.carter@nexcore-industries.com | purchasing |
+| Sarah Mitchell | sarah.mitchell@nexcore-industries.com | purchasing |
+| Michael Davis | michael.davis@nexcore-industries.com | requester |
+| Emily Chen | emily.chen@nexcore-industries.com | requester |
+| Robert Hayes | robert.hayes@nexcore-industries.com | approver (L1 — Procurement Manager) |
+| William Foster | william.foster@nexcore-industries.com | approver (L2 — VP Operations) |
+| David Harrison | director@nexcore-industries.com | approver (L3 — President Director) |
+| Jennifer Walsh | jennifer.walsh@nexcore-industries.com | finance |
+| Thomas Reynolds | cfo@nexcore-industries.com | management |
 | Vendors | 8 | Mixed: Gold/Silver/Bronze/Probation tier · Active/Suspended/Blacklisted status · PKP+PPh / PKP / non-PKP tax · IDR and USD billing |
 | Vendor Users | 13 | vendor_admin and vendor_staff accounts across all vendors |
 | Bank Accounts | 8 | One per vendor, covering multiple banks and currencies |
