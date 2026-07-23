@@ -1,8 +1,8 @@
-# ProcureHub
+# Procurement Hub
 
 **Supplier Management & Procurement Workflow Portal**
 
-ProcureHub is a web-based procurement management system designed for manufacturing companies. It manages the complete procurement lifecycle — from Purchase Requisition through invoice payment — with an integrated vendor portal, configurable multi-level approval workflows, and a full audit trail on every transaction.
+Procurement Hub is a web-based procurement management system designed for manufacturing companies. It manages the complete procurement lifecycle — from Purchase Requisition through invoice payment — with an integrated vendor portal, configurable multi-level approval workflows, and a full audit trail on every transaction.
 
 ---
 
@@ -437,7 +437,7 @@ The `scripts/seed.sql` script provides a realistic starting dataset for developm
 
 | Data | Count | Notes |
 |---|---|---|
-| Company | 1 | PT. Surya Abadi Manufaktur — update to match the actual client before running |
+| Company | 1 | PT. Nexcore Industries — update to match the actual client before running |
 | Currencies | 5 | IDR (base), USD, EUR, SGD, JPY |
 | Units of Measure | 10 | KG, TON, PCS, LTR, MTR, BOX, SET, UNIT, ROLL, DRUM |
 | Payment Terms | 8 | COD, NET7, NET14, NET30, NET45, NET60, DP30%, DP50% |
