@@ -199,35 +199,35 @@ main() {
     declare -A user_map
 
     # Internal users — must match scripts/seed.sql exactly
-    user_map["admin@surya-abadi.co.id"]=$(create_user \
-        "admin@surya-abadi.co.id" "System" "Administrator" "super_admin")
+    user_map["admin@nexcore-industries.com"]=$(create_user \
+        "admin@nexcore-industries.com" "System" "Administrator" "super_admin")
 
-    user_map["agus.prasetyo@surya-abadi.co.id"]=$(create_user \
-        "agus.prasetyo@surya-abadi.co.id" "Agus" "Prasetyo" "purchasing")
+    user_map["agus.prasetyo@nexcore-industries.com"]=$(create_user \
+        "agus.prasetyo@nexcore-industries.com" "Agus" "Prasetyo" "purchasing")
 
-    user_map["dewi.kusuma@surya-abadi.co.id"]=$(create_user \
-        "dewi.kusuma@surya-abadi.co.id" "Dewi" "Kusuma" "purchasing")
+    user_map["dewi.kusuma@nexcore-industries.com"]=$(create_user \
+        "dewi.kusuma@nexcore-industries.com" "Dewi" "Kusuma" "purchasing")
 
-    user_map["budi.santoso@surya-abadi.co.id"]=$(create_user \
-        "budi.santoso@surya-abadi.co.id" "Budi" "Santoso" "requester")
+    user_map["budi.santoso@nexcore-industries.com"]=$(create_user \
+        "budi.santoso@nexcore-industries.com" "Budi" "Santoso" "requester")
 
-    user_map["sari.wijaya@surya-abadi.co.id"]=$(create_user \
-        "sari.wijaya@surya-abadi.co.id" "Sari" "Wijaya" "requester")
+    user_map["sari.wijaya@nexcore-industries.com"]=$(create_user \
+        "sari.wijaya@nexcore-industries.com" "Sari" "Wijaya" "requester")
 
-    user_map["bambang.sutrisno@surya-abadi.co.id"]=$(create_user \
-        "bambang.sutrisno@surya-abadi.co.id" "Bambang" "Sutrisno" "approver")
+    user_map["bambang.sutrisno@nexcore-industries.com"]=$(create_user \
+        "bambang.sutrisno@nexcore-industries.com" "Bambang" "Sutrisno" "approver")
 
-    user_map["hendra.gunawan@surya-abadi.co.id"]=$(create_user \
-        "hendra.gunawan@surya-abadi.co.id" "Hendra" "Gunawan" "approver")
+    user_map["hendra.gunawan@nexcore-industries.com"]=$(create_user \
+        "hendra.gunawan@nexcore-industries.com" "Hendra" "Gunawan" "approver")
 
-    user_map["director@surya-abadi.co.id"]=$(create_user \
-        "director@surya-abadi.co.id" "Hadi" "Purnomo" "approver")
+    user_map["director@nexcore-industries.com"]=$(create_user \
+        "director@nexcore-industries.com" "Hadi" "Purnomo" "approver")
 
-    user_map["rina.marlina@surya-abadi.co.id"]=$(create_user \
-        "rina.marlina@surya-abadi.co.id" "Rina" "Marlina" "finance")
+    user_map["rina.marlina@nexcore-industries.com"]=$(create_user \
+        "rina.marlina@nexcore-industries.com" "Rina" "Marlina" "finance")
 
-    user_map["cfo@surya-abadi.co.id"]=$(create_user \
-        "cfo@surya-abadi.co.id" "Santoso" "Wibowo" "management")
+    user_map["cfo@nexcore-industries.com"]=$(create_user \
+        "cfo@nexcore-industries.com" "Santoso" "Wibowo" "management")
 
     echo ""
     generate_sql user_map

@@ -36,14 +36,14 @@ DELETE FROM unit_of_measures    WHERE id LIKE 'uu%';
 INSERT IGNORE INTO companies (id, name, code, type, address, phone, email, is_active, created_at, updated_at)
 VALUES (
     '11111111-1111-1111-1111-111111111111',
-    'PT. Surya Abadi Manufaktur', 'SAM', 'Internal',
+    'PT. Nexcore Industries', 'NCI', 'Internal',
     'Jl. Industri Raya No. 88, Kawasan Industri Cikarang Barat, Bekasi 17520',
     '+62-21-8901-2345',
-    'procurement@surya-abadi.co.id',
+    'procurement@nexcore-industries.com',
     1, @now, @now
 );
 
-SET @company_id = (SELECT id FROM companies WHERE code = 'SAM' LIMIT 1);
+SET @company_id = (SELECT id FROM companies WHERE code = 'NCI' LIMIT 1);
 
 -- ============================================================
 -- 2. CURRENCIES
@@ -195,57 +195,57 @@ VALUES
 -- super_admin
 ('fa000000-0000-0000-0000-000000000001', @company_id,
  'fa000000-kc00-0000-0000-000000000001',
- 'admin@surya-abadi.co.id', 'System Administrator', 'super_admin',
+ 'admin@nexcore-industries.com', 'System Administrator', 'super_admin',
  @dept_it, 1, @now, @now),
 
 -- purchasing team (2 buyers)
 ('fa000000-0000-0000-0000-000000000002', @company_id,
  'fa000000-kc00-0000-0000-000000000002',
- 'agus.prasetyo@surya-abadi.co.id', 'Agus Prasetyo', 'purchasing',
+ 'agus.prasetyo@nexcore-industries.com', 'Agus Prasetyo', 'purchasing',
  @dept_proc, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000003', @company_id,
  'fa000000-kc00-0000-0000-000000000003',
- 'dewi.kusuma@surya-abadi.co.id', 'Dewi Kusuma', 'purchasing',
+ 'dewi.kusuma@nexcore-industries.com', 'Dewi Kusuma', 'purchasing',
  @dept_proc, 1, @now, @now),
 
 -- requesters (production + engineering)
 ('fa000000-0000-0000-0000-000000000004', @company_id,
  'fa000000-kc00-0000-0000-000000000004',
- 'budi.santoso@surya-abadi.co.id', 'Budi Santoso', 'requester',
+ 'budi.santoso@nexcore-industries.com', 'Budi Santoso', 'requester',
  @dept_prod, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000005', @company_id,
  'fa000000-kc00-0000-0000-000000000005',
- 'sari.wijaya@surya-abadi.co.id', 'Sari Wijaya', 'requester',
+ 'sari.wijaya@nexcore-industries.com', 'Sari Wijaya', 'requester',
  @dept_eng, 1, @now, @now),
 
 -- approvers (L1 manager, L2 VP, L3 director)
 ('fa000000-0000-0000-0000-000000000006', @company_id,
  'fa000000-kc00-0000-0000-000000000006',
- 'bambang.sutrisno@surya-abadi.co.id', 'Bambang Sutrisno', 'approver',
+ 'bambang.sutrisno@nexcore-industries.com', 'Bambang Sutrisno', 'approver',
  @dept_proc, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000007', @company_id,
  'fa000000-kc00-0000-0000-000000000007',
- 'hendra.gunawan@surya-abadi.co.id', 'Hendra Gunawan', 'approver',
+ 'hendra.gunawan@nexcore-industries.com', 'Hendra Gunawan', 'approver',
  @dept_mgmt, 1, @now, @now),
 
 ('fa000000-0000-0000-0000-000000000008', @company_id,
  'fa000000-kc00-0000-0000-000000000008',
- 'director@surya-abadi.co.id', 'Ir. Hadi Purnomo', 'approver',
+ 'director@nexcore-industries.com', 'Ir. Hadi Purnomo', 'approver',
  @dept_mgmt, 1, @now, @now),
 
 -- finance
 ('fa000000-0000-0000-0000-000000000009', @company_id,
  'fa000000-kc00-0000-0000-000000000009',
- 'rina.marlina@surya-abadi.co.id', 'Rina Marlina', 'finance',
+ 'rina.marlina@nexcore-industries.com', 'Rina Marlina', 'finance',
  @dept_fin, 1, @now, @now),
 
 -- management (read-only analytics)
 ('fa000000-0000-0000-0000-000000000010', @company_id,
  'fa000000-kc00-0000-0000-000000000010',
- 'cfo@surya-abadi.co.id', 'Drs. Santoso Wibowo', 'management',
+ 'cfo@nexcore-industries.com', 'Drs. Santoso Wibowo', 'management',
  @dept_mgmt, 1, @now, @now);
 
 -- ============================================================
@@ -258,18 +258,18 @@ INSERT IGNORE INTO approver_matrix_entries
 VALUES
 -- PR approvers
 ('a1000000-0000-0000-0000-000000000001', @company_id, 'PR', 1,
- 'Bambang Sutrisno', 'Procurement Manager', 'bambang.sutrisno@surya-abadi.co.id', @now, @now),
+ 'Bambang Sutrisno', 'Procurement Manager', 'bambang.sutrisno@nexcore-industries.com', @now, @now),
 ('a1000000-0000-0000-0000-000000000002', @company_id, 'PR', 2,
- 'Hendra Gunawan',   'VP Operations',       'hendra.gunawan@surya-abadi.co.id',   @now, @now),
+ 'Hendra Gunawan',   'VP Operations',       'hendra.gunawan@nexcore-industries.com',   @now, @now),
 ('a1000000-0000-0000-0000-000000000003', @company_id, 'PR', 3,
- 'Ir. Hadi Purnomo', 'President Director',  'director@surya-abadi.co.id',          @now, @now),
+ 'Ir. Hadi Purnomo', 'President Director',  'director@nexcore-industries.com',          @now, @now),
 -- PO approvers
 ('a1000000-0000-0000-0000-000000000004', @company_id, 'PO', 1,
- 'Bambang Sutrisno', 'Procurement Manager', 'bambang.sutrisno@surya-abadi.co.id', @now, @now),
+ 'Bambang Sutrisno', 'Procurement Manager', 'bambang.sutrisno@nexcore-industries.com', @now, @now),
 ('a1000000-0000-0000-0000-000000000005', @company_id, 'PO', 2,
- 'Hendra Gunawan',   'VP Operations',       'hendra.gunawan@surya-abadi.co.id',   @now, @now),
+ 'Hendra Gunawan',   'VP Operations',       'hendra.gunawan@nexcore-industries.com',   @now, @now),
 ('a1000000-0000-0000-0000-000000000006', @company_id, 'PO', 3,
- 'Ir. Hadi Purnomo', 'President Director',  'director@surya-abadi.co.id',          @now, @now);
+ 'Ir. Hadi Purnomo', 'President Director',  'director@nexcore-industries.com',          @now, @now);
 
 -- ============================================================
 -- 12. VENDORS
@@ -560,7 +560,7 @@ VALUES
 -- 17. MATERIALS
 -- ============================================================
 SET @now        = UTC_TIMESTAMP(6);
-SET @company_id = (SELECT id FROM companies WHERE code = 'SAM' LIMIT 1);
+SET @company_id = (SELECT id FROM companies WHERE code = 'NCI' LIMIT 1);
 
 DELETE FROM materials WHERE id LIKE 'aa%';
 INSERT IGNORE INTO materials
