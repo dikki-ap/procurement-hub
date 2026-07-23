@@ -104,7 +104,7 @@ export default function VendorRFQDetailPage() {
       )}
 
       {/* Info grid */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
           { label: 'Status',        value: rfq.status },
           { label: 'Items',         value: rfq.itemCount },
@@ -122,8 +122,8 @@ export default function VendorRFQDetailPage() {
       {isOpen && !isSubmitted ? (
         <div>
           <h2 className="text-base font-semibold mb-3">Your Quotation</h2>
-          <div className="rounded-md border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-md border overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead className="bg-muted/50">
                 <tr>
                   {['#', 'Description', 'Qty', 'Unit', 'Unit Price (IDR)'].map(h => (
@@ -170,8 +170,8 @@ export default function VendorRFQDetailPage() {
       ) : (
         <div>
           <h2 className="text-base font-semibold mb-3">Items</h2>
-          <div className="rounded-md border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-md border overflow-x-auto">
+            <table className="w-full text-sm min-w-[400px]">
               <thead className="bg-muted/50">
                 <tr>
                   {['#', 'Description', 'Qty', 'Unit'].map(h => (

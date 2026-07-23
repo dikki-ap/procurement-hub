@@ -178,24 +178,31 @@ docker compose logs -f app
 
 ### 4. Configure Keycloak
 
-After the Keycloak container is running:
+Run the automated setup script — it imports the realm, creates all 10 internal users, assigns roles, and generates the SQL to sync `keycloak_id` in the database:
 
-1. Open the Keycloak Admin Console: http://localhost:9090
-2. Log in with `admin` / `admin` (or the credentials set in `.env`)
-3. Create a new realm named `procurehub`
-4. Import the realm configuration from `keycloak/procurehub-realm.json` (if available)
-5. Create two clients:
-   - `procurehub-api` — Bearer-only, for the backend
-   - `procurehub-web` — Public client, for the frontend SPA
-6. Create internal users with the same email addresses used in the seed data
-7. After creating users in Keycloak, update the `keycloak_id` column in the database:
-
-```sql
-UPDATE users SET keycloak_id = '<uuid-from-keycloak>'
-WHERE email = 'admin@surya-abadi.co.id';
+```bash
+bash scripts/setup-keycloak.sh
 ```
 
-Repeat this for all internal users and vendor users.
+Then apply the generated SQL:
+
+```bash
+mysql -h 127.0.0.1 -P 3307 -u root -prootsecret procurehub < scripts/keycloak-id-updates.sql
+```
+
+The script accepts the following environment overrides (all optional — defaults match the `.env.example` values):
+
+| Variable | Default | Description |
+|---|---|---|
+| `KC_URL` | `http://localhost:9090` | Keycloak base URL |
+| `KC_ADMIN` | `admin` | Keycloak admin username |
+| `KC_ADMIN_PASSWORD` | `admin` | Keycloak admin password |
+| `DB_NAME` | `procurehub` | Database name (written into the SQL file) |
+| `TEMP_PASSWORD` | `ProcureHub@2024!` | Temporary password for all created users |
+
+All created users are marked with `temporary: true` — they must change their password on first login.
+
+> **Vendor users** (vendor_admin and vendor_staff) are created when the vendor registers via the self-registration portal. They do not need to be created manually in Keycloak.
 
 ### 5. Load Seed Data
 

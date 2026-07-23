@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProcureHub.API.Services;
 using ProcureHub.Modules.Procurement.Application.Commands.AcknowledgePO;
 using ProcureHub.Modules.Procurement.Application.Commands.CreatePO;
 using ProcureHub.Modules.Procurement.Application.Commands.IssuePO;
@@ -19,11 +20,16 @@ public class PurchaseOrdersController : ControllerBase
 {
     private readonly IMediator           _mediator;
     private readonly ICurrentUserService _currentUser;
+    private readonly IExcelExportService _excelExport;
 
-    public PurchaseOrdersController(IMediator mediator, ICurrentUserService currentUser)
+    public PurchaseOrdersController(
+        IMediator mediator,
+        ICurrentUserService currentUser,
+        IExcelExportService excelExport)
     {
         _mediator    = mediator;
         _currentUser = currentUser;
+        _excelExport = excelExport;
     }
 
     /// <summary>List POs for a company.</summary>
@@ -33,6 +39,17 @@ public class PurchaseOrdersController : ControllerBase
     {
         var result = await _mediator.Send(new GetPOListQuery(companyId), ct);
         return Ok(ApiResponse.Ok(result));
+    }
+
+    /// <summary>Export PO list to Excel.</summary>
+    [HttpGet("export")]
+    [Authorize(Policy = "RequirePurchasing")]
+    public async Task<IActionResult> ExportToExcel([FromQuery] Guid companyId, CancellationToken ct)
+    {
+        var bytes = await _excelExport.ExportPurchaseOrdersAsync(companyId, ct);
+        return File(bytes,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"PurchaseOrders_{DateTime.UtcNow:yyyyMMdd}.xlsx");
     }
 
     /// <summary>Get PO detail by ID.</summary>

@@ -8,6 +8,7 @@ using ProcureHub.Modules.Analytics.Application.Queries.GetSpendByCategory;
 using ProcureHub.Modules.Analytics.Application.Queries.GetSpendSummary;
 using ProcureHub.Modules.Analytics.Application.Queries.GetVendorConcentration;
 using ProcureHub.Modules.Analytics.Application.Queries.GetVendorPerformanceSummary;
+using ProcureHub.API.Services;
 using ProcureHub.SharedKernel.Abstractions;
 using ProcureHub.SharedKernel.Common;
 
@@ -21,11 +22,16 @@ public class DashboardController : ControllerBase
 {
     private readonly IMediator           _mediator;
     private readonly ICurrentUserService _currentUser;
+    private readonly IExcelExportService _excelExport;
 
-    public DashboardController(IMediator mediator, ICurrentUserService currentUser)
+    public DashboardController(
+        IMediator mediator,
+        ICurrentUserService currentUser,
+        IExcelExportService excelExport)
     {
         _mediator    = mediator;
         _currentUser = currentUser;
+        _excelExport = excelExport;
     }
 
     /// <summary>Role-appropriate dashboard widgets.</summary>
@@ -110,5 +116,23 @@ public class DashboardController : ControllerBase
     {
         var result = await _mediator.Send(new GetVendorConcentrationQuery(companyId), ct);
         return Ok(ApiResponse<VendorConcentrationDto>.Ok(result));
+    }
+
+    /// <summary>Export spend report to Excel (monthly spend + category breakdown + invoice details).</summary>
+    [HttpGet("spend-report/export")]
+    public async Task<IActionResult> ExportSpendReport(
+        [FromQuery] Guid      companyId,
+        [FromQuery] DateOnly? from = null,
+        [FromQuery] DateOnly? to   = null,
+        CancellationToken ct = default)
+    {
+        var today   = DateOnly.FromDateTime(DateTime.UtcNow);
+        var fromDate = from ?? new DateOnly(today.Year, 1, 1);
+        var toDate   = to   ?? today;
+
+        var bytes = await _excelExport.ExportSpendReportAsync(companyId, fromDate, toDate, ct);
+        return File(bytes,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"SpendReport_{fromDate:yyyyMMdd}_{toDate:yyyyMMdd}.xlsx");
     }
 }

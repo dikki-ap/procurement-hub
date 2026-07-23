@@ -22,6 +22,7 @@ using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocumentD
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorScoreHistory;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorDocuments;
 using ProcureHub.Modules.VendorManagement.Application.Queries.GetVendorList;
+using ProcureHub.API.Services;
 using ProcureHub.SharedKernel.Abstractions;
 using ProcureHub.SharedKernel.Common;
 using ProcureHub.SharedKernel.Exceptions;
@@ -37,12 +38,18 @@ public class VendorsController : ControllerBase
     private readonly IMediator                _mediator;
     private readonly ICurrentUserService      _currentUser;
     private readonly IDocumentAccessLogger    _accessLogger;
+    private readonly IExcelExportService      _excelExport;
 
-    public VendorsController(IMediator mediator, ICurrentUserService currentUser, IDocumentAccessLogger accessLogger)
+    public VendorsController(
+        IMediator mediator,
+        ICurrentUserService currentUser,
+        IDocumentAccessLogger accessLogger,
+        IExcelExportService excelExport)
     {
         _mediator     = mediator;
         _currentUser  = currentUser;
         _accessLogger = accessLogger;
+        _excelExport  = excelExport;
     }
 
     /// <summary>List all vendors for a company.</summary>
@@ -52,6 +59,17 @@ public class VendorsController : ControllerBase
     {
         var result = await _mediator.Send(new GetVendorListQuery(companyId), ct);
         return Ok(ApiResponse.Ok(result));
+    }
+
+    /// <summary>Export vendor list to Excel.</summary>
+    [HttpGet("export")]
+    [Authorize(Policy = "RequirePurchasing")]
+    public async Task<IActionResult> ExportToExcel([FromQuery] Guid companyId, CancellationToken ct)
+    {
+        var bytes = await _excelExport.ExportVendorsAsync(companyId, ct);
+        return File(bytes,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"Vendors_{DateTime.UtcNow:yyyyMMdd}.xlsx");
     }
 
     /// <summary>Get vendor detail by ID.</summary>

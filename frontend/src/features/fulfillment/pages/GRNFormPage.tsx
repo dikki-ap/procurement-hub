@@ -105,7 +105,7 @@ export default function GRNFormPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Delivery Note No.</label>
             <input name="deliveryNoteNo" className={inputCls} placeholder="Optional delivery note number" />
@@ -132,7 +132,7 @@ export default function GRNFormPage() {
                       Ordered: {row.orderedQty} | Already received: {row.alreadyReceived} | Remaining: {remaining}
                     </span>
                   </div>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <div>
                       <label className="block text-xs font-medium mb-1">Received Qty</label>
                       <input type="number" min="0" max={remaining} step="0.01" className={inputCls}

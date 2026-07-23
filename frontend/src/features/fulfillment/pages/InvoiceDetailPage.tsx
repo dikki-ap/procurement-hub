@@ -191,7 +191,7 @@ export default function InvoiceDetailPage() {
       {/* Invoice Info */}
       <div className="bg-white rounded-xl border border-slate-100 p-6">
         <h2 className="text-lg font-semibold text-slate-900 mb-5">{invoice.invoiceNumber}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <InfoRow label="Vendor" value={
             <div className="flex items-center gap-1.5">
               <Building2 className="h-3.5 w-3.5 text-slate-400" />

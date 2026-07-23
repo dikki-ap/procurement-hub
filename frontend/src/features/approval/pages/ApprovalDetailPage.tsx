@@ -84,7 +84,7 @@ export default function ApprovalDetailPage() {
       </div>
 
       {/* Info grid */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
           { label: 'Type',        value: workflow.referenceType },
           { label: 'Total Value', value: `Rp ${fmt(workflow.totalValue)}` },
@@ -117,7 +117,7 @@ export default function ApprovalDetailPage() {
 
       {/* Action buttons */}
       {isPending && isCurrentApprover && (
-        <div className="flex gap-2 p-4 rounded-lg bg-blue-50 border border-blue-200">
+        <div className="flex flex-wrap gap-2 p-4 rounded-lg bg-blue-50 border border-blue-200">
           <Button onClick={() => approveMut.mutate()} disabled={approveMut.isPending}>
             <CheckCircle2 className="h-4 w-4 mr-2" />
             {approveMut.isPending ? 'Approving…' : 'Approve'}

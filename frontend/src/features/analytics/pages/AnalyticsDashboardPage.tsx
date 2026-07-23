@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   AreaChart, Area, PieChart, Pie, Cell,
@@ -5,10 +6,13 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts';
-import { LayoutDashboard, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Download } from 'lucide-react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 import { analyticsApi, type DashboardWidgets, type VendorDashboardWidgets } from '../api/analyticsApi';
 import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
+import { downloadExcel } from '@/shared/lib/downloadFile';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
@@ -38,6 +42,27 @@ export default function AnalyticsDashboardPage() {
   const companyId = user?.companyId ?? '';
   const base = useBaseCurrency();
   const sym  = base?.symbol ?? base?.code ?? '?';
+
+  const thisYear  = new Date().getFullYear();
+  const [fromDate, setFromDate] = useState(`${thisYear}-01-01`);
+  const [toDate,   setToDate]   = useState(new Date().toISOString().slice(0, 10));
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportSpend = async () => {
+    setIsExporting(true);
+    try {
+      const from = fromDate.replace(/-/g, '');
+      const to   = toDate.replace(/-/g, '');
+      await downloadExcel(
+        `/analytics/spend-report/export?companyId=${companyId}&from=${fromDate}&to=${toDate}`,
+        `SpendReport_${from}_${to}.xlsx`,
+      );
+    } catch {
+      toast.error('Failed to export spend report');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const { data: widgets } = useQuery({
     queryKey: ['analytics-widgets', companyId],
@@ -119,9 +144,30 @@ export default function AnalyticsDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-        <h1 className="text-xl sm:text-2xl font-semibold">Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <h1 className="text-xl sm:text-2xl font-semibold">Dashboard</h1>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="date"
+            value={fromDate}
+            onChange={e => setFromDate(e.target.value)}
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+          />
+          <span className="text-muted-foreground text-sm">to</span>
+          <input
+            type="date"
+            value={toDate}
+            onChange={e => setToDate(e.target.value)}
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+          />
+          <Button variant="outline" size="sm" onClick={handleExportSpend} disabled={isExporting} className="gap-1">
+            <Download className="h-4 w-4" />
+            <span>{isExporting ? 'Exporting...' : 'Export Spend Report'}</span>
+          </Button>
+        </div>
       </div>
 
       {/* Widget row */}

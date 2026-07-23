@@ -81,6 +81,7 @@ try
 
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
     builder.Services.AddScoped<IDocumentAccessLogger, DocumentAccessLogger>();
+    builder.Services.AddScoped<ProcureHub.API.Services.IExcelExportService, ProcureHub.API.Services.ExcelExportService>();
 
     if (builder.Environment.IsDevelopment())
         builder.Services.AddHostedService<ViteDevServerService>();

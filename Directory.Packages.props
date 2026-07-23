@@ -42,6 +42,7 @@
   <ItemGroup Label="Storage &amp; PDF">
     <PackageVersion Include="AWSSDK.S3" Version="3.7.414.0" />
     <PackageVersion Include="PdfSharp" Version="6.2.0" />
+    <PackageVersion Include="ClosedXML" Version="0.102.3" />
   </ItemGroup>
   <ItemGroup Label="Resilience">
     <PackageVersion Include="Polly.Core" Version="8.7.0" />

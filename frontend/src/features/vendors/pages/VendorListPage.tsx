@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Eye, CheckCircle, PauseCircle, Ban, RotateCcw, Plus, Users } from 'lucide-react';
+import { Eye, CheckCircle, PauseCircle, Ban, RotateCcw, Plus, Users, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { downloadExcel } from '@/shared/lib/downloadFile';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { vendorApi, type VendorDto, type VendorStatus } from '../api/vendorApi';
@@ -38,8 +39,9 @@ export default function VendorListPage() {
   const qc         = useQueryClient();
   const companyId  = useAuthStore(s => s.user?.companyId ?? '');
 
-  const [showAdd,  setShowAdd]  = useState(false);
-  const [modal,    setModal]    = useState<ActionModal>(null);
+  const [showAdd,     setShowAdd]     = useState(false);
+  const [modal,       setModal]       = useState<ActionModal>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['vendors', companyId],
@@ -47,6 +49,18 @@ export default function VendorListPage() {
   });
 
   const closeModal = () => setModal(null);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      await downloadExcel(`/vendors/export?companyId=${companyId}`, `Vendors_${today}.xlsx`);
+    } catch {
+      toast.error('Failed to export vendors');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const mutOpts = (action: string) => ({
     onSuccess: () => {
@@ -122,9 +136,15 @@ export default function VendorListPage() {
             <p className="text-sm text-muted-foreground hidden sm:block">Manage vendor registrations and approvals</p>
           </div>
         </div>
-        <Button size="sm" onClick={() => setShowAdd(true)} className="gap-1">
-          <Plus className="h-4 w-4" /> Add Vendor
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting} className="gap-1">
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Export'}</span>
+          </Button>
+          <Button size="sm" onClick={() => setShowAdd(true)} className="gap-1">
+            <Plus className="h-4 w-4" /> Add Vendor
+          </Button>
+        </div>
       </div>
 
       <DataTable

@@ -86,7 +86,7 @@ export default function RFQDetailPage() {
           </div>
           <p className="text-sm text-muted-foreground">{rfq.title}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {rfq.status === 'Draft' && (
             <Button onClick={() => openMut.mutate()} disabled={openMut.isPending}>
               <Play className="h-4 w-4 mr-2" /> Open for Bidding
@@ -106,7 +106,7 @@ export default function RFQDetailPage() {
       </div>
 
       {/* Info Grid */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
           { label: 'Bid Deadline',  value: fmtDateTime(rfq.bidDeadline) },
           { label: 'Delivery Date', value: fmtDate(rfq.deliveryDate) },
@@ -125,8 +125,8 @@ export default function RFQDetailPage() {
       {/* Items */}
       <div>
         <h2 className="text-base font-semibold mb-3">Items</h2>
-        <div className="rounded-md border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-md border overflow-x-auto">
+          <table className="w-full text-sm min-w-[400px]">
             <thead className="bg-muted/50">
               <tr>
                 {['#', 'Description', 'Qty', 'Unit'].map(h => (
@@ -154,8 +154,8 @@ export default function RFQDetailPage() {
         {rfq.vendors.length === 0 ? (
           <p className="text-sm text-muted-foreground">No vendors invited yet.</p>
         ) : (
-          <div className="rounded-md border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-md border overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead className="bg-muted/50">
                 <tr>
                   {['Vendor ID', 'Invited At', 'Status', 'Declined Reason'].map(h => (

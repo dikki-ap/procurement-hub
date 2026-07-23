@@ -28,6 +28,7 @@
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Hangfire.MySqlStorage" />
     <PackageReference Include="Microsoft.Extensions.Resilience" />
+    <PackageReference Include="ClosedXML" />
   </ItemGroup>
 
   <ItemGroup Label="Project References">

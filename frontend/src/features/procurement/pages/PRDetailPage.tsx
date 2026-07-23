@@ -63,7 +63,7 @@ export default function PRDetailPage() {
           </div>
           <p className="text-sm text-muted-foreground">{pr.title}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {pr.status === 'Draft' && (
             <Button onClick={() => submitMut.mutate()} disabled={submitMut.isPending}>
               <CheckCircle className="h-4 w-4 mr-2" /> Submit PR
@@ -79,7 +79,7 @@ export default function PRDetailPage() {
       </div>
 
       {/* Info Grid */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
           { label: 'Department',       value: pr.department },
           { label: 'Required Date',    value: fmtDate(pr.requiredDate) },
@@ -105,8 +105,8 @@ export default function PRDetailPage() {
       {/* Items Table */}
       <div>
         <h2 className="text-base font-semibold mb-3">Items ({pr.items.length})</h2>
-        <div className="rounded-md border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-md border overflow-x-auto">
+          <table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted/50">
               <tr>
                 {['#', 'Description', 'Qty', 'Unit', 'Unit Price', 'Line Total', 'Notes'].map(h => (

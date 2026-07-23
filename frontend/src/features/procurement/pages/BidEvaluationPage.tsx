@@ -196,8 +196,8 @@ export default function BidEvaluationPage() {
 
           {/* Current evaluators */}
           {evaluators.length > 0 && (
-            <div className="rounded-md border overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="rounded-md border overflow-x-auto">
+              <table className="w-full text-sm min-w-[300px]">
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="px-3 py-2 text-left font-medium text-muted-foreground">Evaluator</th>
@@ -245,7 +245,7 @@ export default function BidEvaluationPage() {
         <section className="space-y-4">
           <h2 className="text-base font-semibold">Weighted Evaluation (Single Evaluator)</h2>
 
-          <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
             {[
               { label: 'Price Weight (%)', value: priceWeight,    set: setPriceWeight },
               { label: 'Quality Weight (%)', value: qualityWeight,  set: setQualityWeight },
@@ -266,8 +266,8 @@ export default function BidEvaluationPage() {
             <p className="text-xs text-amber-600">Weights must sum to 100. Current: {weightsSum.toFixed(2)}</p>
           )}
 
-          <div className="rounded-md border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-md border overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead className="bg-muted/50">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Vendor</th>
@@ -314,8 +314,8 @@ export default function BidEvaluationPage() {
           <div className="p-3 bg-muted/30 rounded-lg text-xs text-muted-foreground">
             Weights — Price: <strong>{evaluation.priceWeight}%</strong> · Quality: <strong>{evaluation.qualityWeight}%</strong> · Delivery: <strong>{evaluation.deliveryWeight}%</strong>
           </div>
-          <div className="rounded-md border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-md border overflow-x-auto">
+            <table className="w-full text-sm min-w-[640px]">
               <thead className="bg-muted/50">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Vendor</th>

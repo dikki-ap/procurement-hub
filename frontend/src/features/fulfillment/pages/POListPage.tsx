@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Plus, Eye } from 'lucide-react';
+import { ShoppingCart, Plus, Eye, Download } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { downloadExcel } from '@/shared/lib/downloadFile';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { fulfillmentApi, type POListDto, type POStatus } from '../api/fulfillmentApi';
 import { useAuthStore } from '@/stores/authStore';
@@ -31,7 +33,20 @@ export default function POListPage() {
   const companyId     = user?.companyId ?? '';
   const base          = useBaseCurrency();
   const sym           = base?.symbol ?? base?.code ?? '?';
-  const [showNew, setShowNew] = useState(false);
+  const [showNew,     setShowNew]     = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      await downloadExcel(`/purchase-orders/export?companyId=${companyId}`, `PurchaseOrders_${today}.xlsx`);
+    } catch {
+      toast.error('Failed to export purchase orders');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const { data: pos = [], isLoading } = useQuery({
     queryKey: ['purchase-orders', companyId],
@@ -81,9 +96,15 @@ export default function POListPage() {
           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           <h1 className="text-xl sm:text-2xl font-semibold">Purchase Orders</h1>
         </div>
-        <Button size="sm" onClick={() => setShowNew(true)}>
-          <Plus className="h-4 w-4 mr-1" /> New PO
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting} className="gap-1">
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Export'}</span>
+          </Button>
+          <Button size="sm" onClick={() => setShowNew(true)}>
+            <Plus className="h-4 w-4 mr-1" /> New PO
+          </Button>
+        </div>
       </div>
 
       <DataTable

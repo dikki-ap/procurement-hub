@@ -87,7 +87,7 @@ export default function PODetailPage() {
           </div>
           <p className="text-sm text-muted-foreground">{po.vendorName}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {po.status === 'Approved' && isPurchasing && (
             <Button onClick={() => issueMut.mutate()} disabled={issueMut.isPending}>
               <FileText className="h-4 w-4 mr-2" /> Issue PO
@@ -107,7 +107,7 @@ export default function PODetailPage() {
       </div>
 
       {/* Info Grid */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg text-sm">
         {[
           { label: 'Total Amount',      value: `Rp ${fmt(po.totalAmount)}` },
           { label: 'Currency',          value: po.currencyCode ?? 'IDR' },
@@ -165,8 +165,8 @@ export default function PODetailPage() {
       {/* Items Table */}
       <div>
         <h2 className="text-base font-semibold mb-3">Items ({po.items.length})</h2>
-        <div className="rounded-md border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-md border overflow-x-auto">
+          <table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted/50">
               <tr>
                 {['#', 'Description', 'Qty', 'Unit', 'Unit Price', 'Total', 'Received'].map(h => (
@@ -206,8 +206,8 @@ export default function PODetailPage() {
       {grns.length > 0 && (
         <div>
           <h2 className="text-base font-semibold mb-3">Goods Receipts ({grns.length})</h2>
-          <div className="rounded-md border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-md border overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead className="bg-muted/50">
                 <tr>
                   {['GRN Number', 'Status', 'Received At', 'Created'].map(h => (
