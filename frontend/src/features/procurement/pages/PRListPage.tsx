@@ -10,8 +10,7 @@ import { NewPRModal } from './NewPRModal';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
 import { AuditCell } from '@/shared/components/AuditCell';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const StatusBadge = ({ status }: { status: PRStatus }) => {
   const cfg: Record<PRStatus, string> = {
@@ -33,11 +32,12 @@ const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
 export default function PRListPage() {
   const navigate   = useNavigate();
   const qc         = useQueryClient();
+  const companyId  = useAuthStore(s => s.user?.companyId ?? '');
   const [showNew, setShowNew] = useState(false);
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['prs', COMPANY_ID],
-    queryFn:  () => procurementApi.listPRs(COMPANY_ID),
+    queryKey: ['prs', companyId],
+    queryFn:  () => procurementApi.listPRs(companyId),
   });
 
   const submitMut = useMutation({

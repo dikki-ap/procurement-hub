@@ -9,8 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { vendorRegistrationApi, type VendorType } from '../api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const vendorTypes: VendorType[] = ['Manufacturer', 'Distributor', 'Trader'];
 
@@ -23,7 +22,8 @@ type Props = {
 };
 
 export function VendorFormModal({ open, onClose }: Props) {
-  const qc = useQueryClient();
+  const qc        = useQueryClient();
+  const companyId = useAuthStore(s => s.user?.companyId ?? '');
 
   const mutation = useMutation({
     mutationFn: vendorRegistrationApi.register,
@@ -41,7 +41,7 @@ export function VendorFormModal({ open, onClose }: Props) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
-      companyId:       COMPANY_ID,
+      companyId:       companyId,
       legalName:       fd.get('legalName') as string,
       tradeName:       (fd.get('tradeName') as string) || undefined,
       vendorType:      fd.get('vendorType') as VendorType,

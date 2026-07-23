@@ -11,8 +11,7 @@ import { TierBadge, ScoreBadge } from '../components/VendorBadges';
 import { SuspendModal, BlacklistModal, ReinstateModal } from '../components/VendorActionModals';
 import { extractApiError } from '@/shared/lib/apiError';
 import { AuditCell } from '@/shared/components/AuditCell';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const StatusBadge = ({ status }: { status: VendorStatus }) => {
   const cfg: Record<VendorStatus, string> = {
@@ -35,15 +34,16 @@ type ActionModal =
   | null;
 
 export default function VendorListPage() {
-  const navigate = useNavigate();
-  const qc       = useQueryClient();
+  const navigate   = useNavigate();
+  const qc         = useQueryClient();
+  const companyId  = useAuthStore(s => s.user?.companyId ?? '');
 
   const [showAdd,  setShowAdd]  = useState(false);
   const [modal,    setModal]    = useState<ActionModal>(null);
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['vendors', COMPANY_ID],
-    queryFn: () => vendorApi.getAll(COMPANY_ID),
+    queryKey: ['vendors', companyId],
+    queryFn: () => vendorApi.getAll(companyId),
   });
 
   const closeModal = () => setModal(null);

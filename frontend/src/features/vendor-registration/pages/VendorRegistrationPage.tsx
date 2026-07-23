@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { vendorRegistrationApi, type VendorType } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
 
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001'; // default company
+const COMPANY_ID = import.meta.env.VITE_DEFAULT_COMPANY_ID ?? '00000000-0000-0000-0000-000000000001';
 
 const vendorTypes: VendorType[] = ['Manufacturer', 'Distributor', 'Trader'];
 

@@ -6,8 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { procurementApi, type CreatePRItemRequest } from '../api/procurementApi';
 import { extractApiError } from '@/shared/lib/apiError';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const inputCls = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
 
@@ -18,8 +17,9 @@ const emptyItem = (): CreatePRItemRequest => ({
 });
 
 export default function PRFormPage() {
-  const navigate = useNavigate();
-  const qc       = useQueryClient();
+  const navigate   = useNavigate();
+  const qc         = useQueryClient();
+  const companyId  = useAuthStore(s => s.user?.companyId ?? '');
   const [items, setItems] = useState<CreatePRItemRequest[]>([emptyItem()]);
 
   const mutation = useMutation({
@@ -36,7 +36,7 @@ export default function PRFormPage() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
-      companyId:        COMPANY_ID,
+      companyId:        companyId,
       title:            fd.get('title') as string,
       description:      (fd.get('description') as string) || undefined,
       department:       fd.get('department') as string,

@@ -11,8 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { procurementApi, type CreatePRItemRequest } from '../api/procurementApi';
 import { extractApiError } from '@/shared/lib/apiError';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const inputCls =
   'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
@@ -22,7 +21,8 @@ const emptyItem = (): CreatePRItemRequest => ({ itemDescription: '', quantity: 1
 type Props = { open: boolean; onClose: () => void };
 
 export function NewPRModal({ open, onClose }: Props) {
-  const qc = useQueryClient();
+  const qc        = useQueryClient();
+  const companyId = useAuthStore(s => s.user?.companyId ?? '');
   const [items, setItems] = useState<CreatePRItemRequest[]>([emptyItem()]);
 
   const mutation = useMutation({
@@ -47,7 +47,7 @@ export function NewPRModal({ open, onClose }: Props) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
-      companyId:        COMPANY_ID,
+      companyId:        companyId,
       title:            fd.get('title') as string,
       description:      (fd.get('description') as string) || undefined,
       department:       fd.get('department') as string,

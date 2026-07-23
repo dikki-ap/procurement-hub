@@ -10,8 +10,7 @@ import { NewRFQModal } from './NewRFQModal';
 import { extractApiError } from '@/shared/lib/apiError';
 import { fmtDate } from '@/shared/lib/date';
 import { AuditCell } from '@/shared/components/AuditCell';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const StatusBadge = ({ status }: { status: RFQStatus }) => {
   const cfg: Record<RFQStatus, string> = {
@@ -31,11 +30,12 @@ const StatusBadge = ({ status }: { status: RFQStatus }) => {
 export default function RFQListPage() {
   const navigate   = useNavigate();
   const qc         = useQueryClient();
+  const companyId  = useAuthStore(s => s.user?.companyId ?? '');
   const [showNew, setShowNew] = useState(false);
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['rfqs', COMPANY_ID],
-    queryFn:  () => procurementApi.listRFQs(COMPANY_ID),
+    queryKey: ['rfqs', companyId],
+    queryFn:  () => procurementApi.listRFQs(companyId),
   });
 
   const closeMut = useMutation({

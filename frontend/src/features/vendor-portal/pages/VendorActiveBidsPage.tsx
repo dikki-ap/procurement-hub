@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/shared/components/DataTable';
 import { procurementApi, type RFQListDto, type RFQStatus } from '@/features/procurement/api/procurementApi';
 import { fmtDateTime } from '@/shared/lib/date';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const StatusBadge = ({ status }: { status: RFQStatus }) => {
   const cfg: Record<RFQStatus, string> = {
@@ -30,11 +29,12 @@ const DeadlineCell = ({ deadline }: { deadline: string }) => {
 };
 
 export default function VendorActiveBidsPage() {
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const companyId = useAuthStore(s => s.user?.companyId ?? '');
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['vendor-rfqs', COMPANY_ID],
-    queryFn:  () => procurementApi.listRFQs(COMPANY_ID).then(r =>
+    queryKey: ['vendor-rfqs', companyId],
+    queryFn:  () => procurementApi.listRFQs(companyId).then(r =>
       r.data.filter(rfq => rfq.status === 'Open')),
   });
 

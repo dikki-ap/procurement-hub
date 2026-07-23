@@ -9,8 +9,7 @@ import { vendorApi } from '@/features/vendors/api/vendorApi';
 import { extractApiError } from '@/shared/lib/apiError';
 import { useBaseCurrency } from '@/shared/hooks/useBaseCurrency';
 import { SearchableSelect } from '@/shared/components/SearchableSelect';
-
-const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuthStore } from '@/stores/authStore';
 
 const inputCls =
   'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400';
@@ -22,17 +21,18 @@ const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(n);
 
 export default function NewPOPage() {
-  const navigate  = useNavigate();
-  const qc        = useQueryClient();
-  const base      = useBaseCurrency();
+  const navigate   = useNavigate();
+  const qc         = useQueryClient();
+  const base       = useBaseCurrency();
+  const companyId  = useAuthStore(s => s.user?.companyId ?? '');
   const sym       = base?.symbol ?? base?.code ?? '?';
 
   const [items, setItems]       = useState<ItemRow[]>([emptyItem()]);
   const [vendorId, setVendorId] = useState('');
 
   const { data: allVendors = [] } = useQuery({
-    queryKey: ['vendors', COMPANY_ID],
-    queryFn:  () => vendorApi.getAll(COMPANY_ID),
+    queryKey: ['vendors', companyId],
+    queryFn:  () => vendorApi.getAll(companyId),
   });
   const vendors = allVendors.filter(v => v.status === 'Active');
 
@@ -50,7 +50,7 @@ export default function NewPOPage() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     mutation.mutate({
-      companyId:        COMPANY_ID,
+      companyId:        companyId,
       vendorId:         fd.get('vendorId') as string,
       expectedDelivery: (fd.get('expectedDelivery') as string) || undefined,
       notes:            (fd.get('notes') as string) || undefined,
